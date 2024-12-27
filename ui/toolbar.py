@@ -64,7 +64,7 @@ class ToolBar(QToolBar):
         key = self.combo_tickers.currentText()
         code = self.tickers[key]
 
-        csvfile = 'src/%s_%s.csv' % (code, date_target)
+        csvfile = 'ohlc/%s_%s.csv' % (code, date_target)
         if not os.path.isfile(csvfile):
             # １分足データを取得
             df = get_ohlc_1m(code, date_target)

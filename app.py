@@ -8,7 +8,11 @@ from PySide6.QtWidgets import (
     QMainWindow,
 )
 
-from tech.psar import initialize, calc_PSAR0, calc_PSAR
+from tech.psar import (
+    calc_PSAR,
+    calc_PSAR0,
+    initialize,
+)
 from ui.toolbar import ToolBar
 
 
