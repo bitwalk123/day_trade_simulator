@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
 )
 
+from tech.psar import initialize, calc_PSAR0, calc_PSAR
 from ui.toolbar import ToolBar
 
 
@@ -23,6 +24,17 @@ class Analyzer(QMainWindow):
         self.addToolBar(toolbar)
 
     def on_read_df(self, df: pd.DataFrame):
+        """
+        Yahoo Finance から取得した１分足データ
+        :param df:
+        :return:
+        """
+        df = initialize(df)
+        for i in range(len(df)):
+            if i == 1:
+                calc_PSAR0(df, i)
+            elif i > 1:
+                calc_PSAR(df, i)
         print(df)
 
 

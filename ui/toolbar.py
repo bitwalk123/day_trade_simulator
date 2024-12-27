@@ -6,8 +6,9 @@ from PySide6.QtCore import QDate, Signal
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QCalendarWidget,
+    QComboBox,
     QToolBar,
-    QToolButton, QComboBox,
+    QToolButton,
 )
 
 from func.tide import get_dates
@@ -47,7 +48,7 @@ class ToolBar(QToolBar):
 
         # dt_today = dt.datetime.now()
         qdate_today = QDate.currentDate()
-        if qdate_today <= qdate:
+        if qdate_today < qdate:
             msg_warning = '過去の日付を選択してください。'
             DialogWarning(msg_warning)
             return
@@ -71,7 +72,7 @@ class ToolBar(QToolBar):
             start, end = get_dates(date_target)
             symbol = '%s.T' % code
             ticker = yf.Ticker(symbol)
-            df = ticker.history(period='1d', interval='1m', start=start, end=end)
+            df: pd.DataFrame = ticker.history(period='1d', interval='1m', start=start, end=end)
             if len(df) == 0:
                 msg_warning = 'データを取得できませんでした。'
                 DialogWarning(msg_warning)
@@ -82,10 +83,18 @@ class ToolBar(QToolBar):
             df.index = [ts_jst.tz_localize(None) for ts_jst in df.index]
             df.index.name = name_index
 
-            # 前場と後場の間に（なぜか）余分なデータが含まれているので削除
             date_str = str(df.index[0].date())
             dt_lunch_1 = pd.to_datetime('%s 11:30:00' % date_str)
             dt_lunch_2 = pd.to_datetime('%s 12:30:00' % date_str)
+            dt_pre_ca = pd.to_datetime('%s 15:24:00' % date_str)
+
+            # 取得したデータが完全か確認
+            if max(df.index) < dt_pre_ca:
+                msg_warning = '取得したデータが不完全です。'
+                DialogWarning(msg_warning)
+                return
+
+            # 前場と後場の間に（なぜか）余分なデータが含まれているので削除
             df1 = df[df.index <= dt_lunch_1]
             df2 = df[df.index >= dt_lunch_2]
             df = pd.concat([df1, df2])
@@ -95,4 +104,5 @@ class ToolBar(QToolBar):
         else:
             df = pd.read_csv(csvfile, index_col=0)
 
+        # シグナル
         self.readDataFrame.emit(df)
