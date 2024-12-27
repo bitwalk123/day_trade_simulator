@@ -23,12 +23,7 @@ if __name__ == '__main__':
     date_str = str(df.index[0].date())
     dt_lunch_1 = pd.to_datetime('%s 11:30:00' % date_str)
     dt_lunch_2 = pd.to_datetime('%s 12:30:00' % date_str)
-    #list_idx1 = pd.Series([t for t in df.index if t <= dt_lunch_1])
-    #list_idx2 = pd.Series([t for t in df.index if t >= dt_lunch_2])
-    #print(df.index)
-    #print(list_idx1)
-    #df1 = df[list_idx1]
-    #df2 = df[list_idx2]
+
     df1 = df[df.index <= dt_lunch_1]
     df2 = df[df.index >= dt_lunch_2]
     df = pd.concat([df1, df2])
