@@ -1,0 +1,7 @@
+backports.tarfile
+importlib-metadata
+jaraco.collections
+pip-chill
+pip-review
+platformdirs
+tomli
