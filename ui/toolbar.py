@@ -72,7 +72,7 @@ class ToolBar(QToolBar):
         code = self.tickers[key]
 
         csvfile = os.path.join(
-            self.res.dir_image, '%s_%s.csv' % (code, date_target)
+            self.res.dir_ohlc, '%s_%s.csv' % (code, date_target)
         )
         if not os.path.isfile(csvfile):
             # １分足データを取得
