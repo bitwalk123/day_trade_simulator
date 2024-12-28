@@ -79,7 +79,7 @@ class ToolBar(QToolBar):
         # QDate から文字列 YYYY-MM-DD を生成
         date_target = get_yyyy_mm_dd(qdate)
 
-        # 対象銘柄のコード
+        # 対象銘柄のコード（東証の銘柄に限る）
         key = self.combo_tickers.currentText()
         code = self.tickers[key]
 
@@ -92,7 +92,8 @@ class ToolBar(QToolBar):
             df = pd.read_csv(csvfile, index_col=0)
         else:
             # １分足データを取得
-            df = get_ohlc_1m(code, date_target)
+            symbol = '%s.T' % code
+            df = get_ohlc_1m(symbol, date_target)
             if len(df) == 0:
                 msg_warning = 'データを取得できませんでした。'
                 DialogWarning(msg_warning)
