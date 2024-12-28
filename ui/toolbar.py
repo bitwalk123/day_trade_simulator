@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 )
 
 from func.io import get_ohlc_1m, read_json
+from func.preprocs import reformat_dataframe
 from func.tide import (
     get_time_breaks,
     get_yyyy_mm_dd,
@@ -33,6 +34,7 @@ class ToolBar(QToolBar):
         self.calendar.setWindowTitle('データ取得日')
         self.calendar.activated.connect(self.on_date_selected)
 
+        # カレンダー表示用のアイコン
         but_calendar = QToolButton()
         but_calendar.setIcon(
             QIcon(os.path.join(self.res.dir_image, 'calendar.png'))
@@ -40,15 +42,25 @@ class ToolBar(QToolBar):
         but_calendar.clicked.connect(self.on_calendar_clicked)
         self.addWidget(but_calendar)
 
+        # 銘柄
         self.combo_tickers = combo_tickers = QComboBox()
         combo_tickers.addItems(self.tickers.keys())
         self.addWidget(combo_tickers)
 
     def on_calendar_clicked(self):
+        """
+        カレンダーボタンがクリックされたときの処理
+        :return:
+        """
         if self.calendar is not None:
             self.calendar.show()
 
     def on_date_selected(self, qdate: QDate):
+        """
+        カレンダーで日付が選択されたときの処理
+        :param qdate:
+        :return:
+        """
         if self.calendar is not None:
             self.calendar.hide()
 
@@ -71,10 +83,14 @@ class ToolBar(QToolBar):
         key = self.combo_tickers.currentText()
         code = self.tickers[key]
 
+        # CSV ファイル名の設定
         csvfile = os.path.join(
             self.res.dir_ohlc, '%s_%s.csv' % (code, date_target)
         )
-        if not os.path.isfile(csvfile):
+        if os.path.isfile(csvfile):
+            # すでに取得している CSV 形式の OHLC データをデータフレームへ読込
+            df = pd.read_csv(csvfile, index_col=0)
+        else:
             # １分足データを取得
             df = get_ohlc_1m(code, date_target)
             if len(df) == 0:
@@ -95,14 +111,10 @@ class ToolBar(QToolBar):
                 return
 
             # 前場と後場の間に（なぜか）余分なデータが含まれているので削除
-            df1 = df[df.index <= dt_lunch_1]
-            df2 = df[df.index >= dt_lunch_2]
-            df = pd.concat([df1, df2])
+            df = reformat_dataframe(df, dt_lunch_1, dt_lunch_2)
 
             # 取得したデータフレームを CSV 形式で保存
             df.to_csv(csvfile)
-        else:
-            df = pd.read_csv(csvfile, index_col=0)
 
         # シグナル
         self.readDataFrame.emit(df)
