@@ -117,5 +117,8 @@ class ToolBar(QToolBar):
             # 取得したデータフレームを CSV 形式で保存
             df.to_csv(csvfile)
 
+        name_index = df.index.name
+        df.index = pd.to_datetime(df.index)
+        df.index.name = name_index
         # シグナル
         self.readDataFrame.emit(df)
