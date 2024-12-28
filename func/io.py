@@ -1,3 +1,5 @@
+import json
+
 import pandas as pd
 import yfinance as yf
 
@@ -23,3 +25,14 @@ def get_ohlc_1m(code: str, date_target: str) -> pd.DataFrame:
     )
 
     return df
+
+
+def read_json(jsonfile: str) -> dict:
+    """
+    指定された JSON ファイルを読み込む
+    :param jsonfile:
+    :return:
+    """
+    with open(jsonfile) as f:
+        dict_contents = json.load(f)
+    return dict_contents

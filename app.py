@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
 )
 
+from structs.res import AppRes
 from tech.psar import (
     calc_PSAR,
     calc_PSAR0,
@@ -21,9 +22,10 @@ class Analyzer(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.res = res = AppRes()
         self.setWindowTitle(self.__app_name__)
 
-        toolbar = ToolBar()
+        toolbar = ToolBar(res)
         toolbar.readDataFrame.connect(self.on_read_df)
         self.addToolBar(toolbar)
 

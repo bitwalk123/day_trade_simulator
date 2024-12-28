@@ -10,26 +10,33 @@ from PySide6.QtWidgets import (
     QToolButton,
 )
 
-from func.io import get_ohlc_1m
-from func.tide import get_yyyy_mm_dd, remove_tz_from_index, get_time_breaks
+from func.io import get_ohlc_1m, read_json
+from func.tide import (
+    get_time_breaks,
+    get_yyyy_mm_dd,
+    remove_tz_from_index,
+)
+from structs.res import AppRes
 from widgets.dialogs import DialogWarning
 
 
 class ToolBar(QToolBar):
     readDataFrame = Signal(pd.DataFrame)
 
-    tickers = {
-        '三菱ＵＦＪフィナンシャルＧ': '8306',
-    }
-
-    def __init__(self):
+    def __init__(self, res: AppRes):
         super().__init__()
+        self.res = res
+        json_ticker = os.path.join(res.dir_config, 'ticker.json')
+        self.tickers = read_json(json_ticker)
+
         self.calendar = QCalendarWidget()
         self.calendar.setWindowTitle('データ取得日')
         self.calendar.activated.connect(self.on_date_selected)
 
         but_calendar = QToolButton()
-        but_calendar.setIcon(QIcon('images/calendar.png'))
+        but_calendar.setIcon(
+            QIcon(os.path.join(self.res.dir_image, 'calendar.png'))
+        )
         but_calendar.clicked.connect(self.on_calendar_clicked)
         self.addWidget(but_calendar)
 
@@ -64,7 +71,9 @@ class ToolBar(QToolBar):
         key = self.combo_tickers.currentText()
         code = self.tickers[key]
 
-        csvfile = 'ohlc/%s_%s.csv' % (code, date_target)
+        csvfile = os.path.join(
+            self.res.dir_image, '%s_%s.csv' % (code, date_target)
+        )
         if not os.path.isfile(csvfile):
             # １分足データを取得
             df = get_ohlc_1m(code, date_target)

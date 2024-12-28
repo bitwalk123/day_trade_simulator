@@ -1,1 +1,1 @@
-# psar
+# day_trade_simulator
