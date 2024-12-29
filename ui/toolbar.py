@@ -67,13 +67,13 @@ class ToolBar(QToolBar):
         # dt_today = dt.datetime.now()
         qdate_today = QDate.currentDate()
         if qdate_today < qdate:
-            msg_warning = '過去の日付を選択してください。'
-            DialogWarning(msg_warning)
+            msg = '過去の日付を選択してください。'
+            DialogWarning(msg)
             return
 
-        if qdate.daysTo(qdate_today) > 32:
-            msg_warning = '日付が古すぎます。'
-            DialogWarning(msg_warning)
+        if qdate.daysTo(qdate_today) > 30:
+            msg = '日付が古すぎます。'
+            DialogWarning(msg)
             return
 
         # QDate から文字列 YYYY-MM-DD を生成
@@ -95,8 +95,8 @@ class ToolBar(QToolBar):
             symbol = '%s.T' % code
             df = get_ohlc_1m(symbol, date_target)
             if len(df) == 0:
-                msg_warning = 'データを取得できませんでした。'
-                DialogWarning(msg_warning)
+                msg = 'データを取得できませんでした。'
+                DialogWarning(msg)
                 return
 
             # 時間情報のタイムゾーン部分を削除
@@ -107,8 +107,8 @@ class ToolBar(QToolBar):
 
             # 取得したデータが完全か確認
             if max(df.index) < dt_pre_ca:
-                msg_warning = '取得したデータが不完全です。'
-                DialogWarning(msg_warning)
+                msg = '取得したデータが不完全です。'
+                DialogWarning(msg)
                 return
 
             # 前場と後場の間に（なぜか）余分なデータが含まれているので削除
