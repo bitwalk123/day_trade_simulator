@@ -67,11 +67,12 @@ class ToolBar(QToolBar):
             msg = '過去の日付を選択してください。'
             DialogWarning(msg)
             return
-
+        """
         if qdate.daysTo(qdate_today) > 30:
             msg = '日付が古すぎます。'
             DialogWarning(msg)
             return
+        """
 
         # データフレームを確認する辞書
         dict_df = dict()
