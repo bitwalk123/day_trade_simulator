@@ -99,3 +99,18 @@ def calc_PSAR(df: pd.DataFrame, i: int):
     else:
         val_PSAR = df.iloc[i - 1, EP]
     df.iloc[i, PSAR] = val_PSAR
+
+
+def psarStepByStep(df: pd.DataFrame) -> pd.DataFrame:
+    # PSAR の算出
+    df = initialize(df)
+    for i in range(len(df)):
+        if i == 1:
+            calc_PSAR0(df, i)
+        elif i > 1:
+            calc_PSAR(df, i)
+
+    df['bull'] = df[df['Trend'] == 1]['PSAR']
+    df['bear'] = df[df['Trend'] == -1]['PSAR']
+
+    return df

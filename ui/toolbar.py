@@ -10,19 +10,16 @@ from PySide6.QtWidgets import (
     QToolButton,
 )
 
-from func.io import get_ohlc_1m, read_json
-from func.preprocs import reformat_dataframe
+from func.io import read_json, get_ohlc
 from func.tide import (
-    get_time_breaks,
     get_yyyy_mm_dd,
-    remove_tz_from_index,
 )
 from structs.res import AppRes
 from widgets.dialogs import DialogWarning
 
 
 class ToolBar(QToolBar):
-    readDataFrame = Signal(pd.DataFrame)
+    readDataFrame = Signal(dict)
 
     def __init__(self, res: AppRes):
         super().__init__()
@@ -76,49 +73,26 @@ class ToolBar(QToolBar):
             DialogWarning(msg)
             return
 
+        # データフレームを確認する辞書
+        dict_df = dict()
+
         # QDate から文字列 YYYY-MM-DD を生成
         date_target = get_yyyy_mm_dd(qdate)
 
-        # 対象銘柄のコード（東証の銘柄に限る）
+        # １分足データを取得
         key = self.combo_tickers.currentText()
-        code = self.tickers[key]
+        interval = '1m'
+        target = {
+            "code": self.tickers[key]["code"],
+            "symbol": self.tickers[key]["symbol"],
+            "date": date_target,
+            "interval": interval,
+        }
+        df = get_ohlc(self.res, target)
+        if len(df) == 0:
+            return
 
-        # １分足データのCSVファイル名
-        file_ohlc_1m = os.path.join(
-            self.res.dir_ohlc, '%s_%s_1m.csv' % (code, date_target)
-        )
-        if os.path.isfile(file_ohlc_1m):
-            # すでに取得している CSV 形式の OHLC データをデータフレームへ読込
-            df = pd.read_csv(file_ohlc_1m, index_col=0)
-        else:
-            # １分足データを取得
-            symbol = '%s.T' % code
-            df = get_ohlc_1m(symbol, date_target)
-            if len(df) == 0:
-                msg = 'データを取得できませんでした。'
-                DialogWarning(msg)
-                return
+        dict_df[interval] = df
 
-            # 時間情報のタイムゾーン部分を削除
-            remove_tz_from_index(df)
-
-            # 判定に使用する（日付付きの）時刻を取得
-            dt_lunch_1, dt_lunch_2, dt_pre_ca = get_time_breaks(df)
-
-            # 取得したデータが完全か確認
-            if max(df.index) < dt_pre_ca:
-                msg = '取得したデータが不完全です。'
-                DialogWarning(msg)
-                return
-
-            # 前場と後場の間に（なぜか）余分なデータが含まれているので削除
-            df = reformat_dataframe(df, dt_lunch_1, dt_lunch_2)
-
-            # 取得したデータフレームを CSV 形式で保存
-            df.to_csv(file_ohlc_1m)
-
-        name_index = df.index.name
-        df.index = pd.to_datetime(df.index)
-        df.index.name = name_index
-        # シグナル
-        self.readDataFrame.emit(df)
+        # データフレーム準備完了シグナル
+        self.readDataFrame.emit(dict_df)

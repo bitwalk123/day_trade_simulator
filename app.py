@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # coding: utf-8
-import pandas as pd
 import sys
 
 from PySide6.QtCore import Qt
@@ -11,9 +10,7 @@ from PySide6.QtWidgets import (
 
 from structs.res import AppRes
 from tech.psar import (
-    calc_PSAR,
-    calc_PSAR0,
-    initialize,
+    psarStepByStep,
 )
 from ui.toolbar import ToolBar
 from widgets.charts import Canvas, ChartNavigation
@@ -41,22 +38,15 @@ class Analyzer(QMainWindow):
             navtoolbar,
         )
 
-    def on_read_df(self, df: pd.DataFrame):
+    def on_read_df(self, dict_df: dict):
         """
         Yahoo Finance から取得した１分足データ
         :param df:
         :return:
         """
-        # PSAR の算出
-        df = initialize(df)
-        for i in range(len(df)):
-            if i == 1:
-                calc_PSAR0(df, i)
-            elif i > 1:
-                calc_PSAR(df, i)
-        df['bull'] = df[df['Trend'] == 1]['PSAR']
-        df['bear'] = df[df['Trend'] == -1]['PSAR']
-
+        # １分足のOHLCデータ
+        df_1m = dict_df['1m']
+        df = psarStepByStep(df_1m)
         self.canvas.plot(df)
 
 
