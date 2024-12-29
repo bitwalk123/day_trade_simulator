@@ -71,7 +71,7 @@ class ToolBar(QToolBar):
             DialogWarning(msg_warning)
             return
 
-        if qdate.daysTo(qdate_today) > 28:
+        if qdate.daysTo(qdate_today) > 32:
             msg_warning = '日付が古すぎます。'
             DialogWarning(msg_warning)
             return
@@ -83,13 +83,13 @@ class ToolBar(QToolBar):
         key = self.combo_tickers.currentText()
         code = self.tickers[key]
 
-        # CSV ファイル名の設定
-        csvfile = os.path.join(
-            self.res.dir_ohlc, '%s_%s.csv' % (code, date_target)
+        # １分足データのCSVファイル名
+        file_ohlc_1m = os.path.join(
+            self.res.dir_ohlc, '%s_%s_1m.csv' % (code, date_target)
         )
-        if os.path.isfile(csvfile):
+        if os.path.isfile(file_ohlc_1m):
             # すでに取得している CSV 形式の OHLC データをデータフレームへ読込
-            df = pd.read_csv(csvfile, index_col=0)
+            df = pd.read_csv(file_ohlc_1m, index_col=0)
         else:
             # １分足データを取得
             symbol = '%s.T' % code
@@ -115,7 +115,7 @@ class ToolBar(QToolBar):
             df = reformat_dataframe(df, dt_lunch_1, dt_lunch_2)
 
             # 取得したデータフレームを CSV 形式で保存
-            df.to_csv(csvfile)
+            df.to_csv(file_ohlc_1m)
 
         name_index = df.index.name
         df.index = pd.to_datetime(df.index)
