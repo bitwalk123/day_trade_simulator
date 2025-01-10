@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
 
 from func.io import read_json, get_ohlc
 from func.tide import (
-    get_yyyy_mm_dd,
+    get_yyyymmdd,
 )
 from structs.res import AppRes
 from widgets.dialogs import DialogWarning
@@ -61,24 +61,11 @@ class ToolBar(QToolBar):
         if self.calendar is not None:
             self.calendar.hide()
 
-        # dt_today = dt.datetime.now()
-        qdate_today = QDate.currentDate()
-        if qdate_today < qdate:
-            msg = '過去の日付を選択してください。'
-            DialogWarning(msg)
-            return
-        """
-        if qdate.daysTo(qdate_today) > 30:
-            msg = '日付が古すぎます。'
-            DialogWarning(msg)
-            return
-        """
-
         # データフレームを確認する辞書
         dict_df = dict()
 
         # QDate から文字列 YYYY-MM-DD を生成
-        date_target = get_yyyy_mm_dd(qdate)
+        date_target = get_yyyymmdd(qdate)
 
         # １分足データを取得
         key = self.combo_tickers.currentText()
@@ -95,5 +82,6 @@ class ToolBar(QToolBar):
 
         dict_df[interval] = df
 
+        print(df)
         # データフレーム準備完了シグナル
-        self.readDataFrame.emit(dict_df)
+        #self.readDataFrame.emit(dict_df)

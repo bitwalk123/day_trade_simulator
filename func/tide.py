@@ -34,7 +34,7 @@ def get_time_breaks(df: pd.DataFrame) -> tuple:
 
     return dt_lunch_1, dt_lunch_2, dt_pre_ca
 
-def get_yyyy_mm_dd(qdate: QDate) -> str:
+def get_yyyymmdd(qdate: QDate) -> str:
     """
     QDate オブジェクトから YYYY-MM-DD の文字列を生成
     :param qdate:
@@ -43,7 +43,7 @@ def get_yyyy_mm_dd(qdate: QDate) -> str:
     str_year = '{:0=4}'.format(qdate.year())
     str_month = '{:0=2}'.format(qdate.month())
     str_day = '{:0=2}'.format(qdate.day())
-    date_target = '%s-%s-%s' % (str_year, str_month, str_day)
+    date_target = '%s%s%s' % (str_year, str_month, str_day)
 
     return date_target
 

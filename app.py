@@ -46,8 +46,8 @@ class Analyzer(QMainWindow):
         """
         # １分足のOHLCデータ
         df_1m = dict_df['1m']
-        df = psarStepByStep(df_1m)
-        self.canvas.plot(df)
+        # df = psarStepByStep(df_1m)
+        # self.canvas.plot(df)
 
 
 def main():
