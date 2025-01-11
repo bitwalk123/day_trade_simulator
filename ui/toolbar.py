@@ -10,9 +10,10 @@ from PySide6.QtWidgets import (
     QToolButton,
 )
 
-from func.io import read_json, get_ohlc
+from func.io import read_json, get_ohlc, get_tick
 from func.tide import (
     get_yyyymmdd,
+    get_yyyy_mm_dd,
 )
 from structs.res import AppRes
 from widgets.dialogs import DialogWarning
@@ -66,22 +67,31 @@ class ToolBar(QToolBar):
 
         # QDate から文字列 YYYY-MM-DD を生成
         date_target = get_yyyymmdd(qdate)
+        date_target_2 = get_yyyy_mm_dd(qdate)
 
-        # １分足データを取得
+        # 扱うデータ情報
         key = self.combo_tickers.currentText()
         interval = '1m'
         target = {
             "code": self.tickers[key]["code"],
             "symbol": self.tickers[key]["symbol"],
             "date": date_target,
+            "date2": date_target_2,
             "interval": interval,
         }
-        df = get_ohlc(self.res, target)
-        if len(df) == 0:
+
+        # １分足データを取得
+        df_ohlc = get_ohlc(self.res, target)
+        if len(df_ohlc) == 0:
             return
 
-        dict_df[interval] = df
+        dict_df[interval] = df_ohlc
 
-        print(df)
+        # ティックデータを取得
+        df_tick = get_tick(self.res, target)
+        dict_df['tick'] = df_tick
+
+        print(df_tick)
+
         # データフレーム準備完了シグナル
-        #self.readDataFrame.emit(dict_df)
+        self.readDataFrame.emit(dict_df)

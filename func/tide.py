@@ -17,6 +17,16 @@ def get_dates(date_target: str) -> tuple[dt.datetime, dt.datetime]:
 
     return dt_start, dt_end
 
+
+def get_range_xaxis(df: pd.DataFrame) -> tuple:
+    date_str = str(df.index[0].date())
+
+    dt_left = pd.to_datetime('%s 08:55:00' % date_str)
+    dt_right = pd.to_datetime('%s 15:30:00' % date_str)
+
+    return dt_left, dt_right
+
+
 def get_time_breaks(df: pd.DataFrame) -> tuple:
     """
     判定に使用する（日付付きの）時刻を取得
@@ -33,6 +43,21 @@ def get_time_breaks(df: pd.DataFrame) -> tuple:
     dt_pre_ca = pd.to_datetime('%s 15:24:00' % date_str)
 
     return dt_lunch_1, dt_lunch_2, dt_pre_ca
+
+
+def get_yyyy_mm_dd(qdate: QDate) -> str:
+    """
+    QDate オブジェクトから YYYY-MM-DD の文字列を生成
+    :param qdate:
+    :return:
+    """
+    str_year = '{:0=4}'.format(qdate.year())
+    str_month = '{:0=2}'.format(qdate.month())
+    str_day = '{:0=2}'.format(qdate.day())
+    date_target = '%s-%s-%s' % (str_year, str_month, str_day)
+
+    return date_target
+
 
 def get_yyyymmdd(qdate: QDate) -> str:
     """
@@ -57,5 +82,3 @@ def remove_tz_from_index(df: pd.DataFrame):
     name_index = df.index.name
     df.index = [ts_jst.tz_localize(None) for ts_jst in df.index]
     df.index.name = name_index
-
-

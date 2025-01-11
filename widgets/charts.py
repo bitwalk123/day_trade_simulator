@@ -2,6 +2,7 @@ import os
 
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
+from matplotlib import dates as mdates
 from matplotlib.backends.backend_qtagg import (
     FigureCanvasQTAgg as FigureCanvas,
     NavigationToolbar2QT as NavigationToolbar,
@@ -10,6 +11,7 @@ from matplotlib.figure import Figure
 import mplfinance as mpf
 import pandas as pd
 
+from func.tide import get_range_xaxis
 from structs.res import AppRes
 
 
@@ -47,7 +49,7 @@ class Canvas(FigureCanvas):
             bottom=0.06,
         )
 
-    def plot(self, df: pd.DataFrame):
+    def plot(self, dict_df: dict):
         """
         プロット
         :param df:
@@ -57,48 +59,43 @@ class Canvas(FigureCanvas):
         # 消去
         clear_axes(self.fig)
 
-        self.plot_candle(df)
+        df_tick = dict_df['tick']
+        df_ohlc_1m = dict_df['1m']
+
+        self.ax.plot(
+            df_tick,
+            color='black',
+            linewidth='0.75',
+            alpha=0.5,
+        )
+
+        df_bear = df_ohlc_1m[df_ohlc_1m['TREND'] < 0]
+        df_bull = df_ohlc_1m[df_ohlc_1m['TREND'] > 0]
+
+        # bear - Downward trend
+        self.ax.scatter(
+            x=df_bear.index,
+            y=df_bear['PSAR'],
+            color='blue',
+            s=10,
+        )
+
+        # bull - Upward trend
+        self.ax.scatter(
+            x=df_bull.index,
+            y=df_bull['PSAR'],
+            color='red',
+            s=10,
+        )
+
+        self.ax.grid()
+        self.ax.xaxis.set_major_formatter(
+            mdates.DateFormatter('%H:%M')
+        )
+        self.ax.set_xlim(get_range_xaxis(df_tick))
 
         # 再描画
         refreshDraw(self.fig)
-
-    def plot_candle(self, df):
-        """
-        ローソク足チャート
-        :param df:
-        :return:
-        """
-        apds = [
-            mpf.make_addplot(
-                df['bear'],
-                type='scatter',
-                marker='o',
-                markersize=5,
-                color='blue',
-                label='Down trend',
-                ax=self.ax
-            ),
-            mpf.make_addplot(
-                df['bull'],
-                type='scatter',
-                marker='o',
-                markersize=5,
-                color='red',
-                label='Up trend',
-                ax=self.ax
-            ),
-        ]
-        mpf.plot(
-            data=df,
-            type='candle',
-            style='default',
-            datetime_format='%H:%M',
-            xrotation=0,
-            addplot=apds,
-            ax=self.ax,
-        )
-        self.ax.grid()
-        self.ax.legend(loc='best', fontsize=9)
 
 
 class ChartNavigation(NavigationToolbar):

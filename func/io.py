@@ -1,19 +1,17 @@
 import json
-import os
 
 import pandas as pd
 import yfinance as yf
 
-from func.common import get_csv_ohlc_name
-from func.preprocs import reformat_dataframe
+from func.common import (
+    get_csv_ohlc_name,
+    get_csv_tick_name,
+)
 
 from func.tide import (
     get_dates,
-    get_time_breaks,
-    remove_tz_from_index,
 )
 from structs.res import AppRes
-from widgets.dialogs import DialogWarning
 
 
 def get_ohlc(res: AppRes, target: dict) -> pd.DataFrame:
@@ -25,9 +23,29 @@ def get_ohlc(res: AppRes, target: dict) -> pd.DataFrame:
     """
     # OHLCのファイル名（CSV形式）
     file_ohlc = get_csv_ohlc_name(res, target)
-    df = pd.read_csv(file_ohlc, index_col=0)
+    df = pd.read_csv(file_ohlc)
+    df.index = pd.to_datetime(
+        ['%s %s' % (df['日付'].iloc[r], df['時刻'].iloc[r]) for r in range(len(df))]
+    )
+    df.index.name = 'Datetime'
 
-    return df
+    list_col_0 = ['始値', '高値', '安値', '終値', '出来高', 'TREND', 'EP', 'AF', 'PSAR']
+    list_col_1 = ['Open', 'High', 'Low', 'Close', 'Volume', 'TREND', 'EP', 'AF', 'PSAR']
+    df0 = df[list_col_0].copy()
+    df0.columns = list_col_1
+    return df0
+
+
+def get_tick(res: AppRes, target: dict) -> pd.DataFrame:
+    file_tick = get_csv_tick_name(res, target)
+    df = pd.read_csv(file_tick)
+    df.index = pd.to_datetime(
+        ['%s %s' % (target['date2'], df['時刻'].iloc[r]) for r in range(len(df))]
+    )
+    df.index.name = 'Datetime'
+    ser = df['株価'].copy()
+    ser.name = 'Price'
+    return pd.DataFrame(ser)
 
 
 def get_ohlc_from_yahoo(target: dict) -> pd.DataFrame:

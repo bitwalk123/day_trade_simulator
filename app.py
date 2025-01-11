@@ -9,9 +9,6 @@ from PySide6.QtWidgets import (
 )
 
 from structs.res import AppRes
-from tech.psar import (
-    psarStepByStep,
-)
 from ui.toolbar import ToolBar
 from widgets.charts import Canvas, ChartNavigation
 
@@ -44,10 +41,7 @@ class Analyzer(QMainWindow):
         :param df:
         :return:
         """
-        # １分足のOHLCデータ
-        df_1m = dict_df['1m']
-        # df = psarStepByStep(df_1m)
-        # self.canvas.plot(df)
+        self.canvas.plot(dict_df)
 
 
 def main():
