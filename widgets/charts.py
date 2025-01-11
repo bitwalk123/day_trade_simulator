@@ -51,7 +51,7 @@ class Canvas(FigureCanvas):
 
         #self.ax = self.fig.add_subplot(111)
         self.ax = dict()
-        n = 2
+        n = 3
         gs = self.fig.add_gridspec(
             n, 1,
             wspace=0.0, hspace=0.0,
@@ -59,7 +59,6 @@ class Canvas(FigureCanvas):
         )
         for i, axis in enumerate(gs.subplots(sharex='col')):
             self.ax[i] = axis
-            self.ax[i].grid()
 
         self.fig.subplots_adjust(
             left=0.05,
