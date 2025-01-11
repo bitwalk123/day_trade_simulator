@@ -122,6 +122,8 @@ class Canvas(FigureCanvas):
         )
         self.ax[1].set_ylabel('Volume')
 
+        self.ax[2].set_ylabel('MFI')
+
         drawGrid(self.fig)
 
         # 再描画
