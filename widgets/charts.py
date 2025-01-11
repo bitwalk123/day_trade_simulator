@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
@@ -8,14 +9,12 @@ from matplotlib.backends.backend_qtagg import (
     NavigationToolbar2QT as NavigationToolbar,
 )
 from matplotlib.figure import Figure
-import mplfinance as mpf
-import pandas as pd
 
 from func.tide import get_range_xaxis
 from structs.res import AppRes
 
 
-def clear_axes(fig: Figure):
+def clearAxes(fig: Figure):
     """Clear axes
 
     :param fig:
@@ -25,6 +24,15 @@ def clear_axes(fig: Figure):
     for ax in axs:
         ax.cla()
 
+def drawGrid(fig: Figure):
+    """Draw grids
+
+    :param fig:
+    :return:
+    """
+    axs = fig.axes
+    for ax in axs:
+        ax.grid()
 
 def refreshDraw(fig: Figure):
     fig.canvas.draw()
@@ -41,7 +49,18 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.family'] = font_prop.get_name()
         plt.rcParams['font.size'] = 14
 
-        self.ax = self.fig.add_subplot(111)
+        #self.ax = self.fig.add_subplot(111)
+        self.ax = dict()
+        n = 2
+        gs = self.fig.add_gridspec(
+            n, 1,
+            wspace=0.0, hspace=0.0,
+            height_ratios=[3 if i == 0 else 1 for i in range(n)]
+        )
+        for i, axis in enumerate(gs.subplots(sharex='col')):
+            self.ax[i] = axis
+            self.ax[i].grid()
+
         self.fig.subplots_adjust(
             left=0.05,
             right=0.99,
@@ -57,12 +76,12 @@ class Canvas(FigureCanvas):
         """
 
         # 消去
-        clear_axes(self.fig)
+        clearAxes(self.fig)
 
         df_tick = dict_df['tick']
         df_ohlc_1m = dict_df['1m']
 
-        self.ax.plot(
+        self.ax[0].plot(
             df_tick,
             color='black',
             linewidth='0.75',
@@ -73,7 +92,7 @@ class Canvas(FigureCanvas):
         df_bull = df_ohlc_1m[df_ohlc_1m['TREND'] > 0]
 
         # bear - Downward trend
-        self.ax.scatter(
+        self.ax[0].scatter(
             x=df_bear.index,
             y=df_bear['PSAR'],
             color='blue',
@@ -81,18 +100,30 @@ class Canvas(FigureCanvas):
         )
 
         # bull - Upward trend
-        self.ax.scatter(
+        self.ax[0].scatter(
             x=df_bull.index,
             y=df_bull['PSAR'],
             color='red',
             s=10,
         )
 
-        self.ax.grid()
-        self.ax.xaxis.set_major_formatter(
+        self.ax[0].set_ylabel('Price')
+
+        self.ax[0].xaxis.set_major_formatter(
             mdates.DateFormatter('%H:%M')
         )
-        self.ax.set_xlim(get_range_xaxis(df_tick))
+        self.ax[0].set_xlim(get_range_xaxis(df_tick))
+
+        self.ax[1].set_yscale('log')
+        self.ax[1].bar(
+            df_ohlc_1m.index,
+            df_ohlc_1m['Volume'],
+            width=timedelta(minutes=1),
+            align = 'center'
+        )
+        self.ax[1].set_ylabel('Volume')
+
+        drawGrid(self.fig)
 
         # 再描画
         refreshDraw(self.fig)

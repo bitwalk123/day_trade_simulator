@@ -84,14 +84,11 @@ class ToolBar(QToolBar):
         df_ohlc = get_ohlc(self.res, target)
         if len(df_ohlc) == 0:
             return
-
         dict_df[interval] = df_ohlc
 
         # ティックデータを取得
         df_tick = get_tick(self.res, target)
         dict_df['tick'] = df_tick
-
-        print(df_tick)
 
         # データフレーム準備完了シグナル
         self.readDataFrame.emit(dict_df)
