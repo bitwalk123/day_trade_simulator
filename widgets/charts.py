@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from datetime import timedelta
 
 import matplotlib.font_manager as fm
@@ -24,6 +25,7 @@ def clearAxes(fig: Figure):
     for ax in axs:
         ax.cla()
 
+
 def drawGrid(fig: Figure):
     """Draw grids
 
@@ -32,10 +34,22 @@ def drawGrid(fig: Figure):
     """
     axs = fig.axes
     for ax in axs:
-        ax.grid()
+        ax.grid(which='major', linestyle='solid')
+        ax.grid(which='minor', linestyle='dotted')
+
 
 def refreshDraw(fig: Figure):
     fig.canvas.draw()
+
+
+def getMajorXTicks(df: pd.DataFrame) -> tuple:
+    date_str = str(df.index[0].date())
+    tick_labels = [
+        '9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00',
+        '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+    ]
+    tick_position = [pd.to_datetime('%s %s' % (date_str, l)) for l in tick_labels]
+    return tick_position, tick_labels
 
 
 class Canvas(FigureCanvas):
@@ -49,19 +63,19 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.family'] = font_prop.get_name()
         plt.rcParams['font.size'] = 14
 
-        #self.ax = self.fig.add_subplot(111)
+        # self.ax = self.fig.add_subplot(111)
         self.ax = dict()
-        n = 3
+        n = 2
         gs = self.fig.add_gridspec(
             n, 1,
             wspace=0.0, hspace=0.0,
-            height_ratios=[3 if i == 0 else 1 for i in range(n)]
+            height_ratios=[2 if i == 0 else 1 for i in range(n)]
         )
         for i, axis in enumerate(gs.subplots(sharex='col')):
             self.ax[i] = axis
 
         self.fig.subplots_adjust(
-            left=0.05,
+            left=0.075,
             right=0.99,
             top=0.98,
             bottom=0.06,
@@ -70,7 +84,7 @@ class Canvas(FigureCanvas):
     def plot(self, dict_df: dict):
         """
         プロット
-        :param df:
+        :param dict_df:
         :return:
         """
 
@@ -79,7 +93,9 @@ class Canvas(FigureCanvas):
 
         df_tick = dict_df['tick']
         df_ohlc_1m = dict_df['1m']
+        # print(df_ohlc_1m)
 
+        # Tick
         self.ax[0].plot(
             df_tick,
             color='black',
@@ -90,7 +106,7 @@ class Canvas(FigureCanvas):
         df_bear = df_ohlc_1m[df_ohlc_1m['TREND'] < 0]
         df_bull = df_ohlc_1m[df_ohlc_1m['TREND'] > 0]
 
-        # bear - Downward trend
+        # PSAR bear - Downward trend
         self.ax[0].scatter(
             x=df_bear.index,
             y=df_bear['PSAR'],
@@ -98,7 +114,7 @@ class Canvas(FigureCanvas):
             s=10,
         )
 
-        # bull - Upward trend
+        # PSAR bull - Upward trend
         self.ax[0].scatter(
             x=df_bull.index,
             y=df_bull['PSAR'],
@@ -108,21 +124,21 @@ class Canvas(FigureCanvas):
 
         self.ax[0].set_ylabel('Price')
 
+        tick_position, tick_labels = getMajorXTicks(df_tick)
+        self.ax[0].set_xticks(ticks=tick_position, labels=tick_labels)
+        # self.ax[0].xaxis.set_major_locator(mdates.MinuteLocator(interval=30))
+        self.ax[0].xaxis.set_minor_locator(mdates.MinuteLocator(interval=5))
         self.ax[0].xaxis.set_major_formatter(
             mdates.DateFormatter('%H:%M')
         )
         self.ax[0].set_xlim(get_range_xaxis(df_tick))
 
-        self.ax[1].set_yscale('log')
-        self.ax[1].bar(
-            df_ohlc_1m.index,
-            df_ohlc_1m['Volume'],
-            width=timedelta(minutes=1),
-            align = 'center'
+        # OBV, On-Valance Volume
+        self.ax[1].plot(
+            df_ohlc_1m['OBV'],
+            color='magenta',
         )
-        self.ax[1].set_ylabel('Volume')
-
-        self.ax[2].set_ylabel('MFI')
+        self.ax[1].set_ylabel('On-Balance Volume')
 
         drawGrid(self.fig)
 

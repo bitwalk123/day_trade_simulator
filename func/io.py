@@ -29,23 +29,11 @@ def get_ohlc(res: AppRes, target: dict) -> pd.DataFrame:
     )
     df.index.name = 'Datetime'
 
-    list_col_0 = ['始値', '高値', '安値', '終値', '出来高', 'TREND', 'EP', 'AF', 'PSAR']
-    list_col_1 = ['Open', 'High', 'Low', 'Close', 'Volume', 'TREND', 'EP', 'AF', 'PSAR']
+    list_col_0 = ['始値', '高値', '安値', '終値', '出来高', 'TREND', 'PSAR', 'OBV']
+    list_col_1 = ['Open', 'High', 'Low', 'Close', 'Volume', 'TREND', 'PSAR', 'OBV']
     df0 = df[list_col_0].copy()
     df0.columns = list_col_1
     return df0
-
-
-def get_tick(res: AppRes, target: dict) -> pd.DataFrame:
-    file_tick = get_csv_tick_name(res, target)
-    df = pd.read_csv(file_tick)
-    df.index = pd.to_datetime(
-        ['%s %s' % (target['date2'], df['時刻'].iloc[r]) for r in range(len(df))]
-    )
-    df.index.name = 'Datetime'
-    ser = df['株価'].copy()
-    ser.name = 'Price'
-    return pd.DataFrame(ser)
 
 
 def get_ohlc_from_yahoo(target: dict) -> pd.DataFrame:
@@ -62,6 +50,18 @@ def get_ohlc_from_yahoo(target: dict) -> pd.DataFrame:
         start=start,
         end=end,
     )
+
+
+def get_tick(res: AppRes, target: dict) -> pd.DataFrame:
+    file_tick = get_csv_tick_name(res, target)
+    df = pd.read_csv(file_tick)
+    df.index = pd.to_datetime(
+        ['%s %s' % (target['date2'], df['時刻'].iloc[r]) for r in range(len(df))]
+    )
+    df.index.name = 'Datetime'
+    ser = df['株価'].copy()
+    ser.name = 'Price'
+    return pd.DataFrame(ser)
 
 
 def read_json(jsonfile: str) -> dict:

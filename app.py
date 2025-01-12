@@ -20,7 +20,7 @@ class Analyzer(QMainWindow):
         super().__init__()
         self.res = AppRes()
         self.setWindowTitle(self.__app_name__)
-        self.setFixedSize(1800, 800)
+        self.setFixedSize(1200, 800)
 
         toolbar = ToolBar(self.res)
         toolbar.readDataFrame.connect(self.on_read_df)

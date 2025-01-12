@@ -1,5 +1,4 @@
 import os
-import pandas as pd
 
 from PySide6.QtCore import QDate, Signal
 from PySide6.QtGui import QIcon
@@ -10,13 +9,16 @@ from PySide6.QtWidgets import (
     QToolButton,
 )
 
-from func.io import read_json, get_ohlc, get_tick
+from func.io import (
+    get_ohlc,
+    get_tick,
+    read_json,
+)
 from func.tide import (
     get_yyyymmdd,
     get_yyyy_mm_dd,
 )
 from structs.res import AppRes
-from widgets.dialogs import DialogWarning
 
 
 class ToolBar(QToolBar):
