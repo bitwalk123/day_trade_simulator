@@ -21,8 +21,8 @@ def get_dates(date_target: str) -> tuple[dt.datetime, dt.datetime]:
 def get_range_xaxis(df: pd.DataFrame) -> tuple:
     date_str = str(df.index[0].date())
 
-    dt_left = pd.to_datetime('%s 08:55:00' % date_str)
-    dt_right = pd.to_datetime('%s 15:30:00' % date_str)
+    dt_left = pd.to_datetime('%s 08:50:00' % date_str)
+    dt_right = pd.to_datetime('%s 15:40:00' % date_str)
 
     return dt_left, dt_right
 
