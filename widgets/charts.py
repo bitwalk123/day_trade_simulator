@@ -126,7 +126,6 @@ class Canvas(FigureCanvas):
 
         tick_position, tick_labels = getMajorXTicks(df_tick)
         self.ax[0].set_xticks(ticks=tick_position, labels=tick_labels)
-        # self.ax[0].xaxis.set_major_locator(mdates.MinuteLocator(interval=30))
         self.ax[0].xaxis.set_minor_locator(mdates.MinuteLocator(interval=5))
         self.ax[0].xaxis.set_major_formatter(
             mdates.DateFormatter('%H:%M')
