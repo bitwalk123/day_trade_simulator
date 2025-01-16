@@ -103,6 +103,7 @@ class Canvas(FigureCanvas):
             alpha=0.5,
         )
 
+        """
         df_bear = df_ohlc_1m[df_ohlc_1m['TREND'] < 0]
         df_bull = df_ohlc_1m[df_ohlc_1m['TREND'] > 0]
 
@@ -121,6 +122,7 @@ class Canvas(FigureCanvas):
             color='red',
             s=10,
         )
+        """
 
         self.ax[0].set_ylabel('Price')
 
