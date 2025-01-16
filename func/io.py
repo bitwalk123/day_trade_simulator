@@ -29,8 +29,8 @@ def get_ohlc(res: AppRes, target: dict) -> pd.DataFrame:
     )
     df.index.name = 'Datetime'
 
-    list_col_0 = ['始値', '高値', '安値', '終値', '出来高', 'TREND', 'PSAR', 'OBV']
-    list_col_1 = ['Open', 'High', 'Low', 'Close', 'Volume', 'TREND', 'PSAR', 'OBV']
+    list_col_0 = ['始値', '高値', '安値', '終値', '出来高', 'TREND', 'PSAR']
+    list_col_1 = ['Open', 'High', 'Low', 'Close', 'Volume', 'TREND', 'PSAR']
     df0 = df[list_col_0].copy()
     df0.columns = list_col_1
     return df0

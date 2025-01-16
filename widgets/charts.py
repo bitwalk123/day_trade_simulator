@@ -133,11 +133,13 @@ class Canvas(FigureCanvas):
         self.ax[0].set_xlim(get_range_xaxis(df_tick))
 
         # OBV, On-Valance Volume
+        """
         self.ax[1].plot(
             df_ohlc_1m['OBV'],
             color='magenta',
         )
         self.ax[1].set_ylabel('On-Balance Volume')
+        """
 
         drawGrid(self.fig)
 
