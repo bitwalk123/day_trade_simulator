@@ -53,13 +53,28 @@ def get_ohlc_from_yahoo(target: dict) -> pd.DataFrame:
 
 
 def get_tick(res: AppRes, target: dict) -> pd.DataFrame:
+    """
+
+    :param res:
+    :param target:
+    :return:
+    """
+    # tick データの読み込み
     file_tick = get_csv_tick_name(res, target)
     df = pd.read_csv(file_tick)
+
+    # 時酷烈に日付情報を付加、文字列から日付フォーマットへ変更
     df.index = pd.to_datetime(
-        ['%s %s' % (target['date2'], df['時刻'].iloc[r]) for r in range(len(df))]
+        [
+            '%s %s' % (
+                target['date_format'], df['Time'].iloc[r],
+            ) for r in range(len(df))
+        ]
     )
     df.index.name = 'Datetime'
-    ser = df['株価'].copy()
+
+    # 一旦 Series にコピーしてから DataFrame で返す
+    ser = df['Price'].copy()
     ser.name = 'Price'
     return pd.DataFrame(ser)
 

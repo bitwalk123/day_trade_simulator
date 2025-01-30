@@ -92,7 +92,7 @@ class Canvas(FigureCanvas):
         clearAxes(self.fig)
 
         df_tick = dict_df['tick']
-        df_ohlc_1m = dict_df['1m']
+        # df_ohlc_1m = dict_df['1m']
         # print(df_ohlc_1m)
 
         # Tick
