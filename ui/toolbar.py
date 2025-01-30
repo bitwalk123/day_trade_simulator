@@ -78,6 +78,7 @@ class ToolBar(QToolBar):
             'name': key,
             'code': self.tickers[key]['code'],
             'symbol': self.tickers[key]['symbol'],
+            'tick_price': self.tickers[key]['tick_price'],
             'date': date_target,
             'date_format': date_format_target,
         }
