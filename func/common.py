@@ -3,16 +3,17 @@ import os
 from structs.res import AppRes
 
 
-def get_csv_ohlc_name(res: AppRes, target: dict) -> str:
+def get_csv_ohlc_name(res: AppRes, dict_info: dict, interval: str) -> str:
     return os.path.join(
         res.dir_ohlc, 'ohlc_%s_%s_%s.csv' % (
-            target["interval"], target["code"], target["date"]
+            interval, dict_info["code"], dict_info["date"]
         )
     )
 
-def get_csv_tick_name(res: AppRes, target: dict) -> str:
+
+def get_csv_tick_name(res: AppRes, dict_info: dict) -> str:
     return os.path.join(
         res.dir_tick, 'tick_%s_%s.csv' % (
-            target["code"], target["date"]
+            dict_info["code"], dict_info["date"]
         )
     )

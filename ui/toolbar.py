@@ -44,7 +44,7 @@ class ToolBar(QToolBar):
 
         # 銘柄
         self.combo_tickers = combo_tickers = QComboBox()
-        combo_tickers.addItems(self.tickers.keys())
+        combo_tickers.addItems([key for key in self.tickers.keys()])
         self.addWidget(combo_tickers)
 
     def on_calendar_clicked(self):
@@ -69,28 +69,29 @@ class ToolBar(QToolBar):
 
         # QDate から文字列 YYYY-MM-DD を生成
         date_target = get_yyyymmdd(qdate)
-        date_target_2 = get_yyyy_mm_dd(qdate)
+        date_format_target = get_yyyy_mm_dd(qdate)
 
         # 扱うデータ情報
         key = self.combo_tickers.currentText()
         interval = '1m'
-        target = {
-            "code": self.tickers[key]["code"],
-            "symbol": self.tickers[key]["symbol"],
-            "date": date_target,
-            "date2": date_target_2,
-            "interval": interval,
+        dict_target = {
+            'name': key,
+            'code': self.tickers[key]['code'],
+            'symbol': self.tickers[key]['symbol'],
+            'tick_price': self.tickers[key]['tick_price'],
+            'date': date_target,
+            'date_format': date_format_target,
         }
 
         # １分足データを取得
-        df_ohlc = get_ohlc(self.res, target)
+        df_ohlc = get_ohlc(self.res, dict_target, interval)
         if len(df_ohlc) == 0:
             return
-        dict_df[interval] = df_ohlc
+        dict_target[interval] = df_ohlc
 
         # ティックデータを取得
-        df_tick = get_tick(self.res, target)
-        dict_df['tick'] = df_tick
+        df_tick = get_tick(self.res, dict_target)
+        dict_target['tick'] = df_tick
 
         # データフレーム準備完了シグナル
-        self.readDataFrame.emit(dict_df)
+        self.readDataFrame.emit(dict_target)
