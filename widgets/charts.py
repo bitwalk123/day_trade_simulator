@@ -75,7 +75,7 @@ class Canvas(FigureCanvas):
             self.ax[i] = axis
 
         self.fig.subplots_adjust(
-            left=0.075,
+            left=0.08,
             right=0.99,
             top=0.98,
             bottom=0.06,
@@ -92,8 +92,7 @@ class Canvas(FigureCanvas):
         clearAxes(self.fig)
 
         df_tick = dict_df['tick']
-        # df_ohlc_1m = dict_df['1m']
-        # print(df_ohlc_1m)
+        df_ohlc_1m = dict_df['1m']
 
         # Tick
         self.ax[0].plot(
@@ -103,7 +102,6 @@ class Canvas(FigureCanvas):
             alpha=0.5,
         )
 
-        """
         df_bear = df_ohlc_1m[df_ohlc_1m['TREND'] < 0]
         df_bull = df_ohlc_1m[df_ohlc_1m['TREND'] > 0]
 
@@ -122,7 +120,6 @@ class Canvas(FigureCanvas):
             color='red',
             s=10,
         )
-        """
 
         self.ax[0].set_ylabel('Price')
 
