@@ -1,6 +1,4 @@
 import os
-import pandas as pd
-from datetime import timedelta
 
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
@@ -11,45 +9,14 @@ from matplotlib.backends.backend_qtagg import (
 )
 from matplotlib.figure import Figure
 
+from func.plots import (
+    clearAxes,
+    drawGrid,
+    getMajorXTicks,
+    refreshDraw,
+)
 from func.tide import get_range_xaxis
 from structs.res import AppRes
-
-
-def clearAxes(fig: Figure):
-    """Clear axes
-
-    :param fig:
-    :return:
-    """
-    axs = fig.axes
-    for ax in axs:
-        ax.cla()
-
-
-def drawGrid(fig: Figure):
-    """Draw grids
-
-    :param fig:
-    :return:
-    """
-    axs = fig.axes
-    for ax in axs:
-        ax.grid(which='major', linestyle='solid')
-        ax.grid(which='minor', linestyle='dotted')
-
-
-def refreshDraw(fig: Figure):
-    fig.canvas.draw()
-
-
-def getMajorXTicks(df: pd.DataFrame) -> tuple:
-    date_str = str(df.index[0].date())
-    tick_labels = [
-        '9:00', '9:30', '10:00', '10:30', '11:00', '11:30', '12:00',
-        '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
-    ]
-    tick_position = [pd.to_datetime('%s %s' % (date_str, l)) for l in tick_labels]
-    return tick_position, tick_labels
 
 
 class Canvas(FigureCanvas):
@@ -57,7 +24,10 @@ class Canvas(FigureCanvas):
         self.fig = Figure()
         super().__init__(self.fig)
 
-        font = os.path.join(res.dir_font, 'RictyDiminished-Regular.ttf')
+        font = os.path.join(
+            res.dir_font,
+            'RictyDiminished-Regular.ttf',
+        )
         fm.fontManager.addfont(font)
         font_prop = fm.FontProperties(fname=font)
         plt.rcParams['font.family'] = font_prop.get_name()
@@ -136,13 +106,21 @@ class Canvas(FigureCanvas):
         # Y軸タイトル
         self.ax[0].set_ylabel('Price')
 
+        # X軸の時刻刻みを調整
         tick_position, tick_labels = getMajorXTicks(df_tick)
-        self.ax[0].set_xticks(ticks=tick_position, labels=tick_labels)
-        self.ax[0].xaxis.set_minor_locator(mdates.MinuteLocator(interval=5))
+        self.ax[0].set_xticks(
+            ticks=tick_position,
+            labels=tick_labels,
+        )
+        self.ax[0].xaxis.set_minor_locator(
+            mdates.MinuteLocator(interval=5)
+        )
         self.ax[0].xaxis.set_major_formatter(
             mdates.DateFormatter('%H:%M')
         )
-        self.ax[0].set_xlim(get_range_xaxis(df_tick))
+        self.ax[0].set_xlim(
+            get_range_xaxis(df_tick)
+        )
 
         # Diff
         df_diff = df_ohlc_1m['Diff']
@@ -153,14 +131,26 @@ class Canvas(FigureCanvas):
         )
         self.ax[1].set_ylabel('Diff')
 
-        #d = timedelta(minutes=1)
         df_period = df_ohlc_1m[df_ohlc_1m['Period'] == 1]
-        # print(df_period)
         for t in df_period.index:
-            self.ax[0].axvline(t, linewidth=1, color='magenta', linestyle='dotted')
-            self.ax[1].axvline(t, linewidth=1, color='magenta', linestyle='dotted')
+            self.ax[0].axvline(
+                t,
+                linewidth=1,
+                color='magenta',
+                linestyle='dotted',
+            )
+            self.ax[1].axvline(
+                t,
+                linewidth=1,
+                color='magenta',
+                linestyle='dotted',
+            )
 
-        self.ax[1].axhline(0, linewidth=0.75, color='#444')
+        self.ax[1].axhline(
+            0,
+            linewidth=0.75,
+            color='#444',
+        )
 
         drawGrid(self.fig)
 
