@@ -83,12 +83,10 @@ class ToolBar(QToolBar):
         }
 
         # １分足データを取得
-        """
         df_ohlc = get_ohlc(self.res, target)
         if len(df_ohlc) == 0:
             return
         dict_df[interval] = df_ohlc
-        """
 
         # ティックデータを取得
         df_tick = get_tick(self.res, target)

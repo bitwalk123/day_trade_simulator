@@ -24,16 +24,31 @@ def get_ohlc(res: AppRes, target: dict) -> pd.DataFrame:
     # OHLCのファイル名（CSV形式）
     file_ohlc = get_csv_ohlc_name(res, target)
     df = pd.read_csv(file_ohlc)
+    r_last = len(df) - 1
+
+    # 最終行が MarketSPEED 2 RSS のセパレータの場合はその行を削除する
+    if df.iat[r_last, 0] == '--------':
+        df = df.iloc[0:r_last].copy()
+
+    # 日付列と時刻列の文字列を結合して Datetime 型へ変換してインデックスに設定
     df.index = pd.to_datetime(
-        ['%s %s' % (df['日付'].iloc[r], df['時刻'].iloc[r]) for r in range(len(df))]
+        [
+            '%s %s' % (
+                df['日付'].iloc[r], df['時刻'].iloc[r]
+            ) for r in range(len(df))
+        ]
     )
     df.index.name = 'Datetime'
 
-    list_col_0 = ['始値', '高値', '安値', '終値', '出来高', 'TREND', 'PSAR']
-    list_col_1 = ['Open', 'High', 'Low', 'Close', 'Volume', 'TREND', 'PSAR']
-    df0 = df[list_col_0].copy()
-    df0.columns = list_col_1
-    return df0
+    # 必要な列名のみコピーする
+    list_col_part = ['始値', '高値', '安値', '終値', '出来高', 'TREND', 'PSAR', 'Period', 'Diff']
+    df_part = df[list_col_part].copy()
+
+    # 列名を変更
+    list_col_new = ['Open', 'High', 'Low', 'Close', 'Volume', 'TREND', 'PSAR', 'Period', 'Diff']
+    df_part.columns = list_col_new
+
+    return df_part
 
 
 def get_ohlc_from_yahoo(target: dict) -> pd.DataFrame:
