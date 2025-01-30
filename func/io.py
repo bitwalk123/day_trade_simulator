@@ -14,7 +14,7 @@ from func.tide import (
 from structs.res import AppRes
 
 
-def get_ohlc(res: AppRes, target: dict) -> pd.DataFrame:
+def get_ohlc(res: AppRes, target: dict, interval: str) -> pd.DataFrame:
     """
     OHLC データをデータフレームで取得
     :param res:
@@ -22,7 +22,7 @@ def get_ohlc(res: AppRes, target: dict) -> pd.DataFrame:
     :return:
     """
     # OHLCのファイル名（CSV形式）
-    file_ohlc = get_csv_ohlc_name(res, target)
+    file_ohlc = get_csv_ohlc_name(res, target, interval)
     df = pd.read_csv(file_ohlc)
     r_last = len(df) - 1
 

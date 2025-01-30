@@ -35,13 +35,8 @@ class Analyzer(QMainWindow):
             navtoolbar,
         )
 
-    def on_read_df(self, dict_df: dict):
-        """
-        Yahoo Finance から取得した１分足データ
-        :param df:
-        :return:
-        """
-        self.canvas.plot(dict_df)
+    def on_read_df(self, dict_target: dict):
+        self.canvas.plot(dict_target)
 
 
 def main():

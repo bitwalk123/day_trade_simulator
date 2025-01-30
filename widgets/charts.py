@@ -63,43 +63,47 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.family'] = font_prop.get_name()
         plt.rcParams['font.size'] = 14
 
-        # self.ax = self.fig.add_subplot(111)
         self.ax = dict()
         n = 2
-        gs = self.fig.add_gridspec(
-            n, 1,
-            wspace=0.0, hspace=0.0,
-            height_ratios=[2 if i == 0 else 1 for i in range(n)]
-        )
-        for i, axis in enumerate(gs.subplots(sharex='col')):
-            self.ax[i] = axis
+
+        if n > 1:
+            gs = self.fig.add_gridspec(
+                n, 1,
+                wspace=0.0, hspace=0.0,
+                height_ratios=[2 if i == 0 else 1 for i in range(n)]
+            )
+            for i, axis in enumerate(gs.subplots(sharex='col')):
+                self.ax[i] = axis
+        else:
+            self.ax[0] = self.fig.add_subplot(111)
 
         self.fig.subplots_adjust(
             left=0.08,
             right=0.99,
-            top=0.98,
+            top=0.95,
             bottom=0.06,
         )
 
-    def plot(self, dict_df: dict):
+    def plot(self, dict_target: dict):
         """
         プロット
-        :param dict_df:
+        :param dict_target:
         :return:
         """
 
         # 消去
         clearAxes(self.fig)
 
-        df_tick = dict_df['tick']
-        df_ohlc_1m = dict_df['1m']
+        # ティックデータ
+        df_tick = dict_target['tick']
+        df_ohlc_1m = dict_target['1m']
 
         # Tick
         self.ax[0].plot(
             df_tick,
             color='black',
             linewidth='0.75',
-            alpha=0.5,
+            alpha=0.25,
         )
 
         df_bear = df_ohlc_1m[df_ohlc_1m['TREND'] < 0]
@@ -121,6 +125,15 @@ class Canvas(FigureCanvas):
             s=10,
         )
 
+        # チャート・タイトル
+        title_chart = '%s (%s) on %s' % (
+            dict_target['name'],
+            dict_target['code'],
+            dict_target['date_format'],
+        )
+        self.ax[0].set_title(title_chart)
+
+        # Y軸タイトル
         self.ax[0].set_ylabel('Price')
 
         tick_position, tick_labels = getMajorXTicks(df_tick)
@@ -131,14 +144,23 @@ class Canvas(FigureCanvas):
         )
         self.ax[0].set_xlim(get_range_xaxis(df_tick))
 
-        # OBV, On-Valance Volume
-        """
+        # Diff
+        df_diff = df_ohlc_1m['Diff']
         self.ax[1].plot(
-            df_ohlc_1m['OBV'],
-            color='magenta',
+            df_diff,
+            linewidth=0.75,
+            color='black',
         )
-        self.ax[1].set_ylabel('On-Balance Volume')
-        """
+        self.ax[1].set_ylabel('Diff')
+
+        #d = timedelta(minutes=1)
+        df_period = df_ohlc_1m[df_ohlc_1m['Period'] == 1]
+        # print(df_period)
+        for t in df_period.index:
+            self.ax[0].axvline(t, linewidth=1, color='magenta', linestyle='dotted')
+            self.ax[1].axvline(t, linewidth=1, color='magenta', linestyle='dotted')
+
+        self.ax[1].axhline(0, linewidth=0.75, color='#444')
 
         drawGrid(self.fig)
 
