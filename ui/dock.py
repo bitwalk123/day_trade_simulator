@@ -76,10 +76,10 @@ class DockSimulator(QDockWidget):
         layout.addWidget(lab051, r, 1)
 
         r += 1
-        self.objTickPrice = lab060 = LabelTitle('現在値')
+        lab060 = LabelTitle('現在値')
         layout.addWidget(lab060, r, 0)
 
-        lab061 = LabelValue()
+        self.objTickPrice = lab061 = LabelValue()
         layout.addWidget(lab061, r, 1)
 
         r += 1
@@ -90,7 +90,7 @@ class DockSimulator(QDockWidget):
         lab080 = LabelTitle('タイマー状態')
         layout.addWidget(lab080, r, 0)
 
-        lab081 = LabelString()
+        self.objStatus = lab081 = LabelString()
         layout.addWidget(lab081, r, 1)
 
         r += 1
@@ -101,7 +101,7 @@ class DockSimulator(QDockWidget):
         lab100 = LabelTitle('呼値')
         layout.addWidget(lab100, r, 0)
 
-        self.objTickPrice = lab101 = LabelValue()
+        self.objPriceDeltaMin = lab101 = LabelValue()
         layout.addWidget(lab101, r, 1)
 
         r += 1
@@ -165,7 +165,7 @@ class DockSimulator(QDockWidget):
 
         self.objCode.setText(dict_target['code'])
         self.objDate.setText(dict_target['date_format'])
-        self.objTickPrice.setValue(dict_target['tick_price'])
+        self.objPriceDeltaMin.setValue(dict_target['tick_price'])
         self.objUnit.setValue(100, False)
 
         self.btnStart.setEnabled(True)
@@ -173,9 +173,13 @@ class DockSimulator(QDockWidget):
     def on_start(self):
         self.simStarted.emit(self.dict_target)
 
+    def updateStatus(self, state: str):
+        self.objStatus.setText(state)
+
     def updateSystemTime(self, time_str: str):
         self.objSystemTime.setText(time_str)
 
-    def updateTickPrice(self, time_str:str, price:float):
+    def updateTickPrice(self, time_str: str, price: float):
+        # print(time_str, price)
         self.objTickTime.setText(time_str)
         self.objTickPrice.setValue(price)
