@@ -101,3 +101,6 @@ class Trader():
             return True
         else:
             return False
+
+    def setTrend(self, trend):
+        self.trend_psar = trend
