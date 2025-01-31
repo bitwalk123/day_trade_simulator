@@ -51,7 +51,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
         while t_current <= self.t_end:
             ###################################################################
-            ###
+            ### 前処理
             # シミュレータ向けの処理
 
             # システム時刻の通知
@@ -67,14 +67,14 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             ###
             ###################################################################
 
+            profit = self.trader.getProfit(p_current)
+            profit_max = self.trader.getProfitMax()
+
             # PSARトレンド
             if t_current.second == 0:
                 trend = self.trader.getTrend()
                 trend, period, diff = self.find_psar_trend(t_current)
                 # print(t_current, trend, period, diff)
-
-            profit = self.trader.getProfit(p_current)
-            profit_max = self.trader.getProfitMax()
 
             if t_current <= self.t_end_1h or (self.t_start_2h <= t_current <= self.t_end_2h):
                 # =============================================================
@@ -106,7 +106,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                 self.sessionClosePos(t_current, p_current, '強制')
 
             ###################################################################
-            ###
+            ### 後処理
             # 収益の更新
             dict_update = {
                 '建玉価格': self.trader.getPrice(),
