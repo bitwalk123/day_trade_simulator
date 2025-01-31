@@ -16,7 +16,7 @@ class SimulatorSignal(QObject):
     updateProfit = Signal(dict)
     updateSystemTime = Signal(str)
     updateTickPrice = Signal(str, float)
-    updateTime = Signal(int)
+    updateProgress = Signal(int)
     updateTrend = Signal(int)
 
 
@@ -41,7 +41,6 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
     def getTimeRange(self):
         return self.t_start.timestamp(), self.t_end.timestamp()
 
-
     def run(self):
         t_current = self.t_start
         p_current = 0
@@ -51,6 +50,10 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         diff = 0
 
         while t_current <= self.t_end:
+            ###################################################################
+            ### 前処理
+            # シミュレータ向けの処理
+
             # システム時刻の通知
             self.updateSystemTime.emit(
                 t_current.strftime(self.time_format)
@@ -61,40 +64,71 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             if not np.isnan(tick_price):
                 p_current = tick_price
 
-            # PSARトレンド
-            if t_current.second == 0:
-                trend = self.trader.getTrend()
-                trend, period, diff = self.find_psar_trend(t_current)
-                # print(t_current, trend, period, diff)
-
-            profit = self.trader.getProfit(p_current)
-            profit_max = self.trader.getProfitMax()
+            ###
+            ###################################################################
 
             if t_current <= self.t_end_1h or (self.t_start_2h <= t_current <= self.t_end_2h):
-                # PSAR トレンド判定
-                if self.trader.getTrend() != trend:
-                    self.trader.setTrend(trend)
-                    # 建玉返済
-                    self.sessionClosePos(t_current, p_current)
-                    # 反対売買
-                    self.sessionOpenPos(t_current, p_current)
+                # =============================================================
+                # （アプリの）取引時間内
+                # =============================================================
+
+                if t_current.second == 0:
+                    # ---------------------------------------------------------
+                    # ジャスト 0 秒の時
+                    # ---------------------------------------------------------
+                    trend, period, diff = self.find_psar_trend(t_current)
+                    if np.isnan(trend):
+                        trend = self.trader.getTrend()
+
+                    # PSAR トレンド判定
+                    if self.trader.getTrend() != trend:
+                        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+                        # トレンドが異なる場合
+                        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+                        # トレンドの更新
+                        self.trader.setTrend(trend)
+                        # 建玉返済
+                        self.sessionClosePos(t_current, p_current)
+                        # 反対売買
+                        self.sessionOpenPos(t_current, p_current)
+                    else:
+                        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+                        # トレンドが同一の場合
+                        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+                        pass
+                else:
+                    # ---------------------------------------------------------
+                    # ジャスト 0 秒以外の時
+                    # ---------------------------------------------------------
+                    pass
+
             else:
+                # =============================================================
+                #  （アプリの）取引時間外
+                # =============================================================
                 # 建玉返済
                 self.sessionClosePos(t_current, p_current, '強制')
 
+            ###################################################################
+            ### 後処理
             # 収益の更新
             dict_update = {
                 '建玉価格': self.trader.getPrice(),
                 '売買': self.trader.getPosition(),
-                '含み損益': profit,
-                '最大含み益': profit_max,
+                '含み損益': self.trader.getProfit(p_current),
+                '最大含み益': self.trader.getProfitMax(),
                 '合計損益': self.trader.getTotal(),
             }
             self.updateProfit.emit(dict_update)
 
-            self.updateTime.emit(t_current.timestamp())
+            # 進捗を更新
+            self.updateProgress.emit(t_current.timestamp())
+
             # 時刻を１秒進める
             t_current += self.t_second
+
+            ###
+            ###################################################################
 
         # スレッド処理の終了を通知
         self.threadFinished.emit()
