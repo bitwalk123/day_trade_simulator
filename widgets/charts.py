@@ -112,12 +112,14 @@ class Canvas(FigureCanvas):
             ticks=tick_position,
             labels=tick_labels,
         )
-        self.ax[0].xaxis.set_minor_locator(
-            mdates.MinuteLocator(interval=5)
-        )
         self.ax[0].xaxis.set_major_formatter(
             mdates.DateFormatter('%H:%M')
         )
+        """
+        self.ax[0].xaxis.set_minor_locator(
+            mdates.MinuteLocator(interval=5)
+        )
+        """
         self.ax[0].set_xlim(
             get_range_xaxis(df_tick)
         )
@@ -131,27 +133,25 @@ class Canvas(FigureCanvas):
         )
         self.ax[1].set_ylabel('Diff')
 
+        # Period が 1 のみ抜き出して縦線を引く
         df_period = df_ohlc_1m[df_ohlc_1m['Period'] == 1]
         for t in df_period.index:
-            self.ax[0].axvline(
-                t,
-                linewidth=1,
-                color='magenta',
-                linestyle='dotted',
-            )
-            self.ax[1].axvline(
-                t,
-                linewidth=1,
-                color='magenta',
-                linestyle='dotted',
-            )
+            for i in range(len(self.ax)):
+                self.ax[i].axvline(
+                    t,
+                    linewidth=1,
+                    color='magenta',
+                    linestyle='dotted',
+                )
 
+        # ax[1] では　y = 0 を黒線で表示、正負を解りやすくする。
         self.ax[1].axhline(
             0,
             linewidth=0.75,
             color='#444',
         )
 
+        # グリッド線
         drawGrid(self.fig)
 
         # 再描画
