@@ -1,4 +1,5 @@
 import json
+import os
 
 import pandas as pd
 import yfinance as yf
@@ -23,7 +24,10 @@ def get_ohlc(res: AppRes, target: dict, interval: str) -> pd.DataFrame:
     """
     # OHLCのファイル名（CSV形式）
     file_ohlc = get_csv_ohlc_name(res, target, interval)
-    df = pd.read_csv(file_ohlc)
+    if os.path.isfile(file_ohlc):
+        df = pd.read_csv(file_ohlc)
+    else:
+        return pd.DataFrame()
     r_last = len(df) - 1
 
     # 最終行が MarketSPEED 2 RSS のセパレータの場合はその行を削除する
@@ -76,7 +80,10 @@ def get_tick(res: AppRes, target: dict) -> pd.DataFrame:
     """
     # tick データの読み込み
     file_tick = get_csv_tick_name(res, target)
-    df = pd.read_csv(file_tick)
+    if os.path.isfile(file_tick):
+        df = pd.read_csv(file_tick)
+    else:
+        return pd.DataFrame()
 
     # 時酷烈に日付情報を付加、文字列から日付フォーマットへ変更
     df.index = pd.to_datetime(
