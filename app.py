@@ -2,13 +2,13 @@
 # coding: utf-8
 import sys
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QThreadPool
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
 )
 
-from sim.simulator import Timer4Sim
+from sim.simulator import WorkerSimulator
 from structs.res import AppRes
 from ui.dock import DockSimulator
 from ui.toolbar import ToolBar
@@ -21,9 +21,7 @@ class Analyzer(QMainWindow):
     def __init__(self):
         super().__init__()
         self.res = AppRes()
-        self.timer = timer = Timer4Sim()
-        timer.updateSystemTime.connect(self.on_update_system_time)
-        timer.updateTickPrice.connect(self.on_update_tick_price)
+        self.threadpool = QThreadPool()
 
         self.setWindowTitle(self.__app_name__)
         self.setFixedSize(1200, 800)
@@ -45,17 +43,45 @@ class Analyzer(QMainWindow):
             navtoolbar,
         )
 
+    def on_end(self):
+        """
+        スレッド処理の終了
+        :return:
+        """
+        self.dock.updateStatus('停止')
+
     def on_read_df(self, dict_target: dict):
         self.canvas.plot(dict_target)
         self.dock.setInit(dict_target)
 
     def on_start(self, dict_target: dict):
-        self.timer.start(dict_target)
+        """
+        シミュレーターを別スレッドで起動
+        :param dict_target:
+        :return:
+        """
+        worker = WorkerSimulator(dict_target)
+        worker.threadFinished.connect(self.on_end)
+        worker.updateSystemTime.connect(self.on_update_system_time)
+        worker.updateTickPrice.connect(self.on_update_tick_price)
+        self.dock.updateStatus('稼働中')
+        self.threadpool.start(worker)
 
     def on_update_system_time(self, time_str: str):
+        """
+        システム時刻の更新
+        :param time_str:
+        :return:
+        """
         self.dock.updateSystemTime(time_str)
 
     def on_update_tick_price(self, time_str: str, price: float):
+        """
+        ティックデータの更新
+        :param time_str:
+        :param price:
+        :return:
+        """
         self.dock.updateTickPrice(time_str, price)
 
 

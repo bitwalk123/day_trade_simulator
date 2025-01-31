@@ -112,6 +112,6 @@ class LabelValue(QLabel):
     def setValue(self, value: int | float, flag=True):
         self.flag = flag
         if flag:
-            self.setText('%.1f' % value)
+            self.setText('%.1f' % float(value))
         else:
             self.setText('%d' % int(value))
