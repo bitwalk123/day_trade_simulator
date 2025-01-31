@@ -61,20 +61,34 @@ class Analyzer(QMainWindow):
         :return:
         """
         worker = WorkerSimulator(dict_target)
+        # 進捗ウィジェットの開始・終了レンジを設定
         self.dock.setProgressRange(*worker.getTimeRange())
+        # シグナルの処理
         worker.threadFinished.connect(self.on_end)
         worker.updateProfit.connect(self.on_update_profit)
         worker.updateProgress.connect(self.on_update_progress)
         worker.updateSystemTime.connect(self.on_update_system_time)
         worker.updateTickPrice.connect(self.on_update_tick_price)
         worker.updateTrend.connect(self.on_update_trend)
+        # ステータス表示の変更
         self.dock.updateStatus('稼働中')
+        # スレッドで処理を開始
         self.threadpool.start(worker)
 
     def on_update_profit(self, dict_update: dict):
+        """
+        含み益の更新
+        :param dict_update:
+        :return:
+        """
         self.dock.updateProfit(dict_update)
 
     def on_update_progress(self, tick: int):
+        """
+        進捗ウィジェットの更新
+        :param tick:
+        :return:
+        """
         self.dock.setProgressValue(tick)
 
     def on_update_system_time(self, time_str: str):
