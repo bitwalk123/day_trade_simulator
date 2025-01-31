@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QSizePolicy,
     QVBoxLayout,
-    QWidget,
+    QWidget, QProgressBar,
 )
 
 from widgets.labels import (
@@ -177,6 +177,15 @@ class DockSimulator(QDockWidget):
         but_start.clicked.connect(self.on_start)
         but_start.setDisabled(True)
         vbox.addWidget(but_start)
+
+        self.progress = pbar = QProgressBar()
+        vbox.addWidget(pbar)
+
+    def setTimeRange(self, time_min: int, time_max: int):
+        self.progress.setRange(time_min, time_max)
+
+    def setTimeValue(self, time_current: int):
+        self.progress.setValue(time_current)
 
     def setInit(self, dict_target: dict):
         self.dict_target = dict_target
