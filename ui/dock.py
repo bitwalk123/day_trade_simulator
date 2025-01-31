@@ -14,7 +14,8 @@ from widgets.labels import (
     LabelString,
     LabelTime,
     LabelTitle,
-    LabelValue, LabelUnit,
+    LabelUnit,
+    LabelValue,
 )
 
 
