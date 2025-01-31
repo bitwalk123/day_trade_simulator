@@ -108,10 +108,10 @@ class DockSimulator(QDockWidget):
         layout.addWidget(lab102, r, 2)
 
         r += 1
-        self.objPricePos = lab110 = LabelTitle('建玉価格')
+        lab110 = LabelTitle('建玉価格')
         layout.addWidget(lab110, r, 0)
 
-        lab111 = LabelValue()
+        self.objPricePos = lab111 = LabelValue()
         layout.addWidget(lab111, r, 1)
 
         self.objBuySell = lab112 = LabelUnit('無し')
@@ -131,7 +131,7 @@ class DockSimulator(QDockWidget):
         lab130 = LabelTitle('含み損益')
         layout.addWidget(lab130, r, 0)
 
-        lab131 = LabelValue()
+        self.objProfit = lab131 = LabelValue()
         layout.addWidget(lab131, r, 1)
 
         lab132 = LabelUnit('円')
@@ -141,7 +141,7 @@ class DockSimulator(QDockWidget):
         lab140 = LabelTitle('最大含み益')
         layout.addWidget(lab140, r, 0)
 
-        lab141 = LabelValue()
+        self.objProfitMax = lab141 = LabelValue()
         layout.addWidget(lab141, r, 1)
 
         lab142 = LabelUnit('円')
@@ -158,7 +158,7 @@ class DockSimulator(QDockWidget):
         lab160 = LabelTitle('合計損益')
         layout.addWidget(lab160, r, 0)
 
-        lab161 = LabelValue()
+        self.objTotal = lab161 = LabelValue()
         layout.addWidget(lab161, r, 1)
 
         lab162 = LabelUnit('円')
@@ -190,6 +190,13 @@ class DockSimulator(QDockWidget):
 
     def on_start(self):
         self.simStarted.emit(self.dict_target)
+
+    def updateProfit(self, dict_update: dict):
+        self.objPricePos.setValue(dict_update['建玉価格'])
+        self.objBuySell.setText(dict_update['売買'])
+        self.objProfit.setValue(dict_update['含み損益'])
+        self.objProfitMax.setValue(dict_update['最大含み益'])
+        self.objTotal.setValue(dict_update['合計損益'])
 
     def updateStatus(self, state: str):
         self.objStatus.setText(state)

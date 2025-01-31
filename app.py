@@ -62,11 +62,15 @@ class Analyzer(QMainWindow):
         """
         worker = WorkerSimulator(dict_target)
         worker.threadFinished.connect(self.on_end)
+        worker.updateProfit.connect(self.on_update_profit)
         worker.updateSystemTime.connect(self.on_update_system_time)
         worker.updateTickPrice.connect(self.on_update_tick_price)
         worker.updateTrend.connect(self.on_update_trend)
         self.dock.updateStatus('稼働中')
         self.threadpool.start(worker)
+
+    def on_update_profit(self, dict_update: dict):
+        self.dock.updateProfit(dict_update)
 
     def on_update_system_time(self, time_str: str):
         """
