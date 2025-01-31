@@ -75,12 +75,13 @@ class ToolBar(QToolBar):
         key = self.combo_tickers.currentText()
         interval = '1m'
         dict_target = {
-            'name': key,
             'code': self.tickers[key]['code'],
-            'symbol': self.tickers[key]['symbol'],
-            'tick_price': self.tickers[key]['tick_price'],
             'date': date_target,
             'date_format': date_format_target,
+            'name': key,
+            'symbol': self.tickers[key]['symbol'],
+            'tick_price': self.tickers[key]['tick_price'],
+            'unit': self.tickers[key]['unit'],
         }
 
         # １分足データを取得
@@ -88,6 +89,7 @@ class ToolBar(QToolBar):
         if len(df_ohlc) == 0:
             return
         dict_target[interval] = df_ohlc
+        # print(df_ohlc)
 
         # ティックデータを取得
         df_tick = get_tick(self.res, dict_target)

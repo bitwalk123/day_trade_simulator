@@ -14,7 +14,7 @@ from widgets.labels import (
     LabelString,
     LabelTime,
     LabelTitle,
-    LabelValue,
+    LabelValue, LabelUnit,
 )
 
 
@@ -104,12 +104,18 @@ class DockSimulator(QDockWidget):
         self.objPriceDeltaMin = lab101 = LabelValue()
         layout.addWidget(lab101, r, 1)
 
+        lab102 = LabelUnit('円')
+        layout.addWidget(lab102, r, 2)
+
         r += 1
-        lab110 = LabelTitle('建玉価格')
+        self.objPricePos = lab110 = LabelTitle('建玉価格')
         layout.addWidget(lab110, r, 0)
 
         lab111 = LabelValue()
         layout.addWidget(lab111, r, 1)
+
+        self.objBuySell = lab112 = LabelUnit('無し')
+        layout.addWidget(lab112, r, 2)
 
         r += 1
         lab120 = LabelTitle('売買単位')
@@ -118,12 +124,18 @@ class DockSimulator(QDockWidget):
         self.objUnit = lab121 = LabelValue()
         layout.addWidget(lab121, r, 1)
 
+        lab122 = LabelUnit('株')
+        layout.addWidget(lab122, r, 2)
+
         r += 1
         lab130 = LabelTitle('含み損益')
         layout.addWidget(lab130, r, 0)
 
         lab131 = LabelValue()
         layout.addWidget(lab131, r, 1)
+
+        lab132 = LabelUnit('円')
+        layout.addWidget(lab132, r, 2)
 
         r += 1
         lab140 = LabelTitle('最大含み益')
@@ -132,11 +144,14 @@ class DockSimulator(QDockWidget):
         lab141 = LabelValue()
         layout.addWidget(lab141, r, 1)
 
+        lab142 = LabelUnit('円')
+        layout.addWidget(lab142, r, 2)
+
         r += 1
         lab150 = LabelTitle('トレンド')
         layout.addWidget(lab150, r, 0)
 
-        lab151 = LabelValue()
+        self.objTrend = lab151 = LabelValue()
         layout.addWidget(lab151, r, 1)
 
         r += 1
@@ -146,9 +161,12 @@ class DockSimulator(QDockWidget):
         lab161 = LabelValue()
         layout.addWidget(lab161, r, 1)
 
+        lab162 = LabelUnit('円')
+        layout.addWidget(lab162, r, 2)
+
         r += 1
         base_control = QWidget()
-        layout.addWidget(base_control, r, 0, 1, 2)
+        layout.addWidget(base_control, r, 0, 1, 3)
 
         vbox = QVBoxLayout()
         vbox.setContentsMargins(QMargins(0, 20, 0, 0))
@@ -166,7 +184,7 @@ class DockSimulator(QDockWidget):
         self.objCode.setText(dict_target['code'])
         self.objDate.setText(dict_target['date_format'])
         self.objPriceDeltaMin.setValue(dict_target['tick_price'])
-        self.objUnit.setValue(100, False)
+        self.objUnit.setValue(dict_target['unit'], False)
 
         self.btnStart.setEnabled(True)
 
@@ -183,3 +201,6 @@ class DockSimulator(QDockWidget):
         # print(time_str, price)
         self.objTickTime.setText(time_str)
         self.objTickPrice.setValue(price)
+
+    def updateTrend(self, trend: int):
+        self.objTrend.setValue(trend, False)

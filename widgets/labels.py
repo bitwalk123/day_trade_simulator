@@ -26,6 +26,16 @@ class LabelFlat(QLabel):
         self.setLineWidth(1)
         self.setStyleSheet('QLabel {font-family: monospace;}')
 
+class LabelUnit(LabelFlat):
+    def __init__(self, title: str):
+        super().__init__(title)
+        self.setStyleSheet("""
+            QLabel {
+                font-family: monospace;
+                padding-left: 5px;
+            }
+        """)
+
 
 class LabelString(QLabel):
     def __init__(self):
