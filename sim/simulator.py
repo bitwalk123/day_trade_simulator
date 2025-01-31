@@ -16,6 +16,7 @@ class SimulatorSignal(QObject):
     updateProfit = Signal(dict)
     updateSystemTime = Signal(str)
     updateTickPrice = Signal(str, float)
+    updateTime = Signal(int)
     updateTrend = Signal(int)
 
 
@@ -36,6 +37,10 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         self.t_minute = datetime.timedelta(minutes=1)
 
         self.trader = Trader(dict_target['unit'])
+
+    def getTimeRange(self):
+        return self.t_start.timestamp(), self.t_end.timestamp()
+
 
     def run(self):
         t_current = self.t_start
@@ -87,6 +92,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             }
             self.updateProfit.emit(dict_update)
 
+            self.updateTime.emit(t_current.timestamp())
             # 時刻を１秒進める
             t_current += self.t_second
 
