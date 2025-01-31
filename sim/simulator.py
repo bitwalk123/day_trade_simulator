@@ -67,40 +67,44 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             ###
             ###################################################################
 
-            profit = self.trader.getProfit(p_current)
-            profit_max = self.trader.getProfitMax()
-
-            # PSARトレンド
-            if t_current.second == 0:
-                trend = self.trader.getTrend()
-                trend, period, diff = self.find_psar_trend(t_current)
-                # print(t_current, trend, period, diff)
-
             if t_current <= self.t_end_1h or (self.t_start_2h <= t_current <= self.t_end_2h):
                 # =============================================================
                 # （アプリの）取引時間内
                 # =============================================================
 
-                # PSAR トレンド判定
-                if self.trader.getTrend() != trend:
-                    #
-                    # トレンドが異なる場合
-                    #
-                    # トレンドの更新
-                    self.trader.setTrend(trend)
-                    # 建玉返済
-                    self.sessionClosePos(t_current, p_current)
-                    # 反対売買
-                    self.sessionOpenPos(t_current, p_current)
+                if t_current.second == 0:
+                    # ---------------------------------------------------------
+                    # ジャスト 0 秒の時
+                    # ---------------------------------------------------------
+                    trend, period, diff = self.find_psar_trend(t_current)
+                    if np.isnan(trend):
+                        trend = self.trader.getTrend()
+
+                    # PSAR トレンド判定
+                    if self.trader.getTrend() != trend:
+                        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+                        # トレンドが異なる場合
+                        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+                        # トレンドの更新
+                        self.trader.setTrend(trend)
+                        # 建玉返済
+                        self.sessionClosePos(t_current, p_current)
+                        # 反対売買
+                        self.sessionOpenPos(t_current, p_current)
+                    else:
+                        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+                        # トレンドが同一の場合
+                        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+                        pass
                 else:
-                    #
-                    # トレンドが同一の場合
-                    #
+                    # ---------------------------------------------------------
+                    # ジャスト 0 秒以外の時
+                    # ---------------------------------------------------------
                     pass
 
             else:
                 # =============================================================
-                #  （アプリの）取引時間内
+                #  （アプリの）取引時間外
                 # =============================================================
                 # 建玉返済
                 self.sessionClosePos(t_current, p_current, '強制')
@@ -111,8 +115,8 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             dict_update = {
                 '建玉価格': self.trader.getPrice(),
                 '売買': self.trader.getPosition(),
-                '含み損益': profit,
-                '最大含み益': profit_max,
+                '含み損益': self.trader.getProfit(p_current),
+                '最大含み益': self.trader.getProfitMax(),
                 '合計損益': self.trader.getTotal(),
             }
             self.updateProfit.emit(dict_update)
