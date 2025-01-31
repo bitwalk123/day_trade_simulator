@@ -173,7 +173,7 @@ class DockSimulator(QDockWidget):
         base_control.setLayout(vbox)
 
         self.btnStart = but_start = QPushButton('START')
-        but_start.setFixedHeight(40)
+        but_start.setFixedHeight(50)
         but_start.clicked.connect(self.on_start)
         but_start.setDisabled(True)
         vbox.addWidget(but_start)
