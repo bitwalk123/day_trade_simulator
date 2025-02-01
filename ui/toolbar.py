@@ -39,12 +39,14 @@ class ToolBar(QToolBar):
         but_calendar.setIcon(
             QIcon(os.path.join(self.res.dir_image, 'calendar.png'))
         )
+        but_calendar.setToolTip('日付選択')
         but_calendar.clicked.connect(self.on_calendar_clicked)
         self.addWidget(but_calendar)
 
         # 銘柄
         self.combo_tickers = combo_tickers = QComboBox()
         combo_tickers.addItems([key for key in self.tickers.keys()])
+        combo_tickers.setToolTip('銘柄選択')
         self.addWidget(combo_tickers)
 
     def on_calendar_clicked(self):
