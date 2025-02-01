@@ -130,6 +130,8 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             ###
             ###################################################################
 
+        df_order = self.trader.getOrderHistory()
+        print(df_order.head(10))
         # スレッド処理の終了を通知
         self.threadFinished.emit()
 
