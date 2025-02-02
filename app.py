@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+import os
 import sys
 
 import pandas as pd
@@ -9,6 +10,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
 )
 
+from func.conv import df_to_html
 from sim.simulator import WorkerSimulator
 from structs.res import AppRes
 from ui.dock import DockSimulator
@@ -75,16 +77,12 @@ class TradeSimulator(QMainWindow):
         if self.df_order is None:
             return
 
-        self.df_order.to_html(
-            '~/temp.html',
-            index=False,
-            justify='center',
-            formatters = {
-                '#': lambda x: '{:*>3}'.format(x),
-                '金　額': lambda x: '{:*>10}'.format(x),
-            },
-            escape=False,
-        )
+        list_html = df_to_html(self.df_order, self.column_format)
+
+        home = os.path.expanduser("~")
+        htmlname = os.path.join(home, 'result.html')
+        with open(htmlname, mode='w') as f:
+            f.writelines(list_html)
 
     def on_read_target(self, dict_target: dict):
         self.canvas.plot(dict_target)
