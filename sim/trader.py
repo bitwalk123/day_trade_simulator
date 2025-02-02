@@ -4,14 +4,14 @@ import pandas as pd
 
 class Trader():
     dict_columns = {
-        '注文番号': [],
-        '時刻': [],
-        '売買': [],
-        '金額': [],
-        '損益': [],
+        '#': [],
+        '時　刻': [],
+        '売　買': [],
+        '金　額': [],
+        '損　益': [],
         '最大益': [],
         '最大損': [],
-        '備考': [],
+        '備　考': [],
     }
     # カラムのフォーマット
     list_format = ['int', 'ts', 'str', 'int', 'int', 'int', 'int', 'str']
@@ -42,14 +42,14 @@ class Trader():
         else:
             action = '不明'
 
-        transaction['注文番号'] = self.id_order
-        transaction['時刻'] = t_current
-        transaction['売買'] = action
-        transaction['金額'] = self.price * self.unit
-        transaction['損益'] = profit
+        transaction['#'] = self.id_order
+        transaction['時　刻'] = t_current
+        transaction['売　買'] = action
+        transaction['金　額'] = self.price * self.unit
+        transaction['損　益'] = profit
         transaction['最大益'] = self.profit_max
         transaction['最大損'] = self.loss_max
-        transaction['備考'] = note
+        transaction['備　考'] = note
         self.updateOrderHistory(transaction)
 
         self.price = 0
@@ -70,14 +70,14 @@ class Trader():
             self.position = '不明'
             self.price = 0
 
-        transaction['注文番号'] = self.id_order
-        transaction['時刻'] = t_current
-        transaction['売買'] = self.position
-        transaction['金額'] = self.price * self.unit
-        transaction['損益'] = ''
+        transaction['#'] = self.id_order
+        transaction['時　刻'] = t_current
+        transaction['売　買'] = self.position
+        transaction['金　額'] = self.price * self.unit
+        transaction['損　益'] = ''
         transaction['最大益'] = ''
         transaction['最大損'] = ''
-        transaction['備考'] = note
+        transaction['備　考'] = note
         self.updateOrderHistory(transaction)
 
     def getLossMax(self):
