@@ -13,6 +13,8 @@ class Trader():
         '最大損': [],
         '備考': [],
     }
+    # カラムのフォーマット
+    list_format = ['int', 'ts', 'str', 'int', 'int', 'int', 'int', 'str']
 
     def __init__(self, unit: int):
         self.unit = unit
@@ -133,3 +135,6 @@ class Trader():
 
     def getOrderHistory(self):
         return self.df_order
+
+    def getColumnFormat(self):
+        return self.list_format

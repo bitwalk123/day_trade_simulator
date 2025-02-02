@@ -12,7 +12,7 @@ from sim.trader import Trader
 
 
 class SimulatorSignal(QObject):
-    threadFinished = Signal(pd.DataFrame)
+    threadFinished = Signal(pd.DataFrame, list)
     updateProfit = Signal(dict)
     updateSystemTime = Signal(str)
     updateTickPrice = Signal(str, float)
@@ -131,8 +131,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             ###################################################################
 
         df_order = self.trader.getOrderHistory()
+        column_format = self.trader.getColumnFormat()
         # スレッド処理の終了を通知
-        self.threadFinished.emit(df_order)
+        self.threadFinished.emit(df_order, column_format)
 
     def find_tick_data(self, t_current):
         """
