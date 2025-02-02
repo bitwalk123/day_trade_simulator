@@ -38,6 +38,7 @@ class TradeSimulator(QMainWindow):
 
         self.dock = dock = DockSimulator(self.res)
         dock.requestOrderHistory.connect(self.on_order_history)
+        dock.requestOrderHistoryHTML.connect(self.on_order_history_html)
         dock.requestSimulationStart.connect(self.on_start)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
@@ -69,6 +70,21 @@ class TradeSimulator(QMainWindow):
             self.order_hist.deleteLater()
         self.order_hist = WinOrderHistory(self.df_order, self.column_format)
         self.order_hist.show()
+
+    def on_order_history_html(self):
+        if self.df_order is None:
+            return
+
+        self.df_order.to_html(
+            '~/temp.html',
+            index=False,
+            justify='center',
+            formatters = {
+                '#': lambda x: '{:*>3}'.format(x),
+                '金　額': lambda x: '{:*>10}'.format(x),
+            },
+            escape=False,
+        )
 
     def on_read_target(self, dict_target: dict):
         self.canvas.plot(dict_target)
