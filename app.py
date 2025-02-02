@@ -30,7 +30,7 @@ class Analyzer(QMainWindow):
         toolbar.readDataFrame.connect(self.on_read_df)
         self.addToolBar(toolbar)
 
-        self.dock = dock = DockSimulator()
+        self.dock = dock = DockSimulator(self.res)
         dock.simStarted.connect(self.on_start)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 

@@ -1,13 +1,17 @@
+import os
+
 from PySide6.QtCore import QMargins, Signal
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDockWidget,
     QGridLayout,
     QPushButton,
     QSizePolicy,
     QVBoxLayout,
-    QWidget, QProgressBar,
+    QWidget, QProgressBar, QHBoxLayout,
 )
 
+from structs.res import AppRes
 from widgets.labels import (
     LabelDate,
     LabelFlat,
@@ -17,13 +21,15 @@ from widgets.labels import (
     LabelUnit,
     LabelValue,
 )
+from widgets.pads import HPad
 
 
 class DockSimulator(QDockWidget):
     simStarted = Signal(dict)
 
-    def __init__(self):
+    def __init__(self, res: AppRes):
         super().__init__()
+        self.res = res
         self.dict_target = dict()
         self.setFeatures(
             QDockWidget.DockWidgetFeature.NoDockWidgetFeatures
@@ -170,6 +176,7 @@ class DockSimulator(QDockWidget):
         layout.addWidget(base_control, r, 0, 1, 3)
 
         vbox = QVBoxLayout()
+        vbox.setSpacing(0)
         vbox.setContentsMargins(QMargins(0, 20, 0, 0))
         base_control.setLayout(vbox)
 
@@ -179,8 +186,27 @@ class DockSimulator(QDockWidget):
         but_start.setDisabled(True)
         vbox.addWidget(but_start)
 
-        self.progress = pbar = QProgressBar()
-        vbox.addWidget(pbar)
+        self.progress = progress = QProgressBar()
+        vbox.addWidget(progress)
+
+        hbar = QWidget()
+        vbox.addWidget(hbar)
+
+        hbox = QHBoxLayout()
+        hbox.setSpacing(0)
+        hbox.setContentsMargins(QMargins(0, 0, 0, 0))
+        hbar.setLayout(hbox)
+
+        hpad = HPad()
+        hbox.addWidget(hpad)
+
+        but_order = QPushButton()
+        but_order.setIcon(
+            QIcon(os.path.join(self.res.dir_image, 'cart.png'))
+        )
+        but_order.setToolTip('売買履歴')
+        hbox.addWidget(but_order)
+
 
     def setProgressRange(self, time_min: int, time_max: int):
         self.progress.setRange(time_min, time_max)

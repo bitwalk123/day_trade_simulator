@@ -1,4 +1,19 @@
+import numpy as np
+import pandas as pd
+
+
 class Trader():
+    dict_columns = {
+        '注文番号': [],
+        '時刻': [],
+        '売買': [],
+        '金額': [],
+        '損益': [],
+        '最大益': [],
+        '最大損': [],
+        '備考': [],
+    }
+
     def __init__(self, unit: int):
         self.unit = unit
 
@@ -9,6 +24,10 @@ class Trader():
         self.profit_max = 0
         self.total = 0
         self.trend_psar = 0
+
+        # 注文履歴
+        df = pd.DataFrame.from_dict(self.dict_columns)
+        self.df_order = df.astype(str)
 
     def closePosition(self, t_current, p_current, transaction, note=''):
         profit = self.getProfit(p_current)
@@ -29,6 +48,7 @@ class Trader():
         transaction['最大益'] = self.profit_max
         transaction['最大損'] = self.loss_max
         transaction['備考'] = note
+        self.updateOrderHistory(transaction)
 
         self.price = 0
         self.profit_max = 0
@@ -56,6 +76,7 @@ class Trader():
         transaction['最大益'] = ''
         transaction['最大損'] = ''
         transaction['備考'] = note
+        self.updateOrderHistory(transaction)
 
     def getLossMax(self):
         return self.loss_max
@@ -104,3 +125,11 @@ class Trader():
 
     def setTrend(self, trend):
         self.trend_psar = trend
+
+    def updateOrderHistory(self, transaction: dict):
+        r = len(self.df_order)
+        for key in transaction.keys():
+            self.df_order.at[r, key] = transaction[key]
+
+    def getOrderHistory(self):
+        return self.df_order
