@@ -5,10 +5,12 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDockWidget,
     QGridLayout,
+    QHBoxLayout,
+    QProgressBar,
     QPushButton,
     QSizePolicy,
     QVBoxLayout,
-    QWidget, QProgressBar, QHBoxLayout,
+    QWidget,
 )
 
 from structs.res import AppRes

@@ -12,9 +12,10 @@ from PySide6.QtCore import (
 class PandasModel(QAbstractTableModel):
     """A model to interface a Qt view with pandas dataframe """
 
-    def __init__(self, df: pd.DataFrame, parent=None):
+    def __init__(self, df: pd.DataFrame, formats:list,parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.df = df
+        self.formats = formats
 
     def rowCount(self, parent: Union[QModelIndex, QPersistentModelIndex] = ...) -> int:
         """
@@ -45,12 +46,22 @@ class PandasModel(QAbstractTableModel):
         value = self.df.iloc[row, col]
 
         if role == Qt.ItemDataRole.DisplayRole:
-            return str(value)
-        elif role == Qt.ItemDataRole.TextAlignmentRole:
-            if (type(value) is np.int64) | (type(value) is np.float64):
-                flag = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+            if self.formats[col] == 'int' and type(value) is not str:
+                return '{:,}'.format(int(value))
+            elif self.formats[col] == 'ts':
+                str_hh = '{:0=2}'.format(value.hour)
+                str_mm = '{:0=2}'.format(value.minute)
+                str_ss = '{:0=2}'.format(value.second)
+                return '%s:%s:%s' % (str_hh, str_mm, str_ss)
             else:
+                return str(value)
+
+        elif role == Qt.ItemDataRole.TextAlignmentRole:
+            if self.formats[col] == 'str' or self.formats[col] == 'ts':
                 flag = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+            else:
+                flag = Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+
             return flag
 
         return None

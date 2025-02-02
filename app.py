@@ -27,6 +27,7 @@ class TradeSimulator(QMainWindow):
 
         self.order_hist: WinOrderHistory | None = None  # 注文履歴
         self.df_order: pd.DataFrame | None = None
+        self.column_format: list | None = None
 
         self.setWindowTitle(self.__app_name__)
         self.setFixedSize(1200, 800)
@@ -49,7 +50,7 @@ class TradeSimulator(QMainWindow):
             navtoolbar,
         )
 
-    def on_end(self, df: pd.DataFrame):
+    def on_end(self, df: pd.DataFrame, column_format: list):
         """
         スレッド処理の終了
         :param df:
@@ -57,6 +58,7 @@ class TradeSimulator(QMainWindow):
         """
         self.dock.updateStatus('停止')
         self.df_order = df
+        self.column_format = column_format
 
     def on_order_history(self):
         if self.df_order is None:
@@ -65,7 +67,7 @@ class TradeSimulator(QMainWindow):
         if self.order_hist is not None:
             self.order_hist.hide()
             self.order_hist.deleteLater()
-        self.order_hist = WinOrderHistory(self.df_order)
+        self.order_hist = WinOrderHistory(self.df_order, self.column_format)
         self.order_hist.show()
 
     def on_read_target(self, dict_target: dict):
