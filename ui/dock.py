@@ -28,6 +28,7 @@ from widgets.pads import HPad
 
 class DockSimulator(QDockWidget):
     requestOrderHistory = Signal()
+    requestOrderHistoryHTML = Signal()
     requestSimulationStart = Signal(dict)
 
     def __init__(self, res: AppRes):
@@ -203,14 +204,21 @@ class DockSimulator(QDockWidget):
         hpad = HPad()
         hbox.addWidget(hpad)
 
+        but_html = QPushButton()
+        but_html.setIcon(
+            QIcon(os.path.join(self.res.dir_image, 'html.png'))
+        )
+        but_html.setToolTip('売買履歴（HTML出力）')
+        but_html.clicked.connect(self.on_order_history_html)
+        hbox.addWidget(but_html)
+
         but_order = QPushButton()
         but_order.setIcon(
             QIcon(os.path.join(self.res.dir_image, 'cart.png'))
         )
-        but_order.setToolTip('売買履歴')
+        but_order.setToolTip('売買履歴（テーブル）')
         but_order.clicked.connect(self.on_order_history)
         hbox.addWidget(but_order)
-
 
     def setProgressRange(self, time_min: int, time_max: int):
         self.progress.setRange(time_min, time_max)
@@ -230,6 +238,9 @@ class DockSimulator(QDockWidget):
 
     def on_order_history(self):
         self.requestOrderHistory.emit()
+
+    def on_order_history_html(self):
+        self.requestOrderHistoryHTML.emit()
 
     def on_start(self):
         self.requestSimulationStart.emit(self.dict_target)

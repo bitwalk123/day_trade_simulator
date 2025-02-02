@@ -3,19 +3,6 @@ import pandas as pd
 
 
 class Trader():
-    dict_columns = {
-        '注文番号': [],
-        '時刻': [],
-        '売買': [],
-        '金額': [],
-        '損益': [],
-        '最大益': [],
-        '最大損': [],
-        '備考': [],
-    }
-    # カラムのフォーマット
-    list_format = ['int', 'ts', 'str', 'int', 'int', 'int', 'int', 'str']
-
     def __init__(self, unit: int):
         self.unit = unit
 
@@ -26,6 +13,28 @@ class Trader():
         self.profit_max = 0
         self.total = 0
         self.trend_psar = 0
+
+        self.l_order = '#'
+        self.l_time = '時　刻'
+        self.l_buysell = '売　買'
+        self.l_price = '金　額'
+        self.l_profit = '損　益'
+        self.l_profit_max = '最大益'
+        self.l_loss_max = '最大損'
+        self.l_note = '備　考'
+
+        self.dict_columns = {
+            self.l_order: [],
+            self.l_time: [],
+            self.l_buysell: [],
+            self.l_price: [],
+            self.l_profit: [],
+            self.l_profit_max: [],
+            self.l_loss_max: [],
+            self.l_note: [],
+        }
+        # カラムのフォーマット
+        self.list_format = ['int', 'ts', 'str', 'int', 'int', 'int', 'int', 'str']
 
         # 注文履歴
         df = pd.DataFrame.from_dict(self.dict_columns)
@@ -42,14 +51,14 @@ class Trader():
         else:
             action = '不明'
 
-        transaction['注文番号'] = self.id_order
-        transaction['時刻'] = t_current
-        transaction['売買'] = action
-        transaction['金額'] = self.price * self.unit
-        transaction['損益'] = profit
-        transaction['最大益'] = self.profit_max
-        transaction['最大損'] = self.loss_max
-        transaction['備考'] = note
+        transaction[self.l_order] = self.id_order
+        transaction[self.l_time] = t_current
+        transaction[self.l_buysell] = action
+        transaction[self.l_price] = self.price * self.unit
+        transaction[self.l_profit] = profit
+        transaction[self.l_profit_max] = self.profit_max
+        transaction[self.l_loss_max] = self.loss_max
+        transaction[self.l_note] = note
         self.updateOrderHistory(transaction)
 
         self.price = 0
@@ -70,14 +79,14 @@ class Trader():
             self.position = '不明'
             self.price = 0
 
-        transaction['注文番号'] = self.id_order
-        transaction['時刻'] = t_current
-        transaction['売買'] = self.position
-        transaction['金額'] = self.price * self.unit
-        transaction['損益'] = ''
-        transaction['最大益'] = ''
-        transaction['最大損'] = ''
-        transaction['備考'] = note
+        transaction[self.l_order] = self.id_order
+        transaction[self.l_time] = t_current
+        transaction[self.l_buysell] = self.position
+        transaction[self.l_price] = self.price * self.unit
+        transaction[self.l_profit] = ''
+        transaction[self.l_profit_max] = ''
+        transaction[self.l_loss_max] = ''
+        transaction[self.l_note] = note
         self.updateOrderHistory(transaction)
 
     def getLossMax(self):
@@ -138,3 +147,25 @@ class Trader():
 
     def getColumnFormat(self):
         return self.list_format
+
+    def calcProfitTotal(self):
+        r = len(self.df_order)
+        total = 0
+        for i in range(r):
+            value = self.df_order.at[i, self.l_profit]
+            if type(value) is not str:
+                total = total + value
+
+        self.df_order.at[r, self.l_order] = ''
+        self.df_order.at[r, self.l_time] = ''
+        self.df_order.at[r, self.l_buysell] = ''
+        self.df_order.at[r, self.l_price] = '損益合計'
+        self.df_order.at[r, self.l_profit] = total
+        self.df_order.at[r, self.l_profit_max] = ''
+        self.df_order.at[r, self.l_loss_max] = ''
+        self.df_order.at[r, self.l_note] = ''
+
+    def getColumnFormat4HTML(self):
+        formatters = {
+            self.l_order: lambda x: '{:*>3}'.format(x),
+        }

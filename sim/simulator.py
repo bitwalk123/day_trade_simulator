@@ -72,11 +72,12 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                 # （アプリの）取引時間内
                 # =============================================================
 
-                if t_current.second == 0:
+                if t_current.second == 1:
                     # ---------------------------------------------------------
-                    # ジャスト 0 秒の時
+                    # ジャスト 1 秒の時
                     # ---------------------------------------------------------
-                    trend, period, diff = self.find_psar_trend(t_current)
+                    t_prev = t_current - self.t_second
+                    trend, period, diff = self.find_psar_trend(t_prev)
                     if np.isnan(trend):
                         trend = self.trader.getTrend()
 
@@ -130,6 +131,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             ###
             ###################################################################
 
+        self.trader.calcProfitTotal()
         df_order = self.trader.getOrderHistory()
         column_format = self.trader.getColumnFormat()
         # スレッド処理の終了を通知
