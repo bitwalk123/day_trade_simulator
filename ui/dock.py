@@ -25,7 +25,8 @@ from widgets.pads import HPad
 
 
 class DockSimulator(QDockWidget):
-    simStarted = Signal(dict)
+    requestOrderHistory = Signal()
+    requestSimulationStart = Signal(dict)
 
     def __init__(self, res: AppRes):
         super().__init__()
@@ -205,6 +206,7 @@ class DockSimulator(QDockWidget):
             QIcon(os.path.join(self.res.dir_image, 'cart.png'))
         )
         but_order.setToolTip('売買履歴')
+        but_order.clicked.connect(self.on_order_history)
         hbox.addWidget(but_order)
 
 
@@ -224,8 +226,11 @@ class DockSimulator(QDockWidget):
 
         self.btnStart.setEnabled(True)
 
+    def on_order_history(self):
+        self.requestOrderHistory.emit()
+
     def on_start(self):
-        self.simStarted.emit(self.dict_target)
+        self.requestSimulationStart.emit(self.dict_target)
 
     def updateProfit(self, dict_update: dict):
         self.objPricePos.setValue(dict_update['建玉価格'])
