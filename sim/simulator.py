@@ -48,7 +48,6 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         trend = 0
         period = 0
         diff = 0
-        trend_accepted = False
 
         while t_current <= self.t_end:
             ###################################################################
@@ -85,16 +84,22 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # PSAR トレンド判定
                     if self.trader.getTrend() != trend:
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-                        # トレンドが異なる場合
+                        # トレンドが異なる場合（トレンド反転）
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-                        # トレンドの更新
+                        # 取引オブジェクトが保持しているトレンドの更新
                         self.trader.setTrend(trend)
+                        # 建玉取得フラグを解除
                         trend_accepted = False
 
                         # 建玉返済
-                        self.sessionClosePos(t_current, p_current, 'トレンド反転')
+                        if self.sessionClosePos(t_current, p_current, '返済（トレンド反転）'):
+                            note = 'ドテン売買'
+                        else:
+                            note = '新規建玉'
+
                         # 建玉取得
-                        self.sessionOpenPos(t_current, p_current, 'ドテン売買')
+                        self.sessionOpenPos(t_current, p_current, note)
+
                     else:
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                         # トレンドが同一の場合
@@ -102,7 +107,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                         pass
                 else:
                     # ---------------------------------------------------------
-                    # ジャスト 0 秒以外の時
+                    # ジャスト 1 秒以外の時
                     # ---------------------------------------------------------
                     pass
             else:
@@ -110,7 +115,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                 #  （アプリの）取引時間外
                 # =============================================================
                 # 建玉返済
-                self.sessionClosePos(t_current, p_current, '強制')
+                self.sessionClosePos(t_current, p_current, '強制返済')
 
             ###################################################################
             ### 後処理
@@ -181,12 +186,18 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
         return trend, period, diff
 
-    def sessionOpenPos(self, t, p, note=''):
+    def sessionOpenPos(self, ts, price, note='') -> bool:
         if not self.trader.hasPosition():
             transaction = dict()
-            self.trader.openPosition(t, p, transaction, note)
+            self.trader.openPosition(ts, price, transaction, note)
+            return True
+        else:
+            return False
 
-    def sessionClosePos(self, t, p, note=''):
+    def sessionClosePos(self, ts, price, note='') -> bool:
         if self.trader.hasPosition():
             transaction = dict()
-            self.trader.closePosition(t, p, transaction, note)
+            self.trader.closePosition(ts, price, transaction, note)
+            return True
+        else:
+            return False
