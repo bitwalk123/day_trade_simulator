@@ -248,7 +248,7 @@ class DockSimulator(QDockWidget):
 
         self.objCode.setText(dict_target['code'])
         self.objDate.setText(dict_target['date_format'])
-        self.objPriceDeltaMin.setValue(dict_target['tick_price'])
+        self.objPriceDeltaMin.setValue(dict_target['price_delta_min'])
         self.objUnit.setValue(dict_target['unit'], False)
 
         self.btnStart.setEnabled(True)

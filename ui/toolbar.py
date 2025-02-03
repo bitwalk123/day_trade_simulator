@@ -82,7 +82,7 @@ class ToolBar(QToolBar):
             'date_format': date_format_target,
             'name': key,
             'symbol': self.tickers[key]['symbol'],
-            'tick_price': self.tickers[key]['tick_price'],
+            'price_delta_min': self.tickers[key]['price_delta_min'],
             'unit': self.tickers[key]['unit'],
         }
 
