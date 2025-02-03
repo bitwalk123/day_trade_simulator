@@ -42,6 +42,7 @@ class TradeSimulator(QMainWindow):
         dock.requestOrderHistory.connect(self.on_order_history)
         dock.requestOrderHistoryHTML.connect(self.on_order_history_html)
         dock.requestSimulationStart.connect(self.on_start)
+        dock.requestOverlayAnalysis.connect(self.on_overlay_anaysis)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
         self.canvas = canvas = Canvas(self.res)
@@ -83,6 +84,9 @@ class TradeSimulator(QMainWindow):
         htmlname = os.path.join(home, 'result.html')
         with open(htmlname, mode='w') as f:
             f.writelines(list_html)
+
+    def on_overlay_anaysis(self, dict_target: dict):
+        print('DEBUG!')
 
     def on_read_target(self, dict_target: dict):
         self.canvas.plot(dict_target)
