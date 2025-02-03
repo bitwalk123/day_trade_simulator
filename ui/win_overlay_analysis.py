@@ -43,8 +43,10 @@ class WinOverlayAnalysis(QMainWindow):
             else:
                 obj.appendXY(x, y)
 
+        # X軸の最大値
         self.canvas.setXMax(x_max)
 
+        # とりあえず全てをプロット
         self.on_plot_all()
 
     def on_plot_all(self):
