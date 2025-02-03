@@ -48,6 +48,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         trend = 0
         period = 0
         diff = 0
+        trend_accepted = False
 
         while t_current <= self.t_end:
             ###################################################################
@@ -88,10 +89,12 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                         # トレンドの更新
                         self.trader.setTrend(trend)
+                        trend_accepted = False
+
                         # 建玉返済
-                        self.sessionClosePos(t_current, p_current)
-                        # 反対売買
-                        self.sessionOpenPos(t_current, p_current)
+                        self.sessionClosePos(t_current, p_current, 'トレンド反転')
+                        # 建玉取得
+                        self.sessionOpenPos(t_current, p_current, 'ドテン売買')
                     else:
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                         # トレンドが同一の場合
@@ -102,7 +105,6 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # ジャスト 0 秒以外の時
                     # ---------------------------------------------------------
                     pass
-
             else:
                 # =============================================================
                 #  （アプリの）取引時間外
