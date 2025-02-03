@@ -16,7 +16,7 @@ from structs.res import AppRes
 from ui.dock import DockSimulator
 from ui.toolbar import ToolBar
 from ui.win_order_history import WinOrderHistory
-from ui.win_overlay_analysis import WinOverlayAnalysis
+from ui.win_overlay import WinOverlayAnalysis
 from widgets.charts import Canvas, ChartNavigation
 
 

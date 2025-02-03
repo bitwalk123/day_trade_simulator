@@ -8,6 +8,7 @@ from matplotlib.backends.backend_qtagg import (
     NavigationToolbar2QT as NavigationToolbar,
 )
 from matplotlib.figure import Figure
+import matplotlib.ticker as ticker
 
 from func.plots import (
     clearAxes,
@@ -176,13 +177,15 @@ class ChartOverlay(FigureCanvas):
         self.ax = self.fig.add_subplot(111)
 
         self.fig.subplots_adjust(
-            left=0.08,
-            right=0.99,
-            top=0.95,
-            bottom=0.06,
+            left=0.1,
+            right=0.95,
+            top=0.99,
+            bottom=0.05,
         )
 
         self.x_max = None
+        self.y_min = None
+        self.y_max = None
 
     def plot(self, list_obj: list):
         # 消去
@@ -196,6 +199,34 @@ class ChartOverlay(FigureCanvas):
             color='#444',
         )
         self.ax.set_xlim(0, self.x_max)
+        self.ax.set_ylim(self.y_min, self.y_max)
+
+        self.ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+        self.ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+
+        # グリッド線
+        drawGrid(self.fig)
+
+        # 再描画
+        refreshDraw(self.fig)
+
+    def plotSingle(self, obj: PairXY):
+        # 消去
+        clearAxes(self.fig)
+
+        self.ax.plot(
+            obj.getX(), obj.getY(),
+        )
+        self.ax.axhline(
+            0,
+            linewidth=0.75,
+            color='#444',
+        )
+        self.ax.set_xlim(0, self.x_max)
+        self.ax.set_ylim(self.y_min, self.y_max)
+
+        self.ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+        self.ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
 
         # グリッド線
         drawGrid(self.fig)
@@ -226,8 +257,10 @@ class ChartOverlay(FigureCanvas):
         # 再描画
         refreshDraw(self.fig)
 
-    def setXMax(self, x_max):
-        self.x_max = x_max
+    def setAxisRange(self, x_max, y_min, y_max):
+        self.x_max = x_max * 1.05
+        self.y_min = y_min * 1.05
+        self.y_max = y_max * 1.05
 
 class ChartNavigation(NavigationToolbar):
     def __init__(self, chart: FigureCanvas):
