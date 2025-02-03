@@ -29,6 +29,7 @@ from widgets.pads import HPad
 class DockSimulator(QDockWidget):
     requestOrderHistory = Signal()
     requestOrderHistoryHTML = Signal()
+    requestOverlayAnalysis = Signal(dict)
     requestSimulationStart = Signal(dict)
 
     def __init__(self, res: AppRes):
@@ -204,6 +205,14 @@ class DockSimulator(QDockWidget):
         hpad = HPad()
         hbox.addWidget(hpad)
 
+        but_overlay = QPushButton()
+        but_overlay.setIcon(
+            QIcon(os.path.join(self.res.dir_image, 'overlay.png'))
+        )
+        but_overlay.setToolTip('重ね合わせ')
+        but_overlay.clicked.connect(self.on_overlay)
+        hbox.addWidget(but_overlay)
+
         but_html = QPushButton()
         but_html.setIcon(
             QIcon(os.path.join(self.res.dir_image, 'html.png'))
@@ -220,11 +229,19 @@ class DockSimulator(QDockWidget):
         but_order.clicked.connect(self.on_order_history)
         hbox.addWidget(but_order)
 
-    def setProgressRange(self, time_min: int, time_max: int):
-        self.progress.setRange(time_min, time_max)
+    def on_order_history(self):
+        self.requestOrderHistory.emit()
 
-    def setProgressValue(self, time_current: int):
-        self.progress.setValue(time_current)
+    def on_order_history_html(self):
+        self.requestOrderHistoryHTML.emit()
+
+    def on_overlay(self):
+        if len(self.dict_target) == 0:
+            return
+        self.requestOverlayAnalysis.emit(self.dict_target)
+
+    def on_start(self):
+        self.requestSimulationStart.emit(self.dict_target)
 
     def setInit(self, dict_target: dict):
         self.dict_target = dict_target
@@ -236,14 +253,11 @@ class DockSimulator(QDockWidget):
 
         self.btnStart.setEnabled(True)
 
-    def on_order_history(self):
-        self.requestOrderHistory.emit()
+    def setProgressRange(self, time_min: int, time_max: int):
+        self.progress.setRange(time_min, time_max)
 
-    def on_order_history_html(self):
-        self.requestOrderHistoryHTML.emit()
-
-    def on_start(self):
-        self.requestSimulationStart.emit(self.dict_target)
+    def setProgressValue(self, time_current: int):
+        self.progress.setValue(time_current)
 
     def updateProfit(self, dict_update: dict):
         self.objPricePos.setValue(dict_update['建玉価格'])
