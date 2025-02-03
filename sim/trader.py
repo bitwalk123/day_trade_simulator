@@ -54,7 +54,7 @@ class Trader():
         transaction[self.l_order] = self.id_order
         transaction[self.l_time] = t_current
         transaction[self.l_buysell] = action
-        transaction[self.l_price] = self.price * self.unit
+        transaction[self.l_price] = p_current * self.unit
         transaction[self.l_profit] = profit
         transaction[self.l_profit_max] = self.profit_max
         transaction[self.l_loss_max] = self.loss_max
