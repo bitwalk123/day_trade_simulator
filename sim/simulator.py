@@ -98,7 +98,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                         # トレンドが同一の場合
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-                        if trend_accepted == False and 0< period < 6 and 0 < diff:
+                        if trend_accepted == False and 0 < period < 6 and 0 < diff:
                             note = '新規建玉@period=%d' % period
                             # 建玉取得
                             if self.sessionOpenPos(t_current, p_current, note):
@@ -186,7 +186,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
         return trend, period, diff
 
-    def sessionOpenPos(self, ts, price, note='')->bool:
+    def sessionOpenPos(self, ts, price, note='') -> bool:
         if not self.trader.hasPosition():
             transaction = dict()
             self.trader.openPosition(ts, price, transaction, note)
