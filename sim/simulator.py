@@ -71,14 +71,16 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                 # =============================================================
                 # （アプリの）取引時間内
                 # =============================================================
-
                 if t_current.second == 1:
                     # ---------------------------------------------------------
                     # ジャスト 1 秒の時
                     # ---------------------------------------------------------
+                    # 1 秒前（すなわち 0 秒の時）の PSAR トレンド情報を取得
                     t_prev = t_current - self.t_second
                     trend, period, diff = self.find_psar_trend(t_prev)
                     if np.isnan(trend):
+                        # trend が NaN でなければ
+                        # 取引オブジェクトが保持するトレンドを更新
                         trend = self.trader.getTrend()
 
                     # PSAR トレンド判定
@@ -88,25 +90,28 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                         # 取引オブジェクトが保持しているトレンドの更新
                         self.trader.setTrend(trend)
-                        # 建玉取得フラグを解除
-                        trend_accepted = False
 
                         # 建玉返済
                         self.sessionClosePos(t_current, p_current, '返済（トレンド反転）')
-
+                        # すぐさま反対売買（ドテン売買）はしない。
                     else:
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                         # トレンドが同一の場合
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                         if 0 < diff:
+                            # トレンド開始後の差額がプラスの時のみ新たな建玉を取得。
                             note = '新規建玉@period=%d' % period
                             # 建玉取得
                             self.sessionOpenPos(t_current, p_current, note)
+                        else:
+                            # 損益評価
+                            self.eval_profit(t_current, p_current)
                 else:
                     # ---------------------------------------------------------
                     # ジャスト 1 秒以外の時
                     # ---------------------------------------------------------
-                    pass
+                    # 損益評価
+                    self.eval_profit(t_current, p_current)
             else:
                 # =============================================================
                 #  （アプリの）取引時間外
@@ -131,7 +136,6 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
             # 時刻を１秒進める
             t_current += self.t_second
-
             ###
             ###################################################################
 
@@ -140,6 +144,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         column_format = self.trader.getColumnFormat()
         # スレッド処理の終了を通知
         self.threadFinished.emit(df_order, column_format)
+
+    def eval_profit(self, t_current, p_current):
+        pass
 
     def find_tick_data(self, t_current):
         """
