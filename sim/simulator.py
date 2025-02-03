@@ -48,6 +48,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         trend = 0
         period = 0
         diff = 0
+
+        # トレンドに従って建玉を持ったかどうかのフラグとその時の株価
+        # フラグのライフタイムは次のトレンド反転まで
         trend_accepted = False
 
         while t_current <= self.t_end:
@@ -85,14 +88,15 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # PSAR トレンド判定
                     if self.trader.getTrend() != trend:
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-                        # トレンドが異なる場合
+                        # トレンドが異なる場合（トレンド反転）
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-                        # トレンドの更新
+                        # 取引オブジェクトが保持しているトレンドの更新
                         self.trader.setTrend(trend)
+                        # 建玉取得フラグを解除
                         trend_accepted = False
 
                         # 建玉返済
-                        self.sessionClosePos(t_current, p_current, 'トレンド反転')
+                        self.sessionClosePos(t_current, p_current, '返済（トレンド反転）')
 
                     else:
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
@@ -102,7 +106,10 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                             note = '新規建玉@period=%d' % period
                             # 建玉取得
                             if self.sessionOpenPos(t_current, p_current, note):
+                                # 建玉取得フラグを立てる
                                 trend_accepted = True
+                            else:
+                                print('不明のエラー')
                         else:
                             pass
                 else:
