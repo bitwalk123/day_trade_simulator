@@ -236,6 +236,8 @@ class DockSimulator(QDockWidget):
         self.requestOrderHistoryHTML.emit()
 
     def on_overlay(self):
+        if len(self.dict_target) == 0:
+            return
         self.requestOverlayAnalysis.emit(self.dict_target)
 
     def on_start(self):

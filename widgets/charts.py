@@ -16,6 +16,7 @@ from func.plots import (
     refreshDraw,
 )
 from func.tide import get_range_xaxis
+from structs.pair import PairXY
 from structs.res import AppRes
 
 
@@ -157,6 +158,76 @@ class Canvas(FigureCanvas):
         # 再描画
         refreshDraw(self.fig)
 
+
+class ChartOverlay(FigureCanvas):
+    def __init__(self, res: AppRes):
+        self.fig = Figure()
+        super().__init__(self.fig)
+
+        font = os.path.join(
+            res.dir_font,
+            'RictyDiminished-Regular.ttf',
+        )
+        fm.fontManager.addfont(font)
+        font_prop = fm.FontProperties(fname=font)
+        plt.rcParams['font.family'] = font_prop.get_name()
+        plt.rcParams['font.size'] = 14
+
+        self.ax = self.fig.add_subplot(111)
+
+        self.fig.subplots_adjust(
+            left=0.08,
+            right=0.99,
+            top=0.95,
+            bottom=0.06,
+        )
+
+        self.x_max = None
+
+    def plot(self, list_obj: list):
+        # 消去
+        clearAxes(self.fig)
+
+        for obj in list_obj:
+            self.plotEach(obj)
+        self.ax.axhline(
+            0,
+            linewidth=0.75,
+            color='#444',
+        )
+        self.ax.set_xlim(0, self.x_max)
+
+        # グリッド線
+        drawGrid(self.fig)
+
+        # 再描画
+        refreshDraw(self.fig)
+
+    def plotEach(self, obj: PairXY):
+        self.ax.plot(
+            obj.getX(), obj.getY(),
+        )
+
+    def plotBlank(self):
+        # 消去
+        clearAxes(self.fig)
+
+        self.ax.axhline(
+            0,
+            linewidth=0.75,
+            color='#444',
+        )
+        self.ax.set_xlim(0, self.x_max)
+
+        # グリッド線
+        drawGrid(self.fig)
+
+    def plotReflesh(self):
+        # 再描画
+        refreshDraw(self.fig)
+
+    def setXMax(self, x_max):
+        self.x_max = x_max
 
 class ChartNavigation(NavigationToolbar):
     def __init__(self, chart: FigureCanvas):

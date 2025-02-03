@@ -16,6 +16,7 @@ from structs.res import AppRes
 from ui.dock import DockSimulator
 from ui.toolbar import ToolBar
 from ui.win_order_history import WinOrderHistory
+from ui.win_overlay_analysis import WinOverlayAnalysis
 from widgets.charts import Canvas, ChartNavigation
 
 
@@ -27,9 +28,13 @@ class TradeSimulator(QMainWindow):
         self.res = AppRes()
         self.threadpool = QThreadPool()
 
+        # 注文履歴
         self.order_hist: WinOrderHistory | None = None  # 注文履歴
         self.df_order: pd.DataFrame | None = None
         self.column_format: list | None = None
+
+        # 重ね合わせ解析
+        self.overlay: WinOverlayAnalysis | None = None
 
         self.setWindowTitle(self.__app_name__)
         self.setFixedSize(1200, 800)
@@ -77,7 +82,6 @@ class TradeSimulator(QMainWindow):
     def on_order_history_html(self):
         if self.df_order is None:
             return
-
         list_html = df_to_html(self.df_order, self.column_format)
 
         home = os.path.expanduser("~")
@@ -86,7 +90,11 @@ class TradeSimulator(QMainWindow):
             f.writelines(list_html)
 
     def on_overlay_anaysis(self, dict_target: dict):
-        print('DEBUG!')
+        if self.overlay is not None:
+            self.overlay.hide()
+            self.overlay.deleteLater()
+        self.overlay = WinOverlayAnalysis(dict_target, self.res)
+        self.overlay.show()
 
     def on_read_target(self, dict_target: dict):
         self.canvas.plot(dict_target)
