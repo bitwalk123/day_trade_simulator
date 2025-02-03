@@ -93,16 +93,21 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
                         # 建玉返済
                         self.sessionClosePos(t_current, p_current, 'トレンド反転')
-                        # 建玉取得
-                        self.sessionOpenPos(t_current, p_current, 'ドテン売買')
+
                     else:
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                         # トレンドが同一の場合
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-                        pass
+                        if trend_accepted == False and 0< period < 6 and 0 < diff:
+                            note = '新規建玉@period=%d' % period
+                            # 建玉取得
+                            if self.sessionOpenPos(t_current, p_current, note):
+                                trend_accepted = True
+                        else:
+                            pass
                 else:
                     # ---------------------------------------------------------
-                    # ジャスト 0 秒以外の時
+                    # ジャスト 1 秒以外の時
                     # ---------------------------------------------------------
                     pass
             else:
@@ -110,7 +115,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                 #  （アプリの）取引時間外
                 # =============================================================
                 # 建玉返済
-                self.sessionClosePos(t_current, p_current, '強制')
+                self.sessionClosePos(t_current, p_current, '強制返済')
 
             ###################################################################
             ### 後処理
@@ -181,12 +186,18 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
         return trend, period, diff
 
-    def sessionOpenPos(self, t, p, note=''):
+    def sessionOpenPos(self, ts, price, note='')->bool:
         if not self.trader.hasPosition():
             transaction = dict()
-            self.trader.openPosition(t, p, transaction, note)
+            self.trader.openPosition(ts, price, transaction, note)
+            return True
+        else:
+            return False
 
-    def sessionClosePos(self, t, p, note=''):
+    def sessionClosePos(self, ts, price, note='') -> bool:
         if self.trader.hasPosition():
             transaction = dict()
-            self.trader.closePosition(t, p, transaction, note)
+            self.trader.closePosition(ts, price, transaction, note)
+            return True
+        else:
+            return False
