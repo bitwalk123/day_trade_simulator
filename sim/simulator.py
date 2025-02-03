@@ -49,10 +49,6 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         period = 0
         diff = 0
 
-        # トレンドに従って建玉を持ったかどうかのフラグとその時の株価
-        # フラグのライフタイムは次のトレンド反転まで
-        trend_accepted = False
-
         while t_current <= self.t_end:
             ###################################################################
             ### 前処理
@@ -96,22 +92,19 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                         trend_accepted = False
 
                         # 建玉返済
-                        self.sessionClosePos(t_current, p_current, '返済（トレンド反転）')
+                        if self.sessionClosePos(t_current, p_current, '返済（トレンド反転）'):
+                            note = 'ドテン売買'
+                        else:
+                            note = '新規建玉'
+
+                        # 建玉取得
+                        self.sessionOpenPos(t_current, p_current, note)
 
                     else:
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                         # トレンドが同一の場合
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-                        if trend_accepted == False and 0 < period < 6 and 0 < diff:
-                            note = '新規建玉@period=%d' % period
-                            # 建玉取得
-                            if self.sessionOpenPos(t_current, p_current, note):
-                                # 建玉取得フラグを立てる
-                                trend_accepted = True
-                            else:
-                                print('不明のエラー')
-                        else:
-                            pass
+                        pass
                 else:
                     # ---------------------------------------------------------
                     # ジャスト 1 秒以外の時
