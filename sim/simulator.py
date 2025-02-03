@@ -92,19 +92,16 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                         trend_accepted = False
 
                         # 建玉返済
-                        if self.sessionClosePos(t_current, p_current, '返済（トレンド反転）'):
-                            note = 'ドテン売買'
-                        else:
-                            note = '新規建玉'
-
-                        # 建玉取得
-                        self.sessionOpenPos(t_current, p_current, note)
+                        self.sessionClosePos(t_current, p_current, '返済（トレンド反転）')
 
                     else:
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                         # トレンドが同一の場合
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-                        pass
+                        if 0 < diff:
+                            note = '新規建玉@period=%d' % period
+                            # 建玉取得
+                            self.sessionOpenPos(t_current, p_current, note)
                 else:
                     # ---------------------------------------------------------
                     # ジャスト 1 秒以外の時
