@@ -116,6 +116,7 @@ class TradeSimulator(QMainWindow):
         worker.updateSystemTime.connect(self.on_update_system_time)
         worker.updateTickPrice.connect(self.on_update_tick_price)
         worker.updateTrend.connect(self.on_update_trend)
+
         # ステータス表示の変更
         self.dock.updateStatus('稼働中')
         # スレッドで処理を開始
