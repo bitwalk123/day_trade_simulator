@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 
 from func.io import read_json
 from structs.res import AppRes
+from ui.win_explorer import WinExplorer
 from widgets.labels import (
     LabelDate,
     LabelFlat,
@@ -32,15 +33,23 @@ class DockSimulator(QDockWidget):
     requestOrderHistoryHTML = Signal()
     requestOverlayAnalysis = Signal(dict)
     requestSimulationStart = Signal(dict, dict)
+    requestAutoSimStart = Signal(dict, dict)
 
     def __init__(self, res: AppRes):
         super().__init__()
         self.res = res
         self.dict_target = dict()
+
         # シミュレーション・パラメータ（辞書）の読み込み
         json_params = os.path.join(res.dir_config, 'params.json')
-        self.param = read_json(json_params)
+        self.params = read_json(json_params)
 
+        # 最適パラメータ探索用ウィンドウ
+        self.explorer: WinExplorer | None = None
+
+        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+        # UI
+        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         self.setFeatures(
             QDockWidget.DockWidgetFeature.NoDockWidgetFeatures
         )
@@ -210,13 +219,13 @@ class DockSimulator(QDockWidget):
         hpad = HPad()
         hbox.addWidget(hpad)
 
-        but_explore = QPushButton()
-        but_explore.setIcon(
+        but_explorer = QPushButton()
+        but_explorer.setIcon(
             QIcon(os.path.join(self.res.dir_image, 'explore.png'))
         )
-        but_explore.setToolTip('最適パラメータの探索')
-        but_explore.clicked.connect(self.on_explore)
-        hbox.addWidget(but_explore)
+        but_explorer.setToolTip('最適パラメータの探索')
+        but_explorer.clicked.connect(self.on_explorer)
+        hbox.addWidget(but_explorer)
 
         but_overlay = QPushButton()
         but_overlay.setIcon(
@@ -242,8 +251,10 @@ class DockSimulator(QDockWidget):
         but_order.clicked.connect(self.on_order_history)
         hbox.addWidget(but_order)
 
-    def on_explore(self):
-        pass
+    def on_explorer(self):
+        self.explorer = explorer = WinExplorer(self.res)
+        explorer.requestAutoSim.connect(self.on_start_autosim)
+        self.explorer.show()
 
     def on_order_history(self):
         self.requestOrderHistory.emit()
@@ -257,7 +268,10 @@ class DockSimulator(QDockWidget):
         self.requestOverlayAnalysis.emit(self.dict_target)
 
     def on_start(self):
-        self.requestSimulationStart.emit(self.dict_target, self.param)
+        self.requestSimulationStart.emit(self.dict_target, self.params)
+
+    def on_start_autosim(self, dict_target: dict, params: dict):
+        self.requestAutoSimStart.emit(dict_target, params)
 
     def setInit(self, dict_target: dict):
         self.dict_target = dict_target
