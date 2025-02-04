@@ -249,6 +249,7 @@ class ChartOverlay(FigureCanvas):
             color='#444',
         )
         self.ax.set_xlim(0, self.x_max)
+        self.ax.set_ylim(self.y_min, self.y_max)
 
         # グリッド線
         drawGrid(self.fig)
@@ -258,9 +259,10 @@ class ChartOverlay(FigureCanvas):
         refreshDraw(self.fig)
 
     def setAxisRange(self, x_max, y_min, y_max):
-        self.x_max = x_max * 1.05
-        self.y_min = y_min * 1.05
-        self.y_max = y_max * 1.05
+        self.x_max = x_max
+        y_pad = (y_max - y_min) * 0.05
+        self.y_min = y_min - y_pad
+        self.y_max = y_max + y_pad
 
 class ChartNavigation(NavigationToolbar):
     def __init__(self, chart: FigureCanvas):

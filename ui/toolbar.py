@@ -70,9 +70,12 @@ class ToolBar(QToolBar):
         if self.calendar is not None:
             self.calendar.hide()
 
-        # データフレームを確認する辞書
-        dict_df = dict()
+        dict_target = self.prepDataset(qdate)
 
+        # データフレーム準備完了シグナル
+        self.readDataFrame.emit(dict_target)
+
+    def prepDataset(self, qdate: QDate):
         # QDate から文字列 YYYY-MM-DD を生成
         date_target = get_yyyymmdd(qdate)
         date_format_target = get_yyyy_mm_dd(qdate)
@@ -89,17 +92,12 @@ class ToolBar(QToolBar):
             'price_delta_min': self.tickers[key]['price_delta_min'],
             'unit': self.tickers[key]['unit'],
         }
-
         # １分足データを取得
         df_ohlc = get_ohlc(self.res, dict_target, interval)
-        if len(df_ohlc) == 0:
-            return
         dict_target[interval] = df_ohlc
-        # print(df_ohlc)
 
         # ティックデータを取得
         df_tick = get_tick(self.res, dict_target)
         dict_target['tick'] = df_tick
 
-        # データフレーム準備完了シグナル
-        self.readDataFrame.emit(dict_target)
+        return dict_target
