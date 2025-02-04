@@ -37,10 +37,14 @@ class DockSimulator(QDockWidget):
         super().__init__()
         self.res = res
         self.dict_target = dict()
+
         # シミュレーション・パラメータ（辞書）の読み込み
         json_params = os.path.join(res.dir_config, 'params.json')
         self.param = read_json(json_params)
 
+        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+        # UI
+        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         self.setFeatures(
             QDockWidget.DockWidgetFeature.NoDockWidgetFeatures
         )

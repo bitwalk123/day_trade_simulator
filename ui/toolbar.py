@@ -31,6 +31,9 @@ class ToolBar(QToolBar):
         json_ticker = os.path.join(res.dir_config, 'ticker.json')
         self.tickers = read_json(json_ticker)
 
+        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+        # UI
+        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         self.calendar = QCalendarWidget()
         self.calendar.setWindowTitle('データ取得日')
         self.calendar.activated.connect(self.on_date_selected)
