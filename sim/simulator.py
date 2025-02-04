@@ -23,9 +23,15 @@ class SimulatorSignal(QObject):
 class WorkerSimulator(QRunnable, SimulatorSignal):
     def __init__(self, dict_target: dict):
         super().__init__()
+        # 時刻フォーマット用文字列
         self.time_format = '%H:%M:%S'
+
+        # ティックデータ
         self.df_tick = dict_target['tick']
+        # 1 分足の OHLC データ
         self.df_ohlc_1m = dict_target['1m']
+
+        # 取引時間
         self.date_str = dict_target['date_format']
         self.t_start = pd.to_datetime('%s 09:00:00' % self.date_str)
         self.t_end_1h = pd.to_datetime('%s 11:29:50' % self.date_str)
@@ -33,10 +39,18 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         self.t_end_2h = pd.to_datetime('%s 15:24:50' % self.date_str)
         self.t_end = pd.to_datetime('%s 15:31:00' % self.date_str)
 
-        self.t_second = datetime.timedelta(seconds=1)
-        self.t_minute = datetime.timedelta(minutes=1)
+        # 呼値
+        self.price_delta_min = dict_target['price_delta_min']
 
-        self.trader = Trader(dict_target['unit'])
+        # 売買単位
+        self.unit = dict_target['unit']
+
+        # 取引オブジェクト
+        self.trader = Trader(self.unit)
+
+        # シミュレータ用時間定数
+        self.t_second = datetime.timedelta(seconds=1)  # 1 秒
+        self.t_minute = datetime.timedelta(minutes=1)  # 1 分
 
     def getTimeRange(self):
         return self.t_start.timestamp(), self.t_end.timestamp()
