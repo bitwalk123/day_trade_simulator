@@ -100,13 +100,13 @@ class TradeSimulator(QMainWindow):
         self.canvas.plot(dict_target)
         self.dock.setInit(dict_target)
 
-    def on_start(self, dict_target: dict):
+    def on_start(self, dict_target: dict, params: dict):
         """
         シミュレーターを別スレッドで起動
         :param dict_target:
         :return:
         """
-        worker = WorkerSimulator(dict_target)
+        worker = WorkerSimulator(dict_target, params)
         # 進捗ウィジェットの開始・終了レンジを設定
         self.dock.setProgressRange(*worker.getTimeRange())
         # シグナルの処理

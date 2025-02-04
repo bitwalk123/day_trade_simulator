@@ -21,15 +21,16 @@ class SimulatorSignal(QObject):
 
 
 class WorkerSimulator(QRunnable, SimulatorSignal):
-    def __init__(self, dict_target: dict):
+    def __init__(self, dict_target: dict, params: dict):
         super().__init__()
+
+        self.level_losscut_1 = None
+        self.level_losscut_2 = None
+        self.level_secure_1 = None
+        self.threshold_profit_1 = None
+
         # 時刻フォーマット用文字列
         self.time_format = '%H:%M:%S'
-
-        # ティックデータ
-        self.df_tick = dict_target['tick']
-        # 1 分足の OHLC データ
-        self.df_ohlc_1m = dict_target['1m']
 
         # 取引時間
         self.date_str = dict_target['date_format']
@@ -38,6 +39,15 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         self.t_start_2h = pd.to_datetime('%s 12:30:00' % self.date_str)
         self.t_end_2h = pd.to_datetime('%s 15:24:50' % self.date_str)
         self.t_end = pd.to_datetime('%s 15:31:00' % self.date_str)
+
+        # シミュレータ用時間定数
+        self.t_second = datetime.timedelta(seconds=1)  # 1 秒
+        self.t_minute = datetime.timedelta(minutes=1)  # 1 分
+
+        # ティックデータ
+        self.df_tick = dict_target['tick']
+        # 1 分足の OHLC データ
+        self.df_ohlc_1m = dict_target['1m']
 
         # 呼値
         self.price_delta_min = dict_target['price_delta_min']
@@ -48,9 +58,8 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # 取引オブジェクト
         self.trader = Trader(self.unit)
 
-        # シミュレータ用時間定数
-        self.t_second = datetime.timedelta(seconds=1)  # 1 秒
-        self.t_minute = datetime.timedelta(minutes=1)  # 1 分
+        # 利確・損切パラメータの設定
+        self.setting_params(params)
 
     def getTimeRange(self):
         return self.t_start.timestamp(), self.t_end.timestamp()
@@ -112,7 +121,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                         # トレンドが同一の場合
                         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-                        if 0 < diff:
+                        if period < self.period_max and 0 < diff:
                             # トレンド開始後の差額がプラスの時のみ新たな建玉を取得。
                             note = '新規建玉@period=%d' % period
                             # 建玉取得
@@ -160,7 +169,29 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         self.threadFinished.emit(df_order, column_format)
 
     def eval_profit(self, t_current, p_current):
-        pass
+        profit = self.trader.getProfit(p_current)
+        # ========
+        #  損　切
+        # ========
+        # 損切１
+        # PSAR トレンド内で一度も含み益がプラスになっていない時の損切レベル
+        if profit < self.level_losscut_1 and 0 == self.trader.getProfitMax():
+            if self.sessionClosePos(t_current, p_current, '損切１'):
+                return
+        # 損切２
+        # PSAR トレンド内で最大含み益がプラスになっている時の損切レベル
+        if profit < self.level_losscut_2 and 0 < self.trader.getProfitMax():
+            if self.sessionClosePos(t_current, p_current, '損切２'):
+                return
+
+        # ========
+        #  利　確
+        # ========
+        profit_lower = self.trader.getProfitMax() * self.threshold_profit_1
+        # 利確１
+        if self.level_secure_1 < self.trader.getProfitMax() and profit < profit_lower:
+            if self.sessionClosePos(t_current, p_current, '利確１'):
+                return
 
     def find_tick_data(self, t_current):
         """
@@ -205,6 +236,13 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         return trend, period, diff
 
     def sessionOpenPos(self, ts, price, note='') -> bool:
+        """
+        建玉の取得
+        :param ts:
+        :param price:
+        :param note:
+        :return:
+        """
         if not self.trader.hasPosition():
             transaction = dict()
             self.trader.openPosition(ts, price, transaction, note)
@@ -213,9 +251,51 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             return False
 
     def sessionClosePos(self, ts, price, note='') -> bool:
+        """
+        建玉の返済
+        :param ts:
+        :param price:
+        :param note:
+        :return:
+        """
         if self.trader.hasPosition():
             transaction = dict()
             self.trader.closePosition(ts, price, transaction, note)
             return True
         else:
             return False
+
+    def setting_params(self, params: dict):
+        """
+        シミュレーション・パラメータの設定
+        :return:
+        """
+        # ---------------------------------------------------------------------
+        # エントリー可能な最大 period in PSAR
+        # ここで設定した数より大きい period で diff が正になっても
+        # 大きくは伸びないと仮定してエントリを諦める
+        # ---------------------------------------------------------------------
+        self.period_max = params['period_max']
+
+        # ---------------------------------------------------------------------
+        # 利確・損切レベル
+        # ---------------------------------------------------------------------
+        # 呼値×売買単位
+        block = self.price_delta_min * self.unit
+
+        # ロスカット・レベル１
+        # PSAR トレンド内で一度も含み益がプラスになっていない時の損切レベル
+        factor_losscut_1 = params['factor_losscut_1']
+        self.level_losscut_1 = -1 * block * factor_losscut_1
+
+        # ロスカット・レベル２
+        # PSAR トレンド内で最大含み益がプラスになっている時の損切レベル
+        factor_losscut_2 = params['factor_losscut_2']
+        self.level_losscut_2 = -1 * block * factor_losscut_2
+
+        # 利確検討最低価格１
+        factor_profit_1 = params['factor_profit_1']
+        self.level_secure_1 = block * factor_profit_1
+        # 利確しきい値１
+        # 最大含み損にしきい値を乗じた値を下回れば利確する。
+        self.threshold_profit_1 = params['threshold_profit_1']

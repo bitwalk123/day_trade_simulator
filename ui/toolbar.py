@@ -27,6 +27,7 @@ class ToolBar(QToolBar):
     def __init__(self, res: AppRes):
         super().__init__()
         self.res = res
+        # 銘柄リスト（辞書）の読み込み
         json_ticker = os.path.join(res.dir_config, 'ticker.json')
         self.tickers = read_json(json_ticker)
 
