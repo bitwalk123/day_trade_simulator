@@ -94,7 +94,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                 # =============================================================
                 # （アプリの）取引時間内
                 # =============================================================
-                self.session_main(t_current, p_current)
+                self.loopMain(t_current, p_current)
             else:
                 # =============================================================
                 #  （アプリの）取引時間外
@@ -129,10 +129,14 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # スレッド処理の終了を通知
         self.threadFinished.emit(df_order, column_format)
 
-    def session_main(self, t_current, p_current):
+    def loopMain(self, t_current, p_current):
         if t_current.second == 1:
             # -----------------------------------------------------------------
-            # ジャスト 1 秒の時
+            # 【ジャスト 1 秒の時】
+            # 理想的には HH:MM:00 に新しい 1 分足の OHLC の情報が流れ込み、
+            # その情報を元に「平均足」、Prabolic SAR が算出され、その後に売買判定が行われる。
+            # 現実的には、特に終盤になると VBA の実環境では 1 秒遅れになる場合が多いので、
+            # シミュレーション環境では、はじめから 1 秒遅れるものとして実行する。
             # -----------------------------------------------------------------
             # 1 秒前（すなわち 0 秒の時）の PSAR トレンド情報を取得
             t_prev = t_current - self.t_second
@@ -156,6 +160,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             else:
                 # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                 # トレンドが同一の場合
+                # 建玉を取得するタイミングは、当面はここだけに限定する
                 # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                 if period < self.period_max and 0 < diff:
                     # トレンド開始後の差額がプラスの時のみ新たな建玉を取得。
@@ -167,7 +172,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     self.eval_profit(t_current, p_current)
         else:
             # -----------------------------------------------------------------
-            # ジャスト 1 秒以外の時
+            # 【ジャスト 1 秒以外の時】
             # -----------------------------------------------------------------
             # 損益評価
             self.eval_profit(t_current, p_current)
