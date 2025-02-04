@@ -10,19 +10,14 @@ from PySide6.QtWidgets import (
 )
 
 from func.io import (
-    get_ohlc,
-    get_tick,
     read_json,
 )
-from func.tide import (
-    get_yyyymmdd,
-    get_yyyy_mm_dd,
-)
+from func.preprocs import prepDataset
 from structs.res import AppRes
 
 
 class ToolBar(QToolBar):
-    readDataFrame = Signal(dict)
+    readyDataset = Signal(dict)
 
     def __init__(self, res: AppRes):
         super().__init__()
@@ -70,34 +65,11 @@ class ToolBar(QToolBar):
         if self.calendar is not None:
             self.calendar.hide()
 
-        dict_target = self.prepDataset(qdate)
+        key = self.combo_tickers.currentText()
+        # key（銘柄の名前）をキーにして入れ子になっている辞書を取り出す。
+        info = self.tickers[key]
+        info['name'] = key
+        dict_target = prepDataset(info, qdate, self.res)
 
         # データフレーム準備完了シグナル
-        self.readDataFrame.emit(dict_target)
-
-    def prepDataset(self, qdate: QDate):
-        # QDate から文字列 YYYY-MM-DD を生成
-        date_target = get_yyyymmdd(qdate)
-        date_format_target = get_yyyy_mm_dd(qdate)
-
-        # 扱うデータ情報
-        key = self.combo_tickers.currentText()
-        interval = '1m'
-        dict_target = {
-            'code': self.tickers[key]['code'],
-            'date': date_target,
-            'date_format': date_format_target,
-            'name': key,
-            'symbol': self.tickers[key]['symbol'],
-            'price_delta_min': self.tickers[key]['price_delta_min'],
-            'unit': self.tickers[key]['unit'],
-        }
-        # １分足データを取得
-        df_ohlc = get_ohlc(self.res, dict_target, interval)
-        dict_target[interval] = df_ohlc
-
-        # ティックデータを取得
-        df_tick = get_tick(self.res, dict_target)
-        dict_target['tick'] = df_tick
-
-        return dict_target
+        self.readyDataset.emit(dict_target)

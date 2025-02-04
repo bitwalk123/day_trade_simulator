@@ -40,10 +40,11 @@ class TradeSimulator(QMainWindow):
         self.setFixedSize(1200, 800)
 
         toolbar = ToolBar(self.res)
-        toolbar.readDataFrame.connect(self.on_read_target)
+        toolbar.readyDataset.connect(self.on_show_target)
         self.addToolBar(toolbar)
 
         self.dock = dock = DockSimulator(self.res)
+        dock.requestAutoSimStart.connect(self.on_start_autosim)
         dock.requestOrderHistory.connect(self.on_order_history)
         dock.requestOrderHistoryHTML.connect(self.on_order_history_html)
         dock.requestSimulationStart.connect(self.on_start)
@@ -96,7 +97,7 @@ class TradeSimulator(QMainWindow):
         self.overlay = WinOverlayAnalysis(dict_target, self.res)
         self.overlay.show()
 
-    def on_read_target(self, dict_target: dict):
+    def on_show_target(self, dict_target: dict):
         self.canvas.plot(dict_target)
         self.dock.setInit(dict_target)
 
@@ -121,6 +122,10 @@ class TradeSimulator(QMainWindow):
         self.dock.updateStatus('稼働中')
         # スレッドで処理を開始
         self.threadpool.start(worker)
+
+    def on_start_autosim(self, dict_target: dict, params: dict):
+        self.on_show_target(dict_target)
+        self.on_start(dict_target, params)
 
     def on_update_profit(self, dict_update: dict):
         """

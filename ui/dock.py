@@ -33,6 +33,7 @@ class DockSimulator(QDockWidget):
     requestOrderHistoryHTML = Signal()
     requestOverlayAnalysis = Signal(dict)
     requestSimulationStart = Signal(dict, dict)
+    requestAutoSimStart = Signal(dict, dict)
 
     def __init__(self, res: AppRes):
         super().__init__()
@@ -41,7 +42,7 @@ class DockSimulator(QDockWidget):
 
         # シミュレーション・パラメータ（辞書）の読み込み
         json_params = os.path.join(res.dir_config, 'params.json')
-        self.param = read_json(json_params)
+        self.params = read_json(json_params)
 
         # 最適パラメータ探索用ウィンドウ
         self.explorer: WinExplorer | None = None
@@ -251,7 +252,8 @@ class DockSimulator(QDockWidget):
         hbox.addWidget(but_order)
 
     def on_explorer(self):
-        self.explorer = WinExplorer(self.res)
+        self.explorer = explorer = WinExplorer(self.res)
+        explorer.requestAutoSim.connect(self.on_start_autosim)
         self.explorer.show()
 
     def on_order_history(self):
@@ -266,7 +268,10 @@ class DockSimulator(QDockWidget):
         self.requestOverlayAnalysis.emit(self.dict_target)
 
     def on_start(self):
-        self.requestSimulationStart.emit(self.dict_target, self.param)
+        self.requestSimulationStart.emit(self.dict_target, self.params)
+
+    def on_start_autosim(self, dict_target: dict, params: dict):
+        self.requestAutoSimStart.emit(dict_target, params)
 
     def setInit(self, dict_target: dict):
         self.dict_target = dict_target
