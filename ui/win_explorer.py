@@ -30,7 +30,7 @@ class WinExplorer(QMainWindow):
         info['price_delta_min'] = 0.5
         info['unit'] = 100
 
-        qdate = QDate(2025, 2, 4)
+        qdate = QDate(2025, 1, 29)
 
         dict_target = prepDataset(info, qdate, self.res)
 
