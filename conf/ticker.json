@@ -2,7 +2,7 @@
   "三菱ＵＦＪフィナンシャルＧ": {
     "code": "8306",
     "symbol": "8306.T",
-    "tick_price": 0.5,
+    "price_delta_min": 0.5,
     "unit": 100
   }
 }

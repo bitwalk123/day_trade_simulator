@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from func.io import read_json
 from structs.res import AppRes
 from widgets.labels import (
     LabelDate,
@@ -30,12 +31,16 @@ class DockSimulator(QDockWidget):
     requestOrderHistory = Signal()
     requestOrderHistoryHTML = Signal()
     requestOverlayAnalysis = Signal(dict)
-    requestSimulationStart = Signal(dict)
+    requestSimulationStart = Signal(dict, dict)
 
     def __init__(self, res: AppRes):
         super().__init__()
         self.res = res
         self.dict_target = dict()
+        # シミュレーション・パラメータ（辞書）の読み込み
+        json_params = os.path.join(res.dir_config, 'params.json')
+        self.param = read_json(json_params)
+
         self.setFeatures(
             QDockWidget.DockWidgetFeature.NoDockWidgetFeatures
         )
@@ -205,6 +210,14 @@ class DockSimulator(QDockWidget):
         hpad = HPad()
         hbox.addWidget(hpad)
 
+        but_explore = QPushButton()
+        but_explore.setIcon(
+            QIcon(os.path.join(self.res.dir_image, 'explore.png'))
+        )
+        but_explore.setToolTip('最適パラメータの探索')
+        but_explore.clicked.connect(self.on_explore)
+        hbox.addWidget(but_explore)
+
         but_overlay = QPushButton()
         but_overlay.setIcon(
             QIcon(os.path.join(self.res.dir_image, 'overlay.png'))
@@ -229,6 +242,9 @@ class DockSimulator(QDockWidget):
         but_order.clicked.connect(self.on_order_history)
         hbox.addWidget(but_order)
 
+    def on_explore(self):
+        pass
+
     def on_order_history(self):
         self.requestOrderHistory.emit()
 
@@ -241,14 +257,14 @@ class DockSimulator(QDockWidget):
         self.requestOverlayAnalysis.emit(self.dict_target)
 
     def on_start(self):
-        self.requestSimulationStart.emit(self.dict_target)
+        self.requestSimulationStart.emit(self.dict_target, self.param)
 
     def setInit(self, dict_target: dict):
         self.dict_target = dict_target
 
         self.objCode.setText(dict_target['code'])
         self.objDate.setText(dict_target['date_format'])
-        self.objPriceDeltaMin.setValue(dict_target['tick_price'])
+        self.objPriceDeltaMin.setValue(dict_target['price_delta_min'])
         self.objUnit.setValue(dict_target['unit'], False)
 
         self.btnStart.setEnabled(True)
