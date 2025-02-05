@@ -52,3 +52,16 @@ def prepDataset(info: dict, qdate: QDate, res: AppRes) -> dict:
     dict_target['tick'] = df_tick
 
     return dict_target
+
+
+def prepResultDF(params: dict) -> pd.DataFrame:
+    dict_result = {
+        'code': list(),
+        'date': list(),
+    }
+    for key in params.keys():
+        dict_result[key] = list()
+    dict_result['total'] = list()
+    df = pd.DataFrame.from_dict(dict_result)
+    df_result = df.astype(object)
+    return df_result

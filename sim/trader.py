@@ -145,7 +145,7 @@ class Trader():
     def getOrderHistory(self):
         return self.df_order
 
-    def getColumnFormat(self):
+    def getColumnFormat(self) -> list:
         return self.list_format
 
     def calcProfitTotal(self):

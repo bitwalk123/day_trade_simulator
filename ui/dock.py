@@ -252,7 +252,7 @@ class DockSimulator(QDockWidget):
         hbox.addWidget(but_order)
 
     def on_explorer(self):
-        self.explorer = explorer = WinExplorer(self.res)
+        self.explorer = explorer = WinExplorer(self.res, self.params)
         explorer.requestAutoSim.connect(self.on_start_autosim)
         self.explorer.show()
 
@@ -272,6 +272,9 @@ class DockSimulator(QDockWidget):
 
     def on_start_autosim(self, dict_target: dict, params: dict):
         self.requestAutoSimStart.emit(dict_target, params)
+
+    def setAutoSimResult(self, result: dict):
+        self.explorer.appendResult(result)
 
     def setInit(self, dict_target: dict):
         self.dict_target = dict_target

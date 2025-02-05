@@ -82,6 +82,24 @@ class LabelTitle(QLabel):
             }
         """)
 
+class LabelTitle2(LabelTitle):
+    def __init__(self, title: str):
+        super().__init__(title)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.setFrameStyle(
+            QFrame.Shape.Panel | QFrame.Shadow.Raised
+        )
+        self.setLineWidth(1)
+        self.setAlignment(
+            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter
+        )
+        self.setStyleSheet("""
+            QLabel {
+                font-family: monospace;
+                padding-right: 5px;
+            }
+        """)
+
 
 class LabelTime(QLabel):
     def __init__(self):
@@ -102,10 +120,9 @@ class LabelTime(QLabel):
 
 
 class LabelValue(QLabel):
-    flag = True
-
     def __init__(self):
         super().__init__()
+        self.flag = True
         self.setFrameStyle(
             QFrame.Shape.Panel | QFrame.Shadow.Sunken
         )
@@ -132,5 +149,16 @@ class LabelValue(QLabel):
         self.flag = flag
         if flag:
             self.setText('%.1f' % float(value))
+        else:
+            self.setText('%d' % int(value))
+
+class LabelValue2(LabelValue):
+    def __init__(self):
+        super().__init__()
+
+    def setValue(self, value: int | float, flag=True):
+        self.flag = flag
+        if flag:
+            self.setText('%.3f' % float(value))
         else:
             self.setText('%d' % int(value))
