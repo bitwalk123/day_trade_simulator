@@ -1,3 +1,6 @@
+import os
+
+import pandas as pd
 from PySide6.QtCore import QDate, Signal, QMargins, Qt
 from PySide6.QtWidgets import (
     QGridLayout,
@@ -146,6 +149,8 @@ class WinExplorer(QMainWindow):
         else:
             total_max = self.df_result['total'].max()
             print(self.df_result[self.df_result['total'] == total_max])
+            file_pkl = os.path.join(self.res.dir_result, 'result.pkl')
+            self.df_result.to_pickle(file_pkl)
             print('Completed!')
 
     def appendResult(self, result: dict):
