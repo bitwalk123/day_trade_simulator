@@ -149,7 +149,7 @@ class WinExplorer(QMainWindow):
         else:
             total_max = self.df_result['total'].max()
             print(self.df_result[self.df_result['total'] == total_max])
-            file_pkl =os.path.join(self.res.dir_result, 'result.pkl')
+            file_pkl = os.path.join(self.res.dir_result, 'result.pkl')
             self.df_result.to_pickle(file_pkl)
             print('Completed!')
 
