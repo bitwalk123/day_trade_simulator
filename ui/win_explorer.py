@@ -123,15 +123,15 @@ class WinExplorer(QMainWindow):
         params = self.params.copy()
         self.idx = 0
 
-        for value_1 in range(2, 10):
+        for value_1 in range(3, 8):
             params['period_max'] = value_1
-            for value_2 in range(1, 10):
+            for value_2 in range(3, 8):
                 params['factor_losscut_1'] = value_2
-                for value_3 in range(1, 10):
+                for value_3 in range(1, 4):
                     params['factor_losscut_2'] = value_3
-                    for value_4 in range(2, 10):
+                    for value_4 in range(5, 12):
                         params['factor_profit_1'] = value_4
-                        for value_5 in range(3, 10):
+                        for value_5 in range(6, 10):
                             params['threshold_profit_1'] = value_5 * 0.1
                             params0 = params.copy()
                             self.list_params.append(params0)
@@ -149,7 +149,7 @@ class WinExplorer(QMainWindow):
             print('Completed!')
 
     def appendResult(self, result: dict):
-        print('%d/%d' % (self.idx + 1, len(self.list_params)))
+        print('%d/%d' % (self.idx, len(self.list_params)))
         r = len(self.df_result)
         for key in result.keys():
             self.df_result.at[r, key] = result[key]
