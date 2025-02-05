@@ -9,10 +9,11 @@ from PySide6.QtCore import (
 )
 
 from sim.trader import Trader
+from structs.app_enum import SimulationMode
 
 
 class SimulatorSignal(QObject):
-    threadFinished = Signal(pd.DataFrame, list)
+    threadFinished = Signal(pd.DataFrame, list, SimulationMode, dict)
     updateProfit = Signal(dict)
     updateSystemTime = Signal(str)
     updateTickPrice = Signal(str, float)
@@ -21,8 +22,11 @@ class SimulatorSignal(QObject):
 
 
 class WorkerSimulator(QRunnable, SimulatorSignal):
-    def __init__(self, dict_target: dict, params: dict):
+    def __init__(self, dict_target: dict, params: dict, mode: SimulationMode):
         super().__init__()
+        self.dict_target = dict_target
+        self.params = params
+        self.mode = mode
 
         self.level_losscut_1 = None
         self.level_losscut_2 = None
@@ -126,8 +130,19 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         df_order = self.trader.getOrderHistory()
         column_format = self.trader.getColumnFormat()
 
+        # --------------------
         # スレッド処理の終了を通知
-        self.threadFinished.emit(df_order, column_format)
+        # --------------------
+        result = dict()
+        # 最適条件探索時
+        if self.mode == SimulationMode.EXPLORE:
+            result['code'] = self.dict_target['code']
+            result['date'] = self.dict_target['date_format']
+            #result['params'] = self.params
+            for key in self.params.keys():
+                result[key] = self.params[key]
+            result['total'] = self.trader.getTotal()
+        self.threadFinished.emit(df_order, column_format, self.mode, result)
 
     def loopMain(self, t_current, p_current):
         if t_current.second == 1:

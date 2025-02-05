@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 
 from func.conv import df_to_html
 from sim.simulator import WorkerSimulator
+from structs.app_enum import SimulationMode
 from structs.res import AppRes
 from ui.dock import DockSimulator
 from ui.toolbar import ToolBar
@@ -47,7 +48,7 @@ class TradeSimulator(QMainWindow):
         dock.requestAutoSimStart.connect(self.on_start_autosim)
         dock.requestOrderHistory.connect(self.on_order_history)
         dock.requestOrderHistoryHTML.connect(self.on_order_history_html)
-        dock.requestSimulationStart.connect(self.on_start)
+        dock.requestSimulationStart.connect(self.on_start_sim)
         dock.requestOverlayAnalysis.connect(self.on_overlay_anaysis)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
@@ -60,15 +61,22 @@ class TradeSimulator(QMainWindow):
             navtoolbar,
         )
 
-    def on_end(self, df: pd.DataFrame, column_format: list):
+    def on_end(self, df: pd.DataFrame, column_format: list, mode: SimulationMode, result: dict):
         """
         スレッド処理の終了
         :param df:
+        :param column_format:
         :return:
         """
         self.dock.updateStatus('停止')
         self.df_order = df
         self.column_format = column_format
+
+        if mode == SimulationMode.EXPLORE:
+            self.on_end_autosim(result)
+
+    def on_end_autosim(self, result: dict):
+        self.dock.setAutoSimResult(result)
 
     def on_order_history(self):
         if self.df_order is None:
@@ -101,13 +109,13 @@ class TradeSimulator(QMainWindow):
         self.canvas.plot(dict_target)
         self.dock.setInit(dict_target)
 
-    def on_start(self, dict_target: dict, params: dict):
+    def on_start_sim(self, dict_target: dict, params: dict, mode=SimulationMode.NORMAL):
         """
         シミュレーターを別スレッドで起動
         :param dict_target:
         :return:
         """
-        worker = WorkerSimulator(dict_target, params)
+        worker = WorkerSimulator(dict_target, params, mode)
         # 進捗ウィジェットの開始・終了レンジを設定
         self.dock.setProgressRange(*worker.getTimeRange())
         # シグナルの処理
@@ -125,7 +133,9 @@ class TradeSimulator(QMainWindow):
 
     def on_start_autosim(self, dict_target: dict, params: dict):
         self.on_show_target(dict_target)
-        self.on_start(dict_target, params)
+
+        mode = SimulationMode.EXPLORE
+        self.on_start_sim(dict_target, params, mode)
 
     def on_update_profit(self, dict_update: dict):
         """
