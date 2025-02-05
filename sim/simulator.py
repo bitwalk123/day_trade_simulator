@@ -82,9 +82,10 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             # シミュレータ向けの処理
 
             # システム時刻の通知
-            self.updateSystemTime.emit(
-                t_current.strftime(self.time_format)
-            )
+            if self.mode == SimulationMode.NORMAL:
+                self.updateSystemTime.emit(
+                    t_current.strftime(self.time_format)
+                )
 
             # ティックデータがあれば通知
             tick_price = self.find_tick_data(t_current)
@@ -116,10 +117,12 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                 '最大含み益': self.trader.getProfitMax(),
                 '合計損益': self.trader.getTotal(),
             }
-            self.updateProfit.emit(dict_update)
+            if self.mode == SimulationMode.NORMAL:
+                self.updateProfit.emit(dict_update)
 
             # 進捗を更新
-            self.updateProgress.emit(t_current.timestamp())
+            if self.mode == SimulationMode.NORMAL:
+                self.updateProgress.emit(t_current.timestamp())
 
             # 時刻を１秒進める
             t_current += self.t_second
@@ -227,10 +230,11 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             p_current = self.df_tick.at[t_current, 'Price']
 
             # 現在値詳細時刻と現在値を通知
-            self.updateTickPrice.emit(
-                t_current.strftime(self.time_format),
-                p_current
-            )
+            if self.mode == SimulationMode.NORMAL:
+                self.updateTickPrice.emit(
+                    t_current.strftime(self.time_format),
+                    p_current
+                )
             return p_current
         else:
             return np.nan
@@ -255,7 +259,8 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             diff = self.df_ohlc_1m.at[t_ohlc_latest, 'Diff']
             if not np.isnan(trend):
                 # 取得したトレンドを通知
-                self.updateTrend.emit(trend)
+                if self.mode == SimulationMode.NORMAL:
+                    self.updateTrend.emit(trend)
 
         return trend, period, diff
 
