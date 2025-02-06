@@ -118,7 +118,7 @@ class WinExplorer(QMainWindow):
         info['price_delta_min'] = 0.5
         info['unit'] = 100
 
-        qdate = QDate(2025, 2, 5)
+        qdate = QDate(2025, 2, 6)
 
         self.dict_target = prepDataset(info, qdate, self.res)
 
@@ -128,9 +128,9 @@ class WinExplorer(QMainWindow):
 
         for value_1 in range(3, 8):
             params['period_max'] = value_1
-            for value_2 in range(3, 8):
+            for value_2 in range(0, 6):
                 params['factor_losscut_1'] = value_2
-                for value_3 in range(1, 6):
+                for value_3 in range(0, 6):
                     params['factor_losscut_2'] = value_3
                     for value_4 in range(5, 12):
                         params['factor_profit_1'] = value_4
