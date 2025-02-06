@@ -130,7 +130,7 @@ class WinExplorer(QMainWindow):
             params['period_max'] = value_1
             for value_2 in range(3, 8):
                 params['factor_losscut_1'] = value_2
-                for value_3 in range(1, 4):
+                for value_3 in range(1, 6):
                     params['factor_losscut_2'] = value_3
                     for value_4 in range(5, 12):
                         params['factor_profit_1'] = value_4
@@ -154,6 +154,11 @@ class WinExplorer(QMainWindow):
             print('Completed!')
 
     def appendResult(self, result: dict):
+        """
+        シミュレーション結果をデータフレームの末尾の行に追加する
+        :param result:
+        :return:
+        """
         print('%d/%d' % (self.idx, len(self.list_params)))
         r = len(self.df_result)
         for key in result.keys():
