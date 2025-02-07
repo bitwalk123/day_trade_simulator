@@ -147,10 +147,10 @@ class WinExplorer(QMainWindow):
                             params0 = params.copy()
                             self.list_params.append(params0)
 
+        self.df_result = prepResultDF(self.params)
         self.do_auto_sim()
 
     def do_auto_sim(self):
-        self.df_result = prepResultDF(self.params)
         if self.idx < len(self.list_params):
             params = self.list_params[self.idx]
             self.requestAutoSim.emit(self.dict_target, params)
