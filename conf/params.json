@@ -3,5 +3,5 @@
   "factor_losscut_1": 5,
   "factor_losscut_2": 2,
   "factor_profit_1": 8,
-  "threshold_profit_1": 0.75
+  "threshold_profit_1": 7
 }

@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 
 from func.io import read_json
 from structs.res import AppRes
+from ui.win_contour import WinContour
 from ui.win_explorer import WinExplorer
 from widgets.labels import (
     LabelDate,
@@ -43,6 +44,9 @@ class DockSimulator(QDockWidget):
         # シミュレーション・パラメータ（辞書）の読み込み
         json_params = os.path.join(res.dir_config, 'params.json')
         self.params = read_json(json_params)
+
+        # 鳥瞰図用ウィンドウ
+        self.contour: WinContour | None = None
 
         # 最適パラメータ探索用ウィンドウ
         self.explorer: WinExplorer | None = None
@@ -219,6 +223,14 @@ class DockSimulator(QDockWidget):
         hpad = HPad()
         hbox.addWidget(hpad)
 
+        but_contour = QPushButton()
+        but_contour.setIcon(
+            QIcon(os.path.join(self.res.dir_image, 'contour.png'))
+        )
+        but_contour.setToolTip('鳥瞰図による最適領域チェック')
+        but_contour.clicked.connect(self.on_contour)
+        hbox.addWidget(but_contour)
+
         but_explorer = QPushButton()
         but_explorer.setIcon(
             QIcon(os.path.join(self.res.dir_image, 'explore.png'))
@@ -251,10 +263,14 @@ class DockSimulator(QDockWidget):
         but_order.clicked.connect(self.on_order_history)
         hbox.addWidget(but_order)
 
+    def on_contour(self):
+        self.contour = contour = WinContour(self.res)
+        contour.show()
+
     def on_explorer(self):
         self.explorer = explorer = WinExplorer(self.res, self.params)
         explorer.requestAutoSim.connect(self.on_start_autosim)
-        self.explorer.show()
+        explorer.show()
 
     def on_order_history(self):
         self.requestOrderHistory.emit()
