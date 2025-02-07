@@ -25,7 +25,7 @@ class WinExplorer(QMainWindow):
         self.res = res
         # デフォルトのシミュレーション・パラメータ
         self.params = params
-        self.df_result = prepResultDF(params)
+        self.df_result: pd.DataFrame | None = None
         self.qdate: QDate | None = None
 
         self.dict_target = dict()
@@ -150,6 +150,7 @@ class WinExplorer(QMainWindow):
         self.do_auto_sim()
 
     def do_auto_sim(self):
+        self.df_result = prepResultDF(self.params)
         if self.idx < len(self.list_params):
             params = self.list_params[self.idx]
             self.requestAutoSim.emit(self.dict_target, params)
