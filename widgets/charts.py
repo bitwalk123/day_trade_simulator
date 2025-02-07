@@ -264,6 +264,13 @@ class ChartOverlay(FigureCanvas):
         self.y_min = y_min - y_pad
         self.y_max = y_max + y_pad
 
+
+class Contour(FigureCanvas):
+    def __init__(self, res: AppRes):
+        self.fig = Figure()
+        super().__init__(self.fig)
+
+
 class ChartNavigation(NavigationToolbar):
     def __init__(self, chart: FigureCanvas):
         super().__init__(chart)

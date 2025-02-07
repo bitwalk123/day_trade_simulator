@@ -214,7 +214,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # ========
         #  利　確
         # ========
-        profit_lower = self.trader.getProfitMax() * self.threshold_profit_1
+        profit_lower = self.trader.getProfitMax() * self.threshold_profit_1 / 10.0
         # 利確１
         if self.level_secure_1 < self.trader.getProfitMax() and profit < profit_lower:
             if self.sessionClosePos(t_current, p_current, '利確１'):

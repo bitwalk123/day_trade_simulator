@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
 )
 
 from func.preprocs import prepDataset, prepResultDF
+from func.tide import get_yyyymmdd
 from structs.res import AppRes
 from ui.toolbar_explorer import ToolbarExplorer
 from widgets.labels import LabelTitle, LabelValue2, LabelTitle2
@@ -25,6 +26,7 @@ class WinExplorer(QMainWindow):
         # デフォルトのシミュレーション・パラメータ
         self.params = params
         self.df_result = prepResultDF(params)
+        self.qdate: QDate | None = None
 
         self.dict_target = dict()
         self.list_params = list()
@@ -35,6 +37,7 @@ class WinExplorer(QMainWindow):
 
         toolbar = ToolbarExplorer(res)
         toolbar.playClicked.connect(self.on_start)
+        toolbar.qdateSelected.connect(self.on_date)
         self.addToolBar(toolbar)
 
         sa = QScrollArea()
@@ -110,6 +113,10 @@ class WinExplorer(QMainWindow):
 
         base.setFixedSize(self.sizeHint())
 
+    def on_date(self, qdate: QDate):
+        self.qdate = qdate
+        print('selected %s.' % str(qdate))
+
     def on_start(self):
         info = dict()
         info['name'] = '三菱ＵＦＪフィナンシャルＧ'
@@ -118,9 +125,9 @@ class WinExplorer(QMainWindow):
         info['price_delta_min'] = 0.5
         info['unit'] = 100
 
-        qdate = QDate(2025, 2, 6)
+        # qdate = QDate(2025, 1, 30)
 
-        self.dict_target = prepDataset(info, qdate, self.res)
+        self.dict_target = prepDataset(info, self.qdate, self.res)
 
         self.list_params = list()
         params = self.params.copy()
@@ -135,7 +142,7 @@ class WinExplorer(QMainWindow):
                     for value_4 in range(5, 12):
                         params['factor_profit_1'] = value_4
                         for value_5 in range(6, 10):
-                            params['threshold_profit_1'] = value_5 * 0.1
+                            params['threshold_profit_1'] = value_5
                             params0 = params.copy()
                             self.list_params.append(params0)
 
@@ -149,7 +156,10 @@ class WinExplorer(QMainWindow):
         else:
             total_max = self.df_result['total'].max()
             print(self.df_result[self.df_result['total'] == total_max])
-            file_pkl = os.path.join(self.res.dir_result, 'result.pkl')
+            file_pkl = os.path.join(
+                self.res.dir_result,
+                'result_%s.pkl' % get_yyyymmdd(self.qdate)
+            )
             self.df_result.to_pickle(file_pkl)
             print('Completed!')
 

@@ -1,5 +1,9 @@
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QLabel, QFrame, QSizePolicy
+from PySide6.QtWidgets import (
+    QFrame,
+    QLabel,
+    QSizePolicy,
+)
 
 
 class LabelDate(QLabel):
@@ -67,7 +71,10 @@ class LabelString(QLabel):
 class LabelTitle(QLabel):
     def __init__(self, title: str):
         super().__init__(title)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Preferred,
+        )
         self.setFrameStyle(
             QFrame.Shape.Panel | QFrame.Shadow.Raised
         )
@@ -85,7 +92,10 @@ class LabelTitle(QLabel):
 class LabelTitle2(LabelTitle):
     def __init__(self, title: str):
         super().__init__(title)
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Preferred,
+        )
         self.setFrameStyle(
             QFrame.Shape.Panel | QFrame.Shadow.Raised
         )
