@@ -115,7 +115,7 @@ class WinExplorer(QMainWindow):
 
     def on_date(self, qdate: QDate):
         self.qdate = qdate
-        print('selected %s.' % str(qdate))
+        print('selected %s.' % str(self.qdate))
 
     def on_start(self):
         info = dict()
@@ -127,6 +127,7 @@ class WinExplorer(QMainWindow):
 
         # qdate = QDate(2025, 1, 30)
 
+        print('date; %s.' % str(self.qdate))
         self.dict_target = prepDataset(info, self.qdate, self.res)
 
         self.list_params = list()
