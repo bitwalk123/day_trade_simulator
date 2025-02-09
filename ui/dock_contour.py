@@ -4,9 +4,10 @@ from PySide6.QtWidgets import (
     QButtonGroup,
     QDockWidget,
     QGridLayout,
+    QPushButton,
     QScrollArea,
     QVBoxLayout,
-    QWidget, QPushButton,
+    QWidget,
 )
 
 from structs.res import AppRes
@@ -63,17 +64,22 @@ class DockContour(QDockWidget):
         r = 0
         head_name = LabelTitle2('Parameter')
         self.layout_params.addWidget(head_name, r, 0)
+
         head_x = LabelTitle2('X')
         head_x.setFixedWidth(20)
         self.layout_params.addWidget(head_x, r, 1)
+
         head_y = LabelTitle2('Y')
         head_y.setFixedWidth(20)
         self.layout_params.addWidget(head_y, r, 2)
+
         pad = HPadFixed()
         self.layout_params.addWidget(pad, r, 3)
+
         r += 1
         self.group_x = group_x = QButtonGroup()
         self.group_y = group_y = QButtonGroup()
+
         for col in df.columns:
             if col == 'code':
                 continue
@@ -81,14 +87,18 @@ class DockContour(QDockWidget):
                 continue
             if col == 'total':
                 continue
+
             lab_name = LabelTitle(col)
             self.layout_params.addWidget(lab_name, r, 0)
+
             but_x = SelectButton('#44f')
             group_x.addButton(but_x)
             self.layout_params.addWidget(but_x, r, 1)
+
             but_y = SelectButton('#f44')
             group_y.addButton(but_y)
             self.layout_params.addWidget(but_y, r, 2)
+
             pad = HPadFixed()
             self.layout_params.addWidget(pad, r, 3)
             r += 1
