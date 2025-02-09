@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from PySide6.QtCore import QMargins, Qt
 from PySide6.QtWidgets import (
@@ -12,7 +13,11 @@ from PySide6.QtWidgets import (
 
 from structs.res import AppRes
 from widgets.buttons import SelectButton
-from widgets.labels import LabelTitle, LabelTitle2, LabelInt
+from widgets.labels import (
+    LabelInt,
+    LabelTitle,
+    LabelTitle2,
+)
 from widgets.pads import HPadFixed
 
 
@@ -96,6 +101,7 @@ class DockContour(QDockWidget):
             self.layout_params.addWidget(lab_name, r, 0)
 
             lab_value = LabelInt()
+            lab_value.setValue(int(np.median(df[col])))
             self.layout_params.addWidget(lab_value, r, 1)
 
             slider = QSlider(Qt.Orientation.Horizontal)
