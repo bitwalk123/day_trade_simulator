@@ -1,10 +1,12 @@
 import pandas as pd
 from PySide6.QtCore import QMargins, Qt
 from PySide6.QtWidgets import (
+    QButtonGroup,
     QDockWidget,
     QGridLayout,
     QScrollArea,
-    QWidget, QSizePolicy, QButtonGroup,
+    QVBoxLayout,
+    QWidget, QPushButton,
 )
 
 from structs.res import AppRes
@@ -18,40 +20,46 @@ class DockContour(QDockWidget):
         super().__init__()
         self.res = res
 
-        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-        # UI
-        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+        self.setMinimumWidth(300)
         self.setFeatures(
             QDockWidget.DockWidgetFeature.NoDockWidgetFeatures
         )
+        self.layout_params = QGridLayout()
 
-        sa = QScrollArea()
-        sa.setWidgetResizable(True)
-        #sa.setHorizontalScrollBarPolicy(
-        #    Qt.ScrollBarPolicy.ScrollBarAlwaysOff
-        #)
-        self.setWidget(sa)
+        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+        # UI
+        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+        base = QWidget()
+        self.setWidget(base)
 
-        self.base_params = base_params = QWidget()
-        self.setMinimumWidth(300)
+        layout = QVBoxLayout()
+        layout.setSpacing(0)
+        base.setLayout(layout)
 
-        """
-        base_params.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.MinimumExpanding,
-        )
-        """
-        sa.setWidget(base_params)
+        area = self.set_param_matrix()
+        layout.addWidget(area)
 
-        self.layout_params = layout_params = QGridLayout()
-        layout_params.setSpacing(0)
-        layout_params.setAlignment(
+        but_draw = QPushButton('プロット')
+        layout.addWidget(but_draw)
+
+    def set_param_matrix(self):
+        area = QScrollArea()
+        area.setWidgetResizable(True)
+
+        base = QWidget()
+        area.setWidget(base)
+
+        layout = self.layout_params
+        layout.setSpacing(0)
+        layout.setAlignment(
             Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft
         )
-        layout_params.setContentsMargins(QMargins(0, 0, 0, 0))
-        base_params.setLayout(layout_params)
+        layout.setContentsMargins(QMargins(0, 0, 0, 0))
+        base.setLayout(layout)
 
-    def set_params(self, df: pd.DataFrame):
+        return area
+
+    def setParams(self, df: pd.DataFrame):
         r = 0
         head_name = LabelTitle2('Parameter')
         self.layout_params.addWidget(head_name, r, 0)
@@ -75,13 +83,12 @@ class DockContour(QDockWidget):
                 continue
             lab_name = LabelTitle(col)
             self.layout_params.addWidget(lab_name, r, 0)
-            but_x = SelectButton()
+            but_x = SelectButton('#44f')
             group_x.addButton(but_x)
             self.layout_params.addWidget(but_x, r, 1)
-            but_y = SelectButton()
+            but_y = SelectButton('#f44')
             group_y.addButton(but_y)
             self.layout_params.addWidget(but_y, r, 2)
             pad = HPadFixed()
             self.layout_params.addWidget(pad, r, 3)
             r += 1
-

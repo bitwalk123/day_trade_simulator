@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QPushButton
 
 
 class SelectButton(QPushButton):
-    def __init__(self):
+    def __init__(self, name_color: str = 'blue'):
         super().__init__()
         self.setFixedWidth(20)
         self.setFlat(True)
@@ -10,6 +10,6 @@ class SelectButton(QPushButton):
         self.setAutoExclusive(True)
         self.setStyleSheet("""
         QPushButton {
-            background-color: blue;
+            background-color: %s;
         }
-        """)
+        """ % name_color)
