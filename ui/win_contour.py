@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMainWindow
@@ -22,6 +23,7 @@ class WinContour(QMainWindow):
         self.addToolBar(toolbar)
 
         self.dock = dock = DockContour(self.res)
+        dock.requestContour.connect(self.on_plot)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
         self.contour = contour = Contour(self.res)
@@ -32,6 +34,11 @@ class WinContour(QMainWindow):
             Qt.ToolBarArea.BottomToolBarArea,
             navtoolbar,
         )
+
+    def on_plot(self, dict_data: dict):
+        print(dict_data['x'])
+        print(dict_data['y'])
+        print(dict_data['z'])
 
     def read_pickle(self, pklfile: str):
         self.df = df = pd.read_pickle(pklfile)
