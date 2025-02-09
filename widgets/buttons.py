@@ -34,3 +34,9 @@ class SelectButton(QPushButton):
 
     def getParam(self) -> str:
         return self.param
+
+    def getLabel(self):
+        return self.label
+
+    def getLabelValue(self):
+        return int(self.label.getValue())
