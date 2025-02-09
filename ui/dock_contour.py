@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from PySide6.QtCore import QMargins, Qt
+from PySide6.QtCore import QMargins, Qt, QObject
 from PySide6.QtWidgets import (
     QButtonGroup,
     QDockWidget,
@@ -19,12 +19,15 @@ from widgets.labels import (
     LabelTitle2,
 )
 from widgets.pads import HPadFixed
+from widgets.slider import Slider
 
 
 class DockContour(QDockWidget):
     def __init__(self, res: AppRes):
         super().__init__()
         self.res = res
+        self.group_y = None
+        self.group_x = None
 
         self.setMinimumWidth(400)
         self.setFeatures(
@@ -101,14 +104,18 @@ class DockContour(QDockWidget):
             self.layout_params.addWidget(lab_name, r, 0)
 
             lab_value = LabelInt()
-            lab_value.setValue(int(np.median(df[col])))
             self.layout_params.addWidget(lab_value, r, 1)
 
-            slider = QSlider(Qt.Orientation.Horizontal)
+            slider = Slider(Qt.Orientation.Horizontal)
+            slider.setLabel(lab_value)
             slider.setFixedWidth(100)
-            #slider.setTickPosition(QSlider.TickPosition.TicksBothSides)
-            #slider.setRange(0, 100)
-            #slider.valueChanged.connect(self.show_value)
+            slider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+            slider.setRange(
+                int(df[col].min()),
+                int(df[col].max())
+            )
+            slider.setValue(int(df[col].median()))
+            slider.valueChanged.connect(self.show_value)
             self.layout_params.addWidget(slider, r, 2)
 
             but_x = SelectButton('#44f')
@@ -122,3 +129,7 @@ class DockContour(QDockWidget):
             pad = HPadFixed()
             self.layout_params.addWidget(pad, r, 5)
             r += 1
+
+    def show_value(self, value):
+        slider: Slider | QObject = self.sender()
+        slider.setLabelValue(value)
