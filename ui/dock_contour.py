@@ -91,6 +91,8 @@ class DockContour(QDockWidget):
         r += 1
         self.group_x = group_x = QButtonGroup()
         self.group_y = group_y = QButtonGroup()
+        group_x.buttonToggled.connect(self.selected_button)
+        group_y.buttonToggled.connect(self.selected_button)
 
         for col in df.columns:
             if col == 'code':
@@ -109,7 +111,9 @@ class DockContour(QDockWidget):
             slider = Slider(Qt.Orientation.Horizontal)
             slider.setLabel(lab_value)
             slider.setFixedWidth(100)
-            slider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+            slider.setTickPosition(
+                QSlider.TickPosition.TicksBothSides
+            )
             slider.setRange(
                 int(df[col].min()),
                 int(df[col].max())
@@ -119,17 +123,28 @@ class DockContour(QDockWidget):
             self.layout_params.addWidget(slider, r, 2)
 
             but_x = SelectButton('#44f')
-            group_x.addButton(but_x)
+            but_x.setParam(col)
+            but_x.setObjects(lab_value, slider)
+            group_x.addButton(but_x, r)
             self.layout_params.addWidget(but_x, r, 3)
 
             but_y = SelectButton('#f44')
-            group_y.addButton(but_y)
+            but_y.setParam(col)
+            but_y.setObjects(lab_value, slider)
+            group_y.addButton(but_y, r)
             self.layout_params.addWidget(but_y, r, 4)
 
             pad = HPadFixed()
             self.layout_params.addWidget(pad, r, 5)
             r += 1
 
+        group_x.button(1).setChecked(True)
+        group_y.button(2).setChecked(True)
+
     def show_value(self, value):
         slider: Slider | QObject = self.sender()
         slider.setLabelValue(value)
+
+    def selected_button(self, obj: SelectButton, flag):
+        # print(obj.getParam(), flag)
+        obj.setObjectsDisabled(flag)
