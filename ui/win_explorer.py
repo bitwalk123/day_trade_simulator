@@ -13,8 +13,8 @@ from func.preprocs import prepDataset, prepResultDF
 from func.tide import get_yyyymmdd
 from structs.res import AppRes
 from ui.toolbar_explorer import ToolbarExplorer
-from widgets.labels import LabelTitle, LabelValue2, LabelTitle2
-from widgets.spinbox import SpinBox, DoubleSpinBox
+from widgets.labels import LabelTitle, LabelTitle2, LabelValue
+from widgets.spinbox import SpinBox
 
 
 class WinExplorer(QMainWindow):
@@ -31,6 +31,9 @@ class WinExplorer(QMainWindow):
         self.dict_target = dict()
         self.list_params = list()
         self.idx = 0
+
+        self.dict_low = dict()
+        self.dict_high = dict()
 
         self.setWindowTitle('最適パラメータ探索')
         self.resize(600, 400)
@@ -66,44 +69,43 @@ class WinExplorer(QMainWindow):
         layout.addWidget(col_title_4, r, 3)
         col_title_5 = LabelTitle2('inc')
         layout.addWidget(col_title_5, r, 4)
-
         r += 1
+
         for key in self.params.keys():
             lab_name = LabelTitle(key)
             layout.addWidget(lab_name, r, 0)
-            if key == 'threshold_profit_1':
-                flag = True
-            else:
-                flag = False
 
-            lab_default = LabelValue2()
-            lab_default.setValue(self.params[key], flag)
+            lab_default = LabelValue()
+            lab_default.setValue(self.params[key], False)
             lab_default.setMinimumWidth(50)
             layout.addWidget(lab_default, r, 1)
 
-            if flag:
-                lab_low = DoubleSpinBox()
-                lab_high = DoubleSpinBox()
-                lab_inc = DoubleSpinBox()
-                lab_low.setValue(0.1)
-                lab_high.setValue(0.9)
-                lab_inc.setValue(0.05)
-            else:
-                lab_low = SpinBox()
-                lab_high = SpinBox()
-                match key:
-                    case 'period_max':
-                        lab_low.setValue(2)
-                        lab_high.setValue(10)
-                    case 'factor_profit_1':
-                        lab_low.setValue(3)
-                        lab_high.setValue(15)
-                    case _:
-                        lab_low.setValue(0)
-                        lab_high.setValue(10)
+            match key:
+                case 'period_max':
+                    self.dict_low[key] = 3
+                    self.dict_high[key] = 7
+                case 'factor_losscut_1':
+                    self.dict_low[key] = 0
+                    self.dict_high[key] = 5
+                case 'factor_losscut_2':
+                    self.dict_low[key] = 0
+                    self.dict_high[key] = 5
+                case 'factor_profit_1':
+                    self.dict_low[key] = 5
+                    self.dict_high[key] = 10
+                case 'threshold_profit_1':
+                    self.dict_low[key] = 5
+                    self.dict_high[key] = 9
 
-                lab_inc = SpinBox()
-                lab_inc.setValue(1)
+            lab_low = SpinBox()
+            lab_low.setValue(self.dict_low[key])
+
+            lab_high = SpinBox()
+            lab_high.setValue(self.dict_high[key])
+
+            lab_inc = LabelValue()
+            lab_inc.setValue(1, False)
+            lab_inc.setMinimumWidth(50)
 
             layout.addWidget(lab_low, r, 2)
             layout.addWidget(lab_high, r, 3)
@@ -125,8 +127,6 @@ class WinExplorer(QMainWindow):
         info['price_delta_min'] = 0.5
         info['unit'] = 100
 
-        # qdate = QDate(2025, 1, 30)
-
         print('date; %s.' % str(self.qdate))
         self.dict_target = prepDataset(info, self.qdate, self.res)
 
@@ -134,18 +134,27 @@ class WinExplorer(QMainWindow):
         params = self.params.copy()
         self.idx = 0
 
-        for value_1 in range(3, 8):
-            params['period_max'] = value_1
-            for value_2 in range(0, 6):
-                params['factor_losscut_1'] = value_2
-                for value_3 in range(0, 6):
-                    params['factor_losscut_2'] = value_3
-                    for value_4 in range(5, 12):
-                        params['factor_profit_1'] = value_4
-                        for value_5 in range(6, 10):
-                            params['threshold_profit_1'] = value_5
-                            params0 = params.copy()
-                            self.list_params.append(params0)
+        key_1 = 'period_max'
+        for value_1 in range(self.dict_low[key_1], self.dict_high[key_1] + 1):
+            params[key_1] = value_1
+
+            key_2 = 'factor_losscut_1'
+            for value_2 in range(self.dict_low[key_2], self.dict_high[key_2] + 1):
+                params[key_2] = value_2
+
+                key_3 = 'factor_losscut_2'
+                for value_3 in range(self.dict_low[key_3], self.dict_high[key_3] + 1):
+                    params[key_3] = value_3
+
+                    key_4 = 'factor_profit_1'
+                    for value_4 in range(self.dict_low[key_4], self.dict_high[key_4] + 1):
+                        params[key_4] = value_4
+
+                        key_5 = 'threshold_profit_1'
+                        for value_5 in range(self.dict_low[key_5], self.dict_high[key_5] + 1):
+                            params[key_5] = value_5
+
+                            self.list_params.append(params.copy())
 
         self.df_result = prepResultDF(self.params)
         self.do_auto_sim()
