@@ -1,14 +1,17 @@
-import numpy as np
 import pandas as pd
-from PySide6.QtCore import QMargins, Qt, QObject
+from PySide6.QtCore import (
+    QMargins,
+    QObject,
+    Qt,
+)
 from PySide6.QtWidgets import (
     QButtonGroup,
     QDockWidget,
     QGridLayout,
     QPushButton,
     QScrollArea,
-    QVBoxLayout,
-    QWidget, QSlider,
+    QSlider,
+    QWidget,
 )
 
 from structs.res import AppRes
@@ -18,6 +21,7 @@ from widgets.labels import (
     LabelTitle,
     LabelTitle2,
 )
+from widgets.layouts import VBoxLayout
 from widgets.pads import HPadFixed
 from widgets.slider import Slider
 
@@ -26,8 +30,10 @@ class DockContour(QDockWidget):
     def __init__(self, res: AppRes):
         super().__init__()
         self.res = res
-        self.group_y = None
-        self.group_x = None
+        self.pd = pd.DataFrame()
+
+        self.group_x: QButtonGroup | None = None
+        self.group_y: QButtonGroup | None = None
 
         self.setMinimumWidth(400)
         self.setFeatures(
@@ -41,15 +47,15 @@ class DockContour(QDockWidget):
         base = QWidget()
         self.setWidget(base)
 
-        layout = QVBoxLayout()
-        layout.setSpacing(0)
+        layout = VBoxLayout()
         base.setLayout(layout)
 
         area = self.set_param_matrix()
         layout.addWidget(area)
 
-        but_draw = QPushButton('プロット')
-        layout.addWidget(but_draw)
+        but_plot = QPushButton('プロット')
+        but_plot.clicked.connect(self.on_plot)
+        layout.addWidget(but_plot)
 
     def set_param_matrix(self):
         area = QScrollArea()
@@ -148,3 +154,7 @@ class DockContour(QDockWidget):
     def selected_button(self, obj: SelectButton, flag):
         # print(obj.getParam(), flag)
         obj.setObjectsDisabled(flag)
+
+    def on_plot(self):
+        print('X', self.group_x.checkedId())
+        print('Y', self.group_y.checkedId())
