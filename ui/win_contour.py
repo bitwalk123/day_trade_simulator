@@ -35,4 +35,4 @@ class WinContour(QMainWindow):
 
     def read_pickle(self, pklfile: str):
         self.df = df = pd.read_pickle(pklfile)
-        self.dock.set_params(df)
+        self.dock.setParams(df)

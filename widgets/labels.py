@@ -172,3 +172,29 @@ class LabelValue2(LabelValue):
             self.setText('%.3f' % float(value))
         else:
             self.setText('%d' % int(value))
+
+class LabelInt(QLabel):
+    def __init__(self):
+        super().__init__()
+        self.flag = True
+        self.setFrameStyle(
+            QFrame.Shape.Panel | QFrame.Shadow.Sunken
+        )
+        self.setMinimumWidth(1)
+        self.setLineWidth(1)
+        self.setAlignment(
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        )
+        self.setStyleSheet("""
+            QLabel {
+                font-family: monospace;
+                background-color: white;
+                padding-right: 2px;
+            }
+        """)
+
+    def getValue(self) -> int:
+        return int(self.text())
+
+    def setValue(self, value: int):
+        self.setText('%d' % int(value))
