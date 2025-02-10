@@ -303,7 +303,7 @@ class Contour(FigureCanvas):
         )
         cont.clabel(
             fmt='%.f',
-            fontsize=11,
+            fontsize=12,
         )
 
         self.ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
