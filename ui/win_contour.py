@@ -36,9 +36,15 @@ class WinContour(QMainWindow):
         )
 
     def on_plot(self, dict_data: dict):
-        print(dict_data['x'])
-        print(dict_data['y'])
-        print(dict_data['z'])
+        """
+        Contour Map のプロット
+        :param dict_data:
+        :return:
+        """
+        # print(dict_data['x'])
+        # print(dict_data['y'])
+        # print(dict_data['z'])
+        self.contour.plot(dict_data)
 
     def read_pickle(self, pklfile: str):
         self.df = df = pd.read_pickle(pklfile)

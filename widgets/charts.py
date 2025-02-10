@@ -270,6 +270,54 @@ class Contour(FigureCanvas):
         self.fig = Figure()
         super().__init__(self.fig)
 
+        font = os.path.join(
+            res.dir_font,
+            'RictyDiminished-Regular.ttf',
+        )
+        fm.fontManager.addfont(font)
+        font_prop = fm.FontProperties(fname=font)
+        plt.rcParams['font.family'] = font_prop.get_name()
+        plt.rcParams['font.size'] = 14
+
+        self.ax = self.fig.add_subplot(111)
+
+        self.fig.subplots_adjust(
+            left=0.1,
+            right=0.975,
+            top=0.975,
+            bottom=0.1,
+        )
+
+    def plot(self, dict_data: dict):
+        # 消去
+        clearAxes(self.fig)
+
+        x = dict_data['x']
+        y = dict_data['y']
+        z = dict_data['z']
+        cont = self.ax.contour(
+            x, y, z,
+            colors=['blue'],
+            linestyles='solid',
+            linewidths=0.5,
+        )
+        cont.clabel(
+            fmt='%.f',
+            fontsize=11,
+        )
+
+        self.ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+        self.ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
+
+        self.ax.set_xlabel(dict_data['param_x'], fontsize=16)
+        self.ax.set_ylabel(dict_data['param_y'], fontsize=16)
+
+        # グリッド線
+        drawGrid(self.fig)
+
+        # 再描画
+        refreshDraw(self.fig)
+
 
 class ChartNavigation(NavigationToolbar):
     def __init__(self, chart: FigureCanvas):
