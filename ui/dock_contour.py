@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QScrollArea,
     QSlider,
-    QWidget,
+    QWidget, QWidgetItem,
 )
 
 from structs.res import AppRes
@@ -79,6 +79,14 @@ class DockContour(QDockWidget):
 
     def setParams(self, df: pd.DataFrame):
         self.df = df
+
+        rows = self.layout_params.columnCount()
+        cols = self.layout_params.rowCount()
+        for r in range(rows):
+            for c in range(cols):
+                item: QWidgetItem | None = self.layout_params.itemAtPosition(r, c)
+                if item is not None:
+                    item.widget().deleteLater()
 
         r = 0
         head_name = LabelTitle2('Parameter')
@@ -157,7 +165,6 @@ class DockContour(QDockWidget):
         slider.setLabelValue(value)
 
     def selected_button(self, obj: SelectButton, flag):
-        # print(obj.getParam(), flag)
         obj.setObjectsDisabled(flag)
 
     def on_plot(self):
@@ -168,8 +175,8 @@ class DockContour(QDockWidget):
         param_x = but_x.getParam()
         param_y = but_y.getParam()
 
-        print('X', x, param_x)
-        print('Y', y, param_y)
+        # print('X', x, param_x)
+        # print('Y', y, param_y)
 
         df = self.df.copy()
         for idx in range(len(self.group_x.buttons())):
@@ -182,20 +189,22 @@ class DockContour(QDockWidget):
             but: SelectButton | QObject = self.group_x.button(r)
             param = but.getParam()
             value = but.getLabelValue()
-            # print(r, param, value)
             df = self.extract_df(df, param, value)
 
         df = df[[param_x, param_y, 'total']].sort_values([param_y, param_x]).copy()
-        # self.requestContour.emit(df)
+
         n_x = len(df[param_x].unique())
         n_y = len(df[param_y].unique())
 
         dict_data = dict()
+        dict_data['param_x'] = param_x
+        dict_data['param_y'] = param_y
         dict_data['x'] = np.array(df[param_x].astype(float)).reshape([n_y, n_x])
         dict_data['y'] = np.array(df[param_y].astype(float)).reshape([n_y, n_x])
         dict_data['z'] = np.array(df['total'].astype(float)).reshape([n_y, n_x])
+
         self.requestContour.emit(dict_data)
 
-    def extract_df(self, df: pd.DataFrame, param: str, value: int) -> pd.DataFrame:
-        df0 = df[df[param] == value].copy()
-        return df0
+    def extract_df(self, df: pd.DataFrame, colname: str, value: int) -> pd.DataFrame:
+        df_part = df[df[colname] == value].copy()
+        return df_part
