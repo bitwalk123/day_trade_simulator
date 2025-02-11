@@ -115,4 +115,24 @@ def prepOHLC(df: pd.DataFrame) -> pd.DataFrame:
         'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff'
     ]
 
-    return df
+    return df.copy()
+
+
+def prepTick(df: pd.DataFrame, dateStr: str) -> pd.DataFrame:
+    """
+    読み込んだ Tick ファイルを
+    アプリが使用できる Tick のデータフレームに整形
+
+    :param df:
+    :param dateStr:
+    :return:
+    """
+    # データフレームのインデックスを、「日付時刻」形式に変換
+    df.index = [
+        pd.to_datetime(
+            '%s %s' % (dateStr, t)
+        ) for t in df['Time']
+    ]
+    df.index.name = 'Datetime'
+
+    return pd.DataFrame(df['Price'].copy())
