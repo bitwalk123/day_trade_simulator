@@ -114,6 +114,7 @@ def prepOHLC(df: pd.DataFrame) -> pd.DataFrame:
         'H_Open', 'H_High', 'H_Low', 'H_Close',
         'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff'
     ]
+    df['Volume'] = df['Volume'].astype(float)
 
     return df.copy()
 
