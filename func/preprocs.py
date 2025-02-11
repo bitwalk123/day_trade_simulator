@@ -65,3 +65,54 @@ def prepResultDF(params: dict) -> pd.DataFrame:
     df = pd.DataFrame.from_dict(dict_result)
     df_result = df.astype(object)
     return df_result
+
+
+def prepOHLC(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    読み込んだ OHLC ファイルを
+    アプリが使用できる OHLC のデータフレームに整形
+    :param df:
+    :return:
+    """
+    # 一行目は前日のデータなので除く、
+    # また最終行はセパレータ文字なのでこれも除く
+    rows = len(df)
+    df = df.iloc[1:(rows - 1)].reset_index(drop=True)
+
+    # 必要な列のみ残す
+    df = df[
+        [
+            # Market SPEED RSS からのデータ列
+            '日付', '時刻', '始値', '高値', '安値', '終値', '出来高',
+            # 平均足のデータ列
+            'H_Open', 'H_High', 'H_Low', 'H_Close',
+            # Parabolic SAR のデータ列
+            'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff'
+        ]
+    ]
+
+    # データフレームのインデックスを、「日付時刻」形式に変換
+    df.index = [
+        pd.to_datetime(
+            '%s %s:00' % (d, t)
+        ) for d, t in zip(df['日付'], df['時刻'])
+    ]
+    df.index.name = 'Datetime'
+
+    # 日付、時刻列を除く
+    df = df[
+        [
+            '始値', '高値', '安値', '終値', '出来高',
+            'H_Open', 'H_High', 'H_Low', 'H_Close',
+            'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff'
+        ]
+    ]
+
+    # 列名を英名に揃える
+    df.columns = [
+        'Open', 'High', 'Low', 'Close', 'Volume',
+        'H_Open', 'H_High', 'H_Low', 'H_Close',
+        'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff'
+    ]
+
+    return df
