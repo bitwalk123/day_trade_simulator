@@ -17,6 +17,7 @@ class SpinBox(QSpinBox):
             QSpinBox {
                 font-family: monospace;
                 background-color: white;
+                color: black;
                 padding-left: 2px;
                 padding-right: 2px;
             }
