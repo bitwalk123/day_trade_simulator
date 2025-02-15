@@ -20,6 +20,7 @@ class LabelDate(QLabel):
             QLabel {
                 font-family: monospace;
                 background-color: white;
+                color: black;
             }
         """)
 
@@ -64,6 +65,7 @@ class LabelString(QLabel):
             QLabel {
                 font-family: monospace;
                 background-color: white;
+                color: black;
             }
         """)
 
@@ -125,6 +127,7 @@ class LabelTime(QLabel):
             QLabel {
                 font-family: monospace;
                 background-color: white;
+                color: black;
             }
         """)
 
@@ -145,6 +148,7 @@ class LabelValue(QLabel):
             QLabel {
                 font-family: monospace;
                 background-color: white;
+                color: black;
                 padding-right: 2px;
             }
         """)
@@ -189,6 +193,7 @@ class LabelInt(QLabel):
             QLabel {
                 font-family: monospace;
                 background-color: white;
+                color: black;
                 padding-right: 2px;
             }
         """)
