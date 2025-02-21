@@ -133,7 +133,7 @@ class Canvas(FigureCanvas):
             linewidth=0.75,
             color='black',
         )
-        self.ax[1].set_ylabel('Diff')
+        self.ax[1].set_ylabel('Profit/Loss')
 
         # Period が 1 のみ抜き出して縦線を引く
         df_period = df_ohlc_1m[df_ohlc_1m['Period'] == 1]
