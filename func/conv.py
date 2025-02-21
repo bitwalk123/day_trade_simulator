@@ -25,7 +25,7 @@ def df_to_html(df: pd.DataFrame, list_col_format: list) -> list:
     list_html.append('<thead>\n')
     list_html.append('<tr>\n')
     for colname in df.columns:
-        list_html.append('<th>%s</th>\n' % colname)
+        list_html.append('<th nowrap>%s</th>\n' % colname)
     list_html.append('</tr>\n')
     list_html.append('</thead>\n')
 
