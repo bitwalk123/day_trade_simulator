@@ -8,6 +8,7 @@ jsonpointer
 jupyterlab
 mouseinfo
 mplfinance
+openpyxl
 pip-chill
 pip-review
 pygetwindow
@@ -19,4 +20,5 @@ tinycss2
 tomli
 uri-template
 webcolors
+xlrd
 yfinance
