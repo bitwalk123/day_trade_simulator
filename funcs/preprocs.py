@@ -1,8 +1,8 @@
 import pandas as pd
 from PySide6.QtCore import QDate
 
-from func.io import get_ohlc, get_tick
-from func.tide import get_yyyymmdd, get_yyyy_mm_dd
+from funcs.io import get_ohlc, get_tick
+from funcs.tide import get_yyyymmdd, get_yyyy_mm_dd
 from structs.res import AppRes
 
 

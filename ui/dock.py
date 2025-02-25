@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from func.io import read_json
+from funcs.io import read_json
 from structs.res import AppRes
 from ui.win_contour import WinContour
 from ui.win_explorer import WinExplorer

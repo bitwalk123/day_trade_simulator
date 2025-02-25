@@ -9,10 +9,10 @@ from PySide6.QtWidgets import (
     QToolButton,
 )
 
-from func.io import (
+from funcs.io import (
     read_json,
 )
-from func.preprocs import prepDataset
+from funcs.preprocs import prepDataset
 from structs.res import AppRes
 
 

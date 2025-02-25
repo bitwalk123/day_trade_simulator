@@ -9,8 +9,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from func.preprocs import prepDataset, prepResultDF
-from func.tide import get_yyyymmdd
+from funcs.preprocs import prepDataset, prepResultDF
+from funcs.tide import get_yyyymmdd
 from structs.res import AppRes
 from ui.toolbar_explorer import ToolbarExplorer
 from widgets.labels import LabelTitle, LabelTitle2, LabelValue
