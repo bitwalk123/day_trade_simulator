@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
 )
 
-from func.conv import df_to_html
+from funcs.conv import df_to_html
 from sim.simulator import WorkerSimulator
 from structs.app_enum import SimulationMode
 from structs.res import AppRes

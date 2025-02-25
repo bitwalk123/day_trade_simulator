@@ -10,13 +10,13 @@ from matplotlib.backends.backend_qtagg import (
 from matplotlib.figure import Figure
 import matplotlib.ticker as ticker
 
-from func.plots import (
+from funcs.plots import (
     clearAxes,
     drawGrid,
     getMajorXTicks,
     refreshDraw,
 )
-from func.tide import get_range_xaxis
+from funcs.tide import get_range_xaxis
 from structs.pair import PairXY
 from structs.res import AppRes
 

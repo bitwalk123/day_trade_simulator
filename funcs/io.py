@@ -4,12 +4,12 @@ import os
 import pandas as pd
 import yfinance as yf
 
-from func.common import (
+from funcs.common import (
     get_csv_ohlc_name,
     get_csv_tick_name,
 )
 
-from func.tide import (
+from funcs.tide import (
     get_dates,
 )
 from structs.res import AppRes
