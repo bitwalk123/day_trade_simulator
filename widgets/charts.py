@@ -36,7 +36,7 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.size'] = 14
 
         self.ax = dict()
-        n = 2
+        n = 3
 
         if n > 1:
             gs = self.fig.add_gridspec(
@@ -74,8 +74,8 @@ class Canvas(FigureCanvas):
         self.ax[0].plot(
             df_tick,
             color='black',
-            linewidth='0.75',
-            alpha=0.25,
+            linewidth=0.5,
+            alpha=0.5,
         )
 
         df_bear = df_ohlc_1m[df_ohlc_1m['TREND'] < 0]
@@ -132,10 +132,12 @@ class Canvas(FigureCanvas):
             df_diff,
             linewidth=0.75,
             color='black',
+            alpha=0.75,
         )
         self.ax[1].set_ylabel('Profit/Loss')
 
         # Period が 1 のみ抜き出して縦線を引く
+        """
         df_period = df_ohlc_1m[df_ohlc_1m['Period'] == 1]
         for t in df_period.index:
             for i in range(len(self.ax)):
@@ -145,6 +147,7 @@ class Canvas(FigureCanvas):
                     color='magenta',
                     linestyle='dotted',
                 )
+        """
 
         # ax[1] では　y = 0 を黒線で表示、正負を解りやすくする。
         self.ax[1].axhline(
@@ -152,6 +155,21 @@ class Canvas(FigureCanvas):
             linewidth=0.75,
             color='#444',
         )
+
+        # IQR
+        df_iqr = df_ohlc_1m['IQR']
+        self.ax[2].plot(
+            df_iqr,
+            linewidth=0.75,
+            color='black',
+            alpha=0.75,
+        )
+        self.ax[2].axhline(
+            0,
+            linewidth=0.75,
+            color='#444',
+        )
+        self.ax[2].set_ylabel('IQR')
 
         # グリッド線
         drawGrid(self.fig)
