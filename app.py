@@ -94,8 +94,8 @@ class TradeSimulator(QMainWindow):
         list_html = df_to_html(self.df_order, self.column_format)
 
         home = os.path.expanduser("~")
-        htmlname = os.path.join(home, 'result.html')
-        with open(htmlname, mode='w') as f:
+        name_html = os.path.join(home, 'result.html')
+        with open(name_html, mode='w') as f:
             f.writelines(list_html)
 
     def on_overlay_anaysis(self, dict_target: dict):

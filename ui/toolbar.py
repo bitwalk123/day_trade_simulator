@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
 from funcs.io import (
     read_json,
 )
-from funcs.preprocs import prepDataset
+from funcs.preprocs import prep_dataset
 from structs.res import AppRes
 
 
@@ -69,7 +69,7 @@ class ToolBar(QToolBar):
         # key（銘柄の名前）をキーにして入れ子になっている辞書を取り出す。
         info = self.tickers[key]
         info['name'] = key
-        dict_target = prepDataset(info, qdate, self.res)
+        dict_target = prep_dataset(info, qdate, self.res)
 
         # データフレーム準備完了シグナル
         self.readyDataset.emit(dict_target)

@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from funcs.preprocs import prepDataset, prepResultDF
+from funcs.preprocs import prep_dataset, prep_result_df
 from funcs.tide import get_yyyymmdd
 from structs.res import AppRes
 from ui.toolbar_explorer import ToolbarExplorer
@@ -128,7 +128,7 @@ class WinExplorer(QMainWindow):
         info['unit'] = 100
 
         print('date; %s.' % str(self.qdate))
-        self.dict_target = prepDataset(info, self.qdate, self.res)
+        self.dict_target = prep_dataset(info, self.qdate, self.res)
 
         self.list_params = list()
         params = self.params.copy()
@@ -156,7 +156,7 @@ class WinExplorer(QMainWindow):
 
                             self.list_params.append(params.copy())
 
-        self.df_result = prepResultDF(self.params)
+        self.df_result = prep_result_df(self.params)
         self.do_auto_sim()
 
     def do_auto_sim(self):
