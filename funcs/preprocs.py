@@ -19,7 +19,7 @@ def reformat_dataframe(df: pd.DataFrame, dt_lunch_1, dt_lunch_2) -> pd.DataFrame
     return pd.concat([df1, df2])
 
 
-def prepDataset(info: dict, qdate: QDate, res: AppRes) -> dict:
+def prep_dataset(info: dict, qdate: QDate, res: AppRes) -> dict:
     """
     シミュレーション用のデータセット作成
     :param info:
@@ -54,7 +54,7 @@ def prepDataset(info: dict, qdate: QDate, res: AppRes) -> dict:
     return dict_target
 
 
-def prepResultDF(params: dict) -> pd.DataFrame:
+def prep_result_df(params: dict) -> pd.DataFrame:
     dict_result = {
         'code': list(),
         'date': list(),
@@ -67,7 +67,7 @@ def prepResultDF(params: dict) -> pd.DataFrame:
     return df_result
 
 
-def prepOHLC(df: pd.DataFrame) -> pd.DataFrame:
+def prep_ohlc(df: pd.DataFrame) -> pd.DataFrame:
     """
     読み込んだ OHLC ファイルを
     アプリが使用できる OHLC のデータフレームに整形
@@ -87,7 +87,9 @@ def prepOHLC(df: pd.DataFrame) -> pd.DataFrame:
             # 平均足のデータ列
             'H_Open', 'H_High', 'H_Low', 'H_Close',
             # Parabolic SAR のデータ列
-            'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff'
+            'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff',
+            # IQR
+            'IQR',
         ]
     ]
 
@@ -104,7 +106,8 @@ def prepOHLC(df: pd.DataFrame) -> pd.DataFrame:
         [
             '始値', '高値', '安値', '終値', '出来高',
             'H_Open', 'H_High', 'H_Low', 'H_Close',
-            'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff'
+            'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff',
+            'IQR',
         ]
     ]
 
@@ -112,14 +115,15 @@ def prepOHLC(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = [
         'Open', 'High', 'Low', 'Close', 'Volume',
         'H_Open', 'H_High', 'H_Low', 'H_Close',
-        'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff'
+        'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff',
+        'IQR',
     ]
     df = df.astype(float)
 
     return df.copy()
 
 
-def prepTick(df: pd.DataFrame, dateStr: str) -> pd.DataFrame:
+def prep_tick(df: pd.DataFrame, dateStr: str) -> pd.DataFrame:
     """
     読み込んだ Tick ファイルを
     アプリが使用できる Tick のデータフレームに整形

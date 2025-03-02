@@ -14,6 +14,10 @@ from funcs.tide import (
 )
 from structs.res import AppRes
 
+# OHLCデータにおいて、オリジナルの列名とアプリで使用する列名
+list_col_part = ['始値', '高値', '安値', '終値', '出来高', 'TREND', 'PSAR', 'Period', 'Diff', 'IQR']
+list_col_new = ['Open', 'High', 'Low', 'Close', 'Volume', 'TREND', 'PSAR', 'Period', 'Diff', 'IQR']
+
 
 def get_ohlc(res: AppRes, target: dict, interval: str) -> pd.DataFrame:
     """
@@ -45,12 +49,8 @@ def get_ohlc(res: AppRes, target: dict, interval: str) -> pd.DataFrame:
     df.index.name = 'Datetime'
 
     # 必要な列名のみコピーする
-    list_col_part = ['始値', '高値', '安値', '終値', '出来高', 'TREND', 'PSAR', 'Period', 'Diff']
     df_part = df[list_col_part].copy()
-
-    # 列名を変更
-    list_col_new = ['Open', 'High', 'Low', 'Close', 'Volume', 'TREND', 'PSAR', 'Period', 'Diff']
-    df_part.columns = list_col_new
+    df_part.columns = list_col_new  # 列名を変更
 
     return df_part
 
