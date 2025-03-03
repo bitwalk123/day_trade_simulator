@@ -15,8 +15,8 @@ from funcs.tide import (
 from structs.res import AppRes
 
 # OHLCデータにおいて、オリジナルの列名とアプリで使用する列名
-list_col_part = ['始値', '高値', '安値', '終値', '出来高', 'TREND', 'PSAR', 'Period', 'Diff', 'IQR']
-list_col_new = ['Open', 'High', 'Low', 'Close', 'Volume', 'TREND', 'PSAR', 'Period', 'Diff', 'IQR']
+list_col_part = ['始値', '高値', '安値', '終値', '出来高', 'TREND', 'PSAR', 'Period', 'Diff', 'Slope', 'IQR']
+list_col_new = ['Open', 'High', 'Low', 'Close', 'Volume', 'TREND', 'PSAR', 'Period', 'Diff', 'Slope', 'IQR']
 
 
 def get_ohlc(res: AppRes, target: dict, interval: str) -> pd.DataFrame:

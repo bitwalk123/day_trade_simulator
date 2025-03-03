@@ -1,6 +1,7 @@
 import pandas as pd
 from PySide6.QtCore import QDate
 
+from funcs.common import get_excel_name, get_csv_ohlc_name, get_csv_tick_name
 from funcs.io import get_ohlc, get_tick
 from funcs.tide import get_yyyymmdd, get_yyyy_mm_dd
 from structs.res import AppRes
@@ -43,6 +44,9 @@ def prep_dataset(info: dict, qdate: QDate, res: AppRes) -> dict:
         'unit': info['unit'],
     }
 
+    # Excel ファイルから、必要データを一旦 CSV ファイルに保存する
+    prep_excel(res, dict_target, interval)
+
     # １分足データを取得
     df_ohlc = get_ohlc(res, dict_target, interval)
     dict_target[interval] = df_ohlc
@@ -52,6 +56,33 @@ def prep_dataset(info: dict, qdate: QDate, res: AppRes) -> dict:
     dict_target['tick'] = df_tick
 
     return dict_target
+
+
+def prep_excel(res: AppRes, dict_target: dict, interval: str):
+    """
+    Excel ファイルから、必要データを一旦 CSV ファイルに保存する
+    :param res:
+    :param dict_target:
+    :param interval:
+    :return:
+    """
+
+    # Excel ファイル
+    file_excel = get_excel_name(res, dict_target)
+
+    # Tick データ
+    name_sheet_tick = 'Tick'
+    df_tick = pd.read_excel(file_excel, sheet_name=name_sheet_tick)
+    # dict_target['tick'] = df_tick
+    file_csv_tick = get_csv_tick_name(res, dict_target)
+    df_tick.to_csv(file_csv_tick, index=False)
+
+    # OHLC データ
+    name_sheet_ohlc = 'OHLC%s' % interval
+    df_ohlc = pd.read_excel(file_excel, sheet_name=name_sheet_ohlc)
+    # dict_target[interval] = df_ohlc
+    file_csv_ohlc = get_csv_ohlc_name(res, dict_target, interval)
+    df_ohlc.to_csv(file_csv_ohlc, index=False)
 
 
 def prep_result_df(params: dict) -> pd.DataFrame:
@@ -87,7 +118,7 @@ def prep_ohlc(df: pd.DataFrame) -> pd.DataFrame:
             # 平均足のデータ列
             'H_Open', 'H_High', 'H_Low', 'H_Close',
             # Parabolic SAR のデータ列
-            'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff',
+            'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff', 'Slope',
             # IQR
             'IQR',
         ]
@@ -106,7 +137,7 @@ def prep_ohlc(df: pd.DataFrame) -> pd.DataFrame:
         [
             '始値', '高値', '安値', '終値', '出来高',
             'H_Open', 'H_High', 'H_Low', 'H_Close',
-            'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff',
+            'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff', 'Slope',
             'IQR',
         ]
     ]
