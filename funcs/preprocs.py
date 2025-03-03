@@ -1,9 +1,20 @@
 import pandas as pd
 from PySide6.QtCore import QDate
 
-from funcs.io import get_ohlc, get_tick
-from funcs.tide import get_yyyymmdd, get_yyyy_mm_dd
+from funcs.common import (
+    get_excel_name,
+    get_transaction_name,
+)
+from funcs.conv import df_to_html
+from funcs.tide import (
+    get_yyyy_mm_dd,
+    get_yyyymmdd,
+)
 from structs.res import AppRes
+
+# OHLCデータにおいて、オリジナルの列名とアプリで使用する列名
+list_col_part = ['始値', '高値', '安値', '終値', '出来高', 'TREND', 'PSAR', 'Period', 'Diff', 'Slope', 'IQR']
+list_col_new = ['Open', 'High', 'Low', 'Close', 'Volume', 'TREND', 'PSAR', 'Period', 'Diff', 'Slope', 'IQR']
 
 
 def reformat_dataframe(df: pd.DataFrame, dt_lunch_1, dt_lunch_2) -> pd.DataFrame:
@@ -43,15 +54,88 @@ def prep_dataset(info: dict, qdate: QDate, res: AppRes) -> dict:
         'unit': info['unit'],
     }
 
-    # １分足データを取得
-    df_ohlc = get_ohlc(res, dict_target, interval)
-    dict_target[interval] = df_ohlc
+    # Excel ファイル
+    file_excel = get_excel_name(res, dict_target)
 
-    # ティックデータを取得
-    df_tick = get_tick(res, dict_target)
-    dict_target['tick'] = df_tick
+    # 取引履歴の保存
+    save_transaction_history(dict_target, file_excel, res)
+
+    # Tick データ準備
+    prep_tick(dict_target, file_excel)
+
+    # OHLC データ準備
+    prep_ohlc(dict_target, file_excel, interval)
 
     return dict_target
+
+
+def save_transaction_history(dict_target, file_excel, res):
+    """
+    取引履歴の保存
+    :param dict_target:
+    :param file_excel:
+    :param res:
+    :return:
+    """
+    # Excel から指定したワークシートのみ読み込む
+    name_sheet_transaction = 'Transaction'
+    df_transaction = pd.read_excel(file_excel, sheet_name=name_sheet_transaction)
+
+    # 取引履歴のテーブルを HTML に変換
+    list_col_format = ['int', 'str', 'str', 'int', 'int', 'int', 'int', 'str']
+    list_html = df_to_html(df_transaction, list_col_format)
+
+    # 所定のフォルダ仁保存
+    file_transaction = get_transaction_name(res, dict_target)
+    with open(file_transaction, mode='w') as f:
+        f.writelines(list_html)
+
+
+def prep_ohlc(dict_target, file_excel, interval):
+    # Excel から指定したワークシートのみ読み込む
+    name_sheet_ohlc = 'OHLC%s' % interval
+    df_ohlc = pd.read_excel(file_excel, sheet_name=name_sheet_ohlc)
+
+    # 最終行が MarketSPEED 2 RSS のセパレータの場合はその行を削除する
+    r_last = len(df_ohlc) - 1
+    if df_ohlc.iat[r_last, 0] == '--------':
+        df_ohlc = df_ohlc.iloc[0:r_last].copy()
+
+    # 日付列と時刻列の文字列を結合して Datetime 型へ変換してインデックスに設定
+    df_ohlc.index = pd.to_datetime(
+        [
+            '%s %s' % (
+                df_ohlc['日付'].iloc[r], df_ohlc['時刻'].iloc[r]
+            ) for r in range(len(df_ohlc))
+        ]
+    )
+    df_ohlc.index.name = 'Datetime'
+
+    # 必要な列名のみコピーする
+    df_ohlc_part = df_ohlc[list_col_part].copy()
+    df_ohlc_part.columns = list_col_new  # 列名を変更
+    dict_target[interval] = df_ohlc_part
+
+
+def prep_tick(dict_target, file_excel):
+    # Excel から指定したワークシートのみ読み込む
+    name_sheet_tick = 'Tick'
+    df_tick = pd.read_excel(file_excel, sheet_name=name_sheet_tick)
+
+    # 時酷烈に日付情報を付加、文字列から日付フォーマットへ変更
+    df_tick.index = pd.to_datetime(
+        [
+            '%s %s' % (
+                dict_target['date_format'], df_tick['Time'].iloc[r],
+            ) for r in range(len(df_tick))
+        ]
+    )
+    df_tick.index.name = 'Datetime'
+
+    # 一旦 Series にコピーしてから DataFrame で返す
+    ser_tick = df_tick['Price'].copy()
+    ser_tick.name = 'Price'
+    dict_target['tick'] = pd.DataFrame(ser_tick)
 
 
 def prep_result_df(params: dict) -> pd.DataFrame:
@@ -64,80 +148,5 @@ def prep_result_df(params: dict) -> pd.DataFrame:
     dict_result['total'] = list()
     df = pd.DataFrame.from_dict(dict_result)
     df_result = df.astype(object)
+
     return df_result
-
-
-def prep_ohlc(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    読み込んだ OHLC ファイルを
-    アプリが使用できる OHLC のデータフレームに整形
-    :param df:
-    :return:
-    """
-    # 一行目は前日のデータなので除く、
-    # また最終行はセパレータ文字なのでこれも除く
-    rows = len(df)
-    df = df.iloc[1:(rows - 1)].reset_index(drop=True)
-
-    # 必要な列のみ残す
-    df = df[
-        [
-            # Market SPEED RSS からのデータ列
-            '日付', '時刻', '始値', '高値', '安値', '終値', '出来高',
-            # 平均足のデータ列
-            'H_Open', 'H_High', 'H_Low', 'H_Close',
-            # Parabolic SAR のデータ列
-            'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff',
-            # IQR
-            'IQR',
-        ]
-    ]
-
-    # データフレームのインデックスを、「日付時刻」形式に変換
-    df.index = [
-        pd.to_datetime(
-            '%s %s:00' % (d, t)
-        ) for d, t in zip(df['日付'], df['時刻'])
-    ]
-    df.index.name = 'Datetime'
-
-    # 日付、時刻列を除く
-    df = df[
-        [
-            '始値', '高値', '安値', '終値', '出来高',
-            'H_Open', 'H_High', 'H_Low', 'H_Close',
-            'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff',
-            'IQR',
-        ]
-    ]
-
-    # 列名を英名に揃える
-    df.columns = [
-        'Open', 'High', 'Low', 'Close', 'Volume',
-        'H_Open', 'H_High', 'H_Low', 'H_Close',
-        'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff',
-        'IQR',
-    ]
-    df = df.astype(float)
-
-    return df.copy()
-
-
-def prep_tick(df: pd.DataFrame, dateStr: str) -> pd.DataFrame:
-    """
-    読み込んだ Tick ファイルを
-    アプリが使用できる Tick のデータフレームに整形
-
-    :param df:
-    :param dateStr:
-    :return:
-    """
-    # データフレームのインデックスを、「日付時刻」形式に変換
-    df.index = [
-        pd.to_datetime(
-            '%s %s' % (dateStr, t)
-        ) for t in df['Time']
-    ]
-    df.index.name = 'Datetime'
-
-    return pd.DataFrame(df['Price'].copy())

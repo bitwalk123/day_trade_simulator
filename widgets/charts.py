@@ -36,7 +36,7 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.size'] = 14
 
         self.ax = dict()
-        n = 3
+        n = 4
 
         if n > 1:
             gs = self.fig.add_gridspec(
@@ -157,9 +157,9 @@ class Canvas(FigureCanvas):
         )
 
         # IQR
-        df_iqr = df_ohlc_1m['IQR']
+        df_slope = df_ohlc_1m['Slope']
         self.ax[2].plot(
-            df_iqr,
+            df_slope,
             linewidth=0.75,
             color='black',
             alpha=0.75,
@@ -169,7 +169,23 @@ class Canvas(FigureCanvas):
             linewidth=0.75,
             color='#444',
         )
-        self.ax[2].set_ylabel('IQR')
+        self.ax[2].set_ylabel('Slope')
+
+
+        # IQR
+        df_iqr = df_ohlc_1m['IQR']
+        self.ax[3].plot(
+            df_iqr,
+            linewidth=0.75,
+            color='black',
+            alpha=0.75,
+        )
+        self.ax[3].axhline(
+            0,
+            linewidth=0.75,
+            color='#444',
+        )
+        self.ax[3].set_ylabel('IQR')
 
         # グリッド線
         drawGrid(self.fig)
