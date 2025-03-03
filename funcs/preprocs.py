@@ -1,8 +1,15 @@
 import pandas as pd
 from PySide6.QtCore import QDate
 
-from funcs.common import get_excel_name
-from funcs.tide import get_yyyymmdd, get_yyyy_mm_dd
+from funcs.common import (
+    get_excel_name,
+    get_transaction_name,
+)
+from funcs.conv import df_to_html
+from funcs.tide import (
+    get_yyyy_mm_dd,
+    get_yyyymmdd,
+)
 from structs.res import AppRes
 
 # OHLCデータにおいて、オリジナルの列名とアプリで使用する列名
@@ -50,6 +57,9 @@ def prep_dataset(info: dict, qdate: QDate, res: AppRes) -> dict:
     # Excel ファイル
     file_excel = get_excel_name(res, dict_target)
 
+    # 取引履歴の保存
+    save_transaction_history(dict_target, file_excel, res)
+
     # Tick データ準備
     prep_tick(dict_target, file_excel)
 
@@ -57,6 +67,28 @@ def prep_dataset(info: dict, qdate: QDate, res: AppRes) -> dict:
     prep_ohlc(dict_target, file_excel, interval)
 
     return dict_target
+
+
+def save_transaction_history(dict_target, file_excel, res):
+    """
+    取引履歴の保存
+    :param dict_target:
+    :param file_excel:
+    :param res:
+    :return:
+    """
+    # Excel から指定したワークシートのみ読み込む
+    name_sheet_transaction = 'Transaction'
+    df_transaction = pd.read_excel(file_excel, sheet_name=name_sheet_transaction)
+
+    # 取引履歴のテーブルを HTML に変換
+    list_col_format = ['int', 'str', 'str', 'int', 'int', 'int', 'int', 'str']
+    list_html = df_to_html(df_transaction, list_col_format)
+
+    # 所定のフォルダ仁保存
+    file_transaction = get_transaction_name(res, dict_target)
+    with open(file_transaction, mode='w') as f:
+        f.writelines(list_html)
 
 
 def prep_ohlc(dict_target, file_excel, interval):
