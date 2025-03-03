@@ -6,3 +6,4 @@ class AppRes:
     dir_ohlc = 'ohlc'
     dir_result = 'results'
     dir_tick = 'tick'
+    dir_transaction = 'transaction'
