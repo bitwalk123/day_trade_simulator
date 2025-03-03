@@ -50,21 +50,22 @@ def prep_dataset(info: dict, qdate: QDate, res: AppRes) -> dict:
     # Excel ファイル
     file_excel = get_excel_name(res, dict_target)
 
-    # Tick データ
+    # Tick データ準備
     prep_tick(dict_target, file_excel)
 
-    # OHLC データ
+    # OHLC データ準備
     prep_ohlc(dict_target, file_excel, interval)
 
     return dict_target
 
 
 def prep_ohlc(dict_target, file_excel, interval):
+    # Excel から指定したワークシートのみ読み込む
     name_sheet_ohlc = 'OHLC%s' % interval
     df_ohlc = pd.read_excel(file_excel, sheet_name=name_sheet_ohlc)
-    r_last = len(df_ohlc) - 1
 
     # 最終行が MarketSPEED 2 RSS のセパレータの場合はその行を削除する
+    r_last = len(df_ohlc) - 1
     if df_ohlc.iat[r_last, 0] == '--------':
         df_ohlc = df_ohlc.iloc[0:r_last].copy()
 
@@ -85,6 +86,7 @@ def prep_ohlc(dict_target, file_excel, interval):
 
 
 def prep_tick(dict_target, file_excel):
+    # Excel から指定したワークシートのみ読み込む
     name_sheet_tick = 'Tick'
     df_tick = pd.read_excel(file_excel, sheet_name=name_sheet_tick)
 
