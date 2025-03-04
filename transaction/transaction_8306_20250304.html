@@ -1,0 +1,450 @@
+<style>
+table {border-collapse: collapse; border: solid 1px #aaa; font-family: monospace; font-size: x-small;}
+th,td {border-bottom: solid 1px #aaa; padding: 0 5px;}
+</style>
+<table>
+<thead>
+<tr>
+<th nowrap>注文番号</th>
+<th nowrap>時刻</th>
+<th nowrap>売買</th>
+<th nowrap>金額</th>
+<th nowrap>損益</th>
+<th nowrap>最大益</th>
+<th nowrap>最大損</th>
+<th nowrap>備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td nowrap style="text-align: right;">1</td>
+<td nowrap>09:14:02</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">192,700</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 4</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">1</td>
+<td nowrap>09:18:19</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">192,350</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap style="text-align: right;">200</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap>損切１, period = 8</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">2</td>
+<td nowrap>09:21:01</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">193,450</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 2</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">2</td>
+<td nowrap>09:22:21</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">193,100</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap>損切１, period = 3</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">3</td>
+<td nowrap>09:29:01</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">192,750</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 2</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">3</td>
+<td nowrap>09:35:03</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">192,800</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">300</td>
+<td nowrap style="text-align: right;">-100</td>
+<td nowrap>利確１, period = 8</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">4</td>
+<td nowrap>09:47:01</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">192,250</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 3</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">4</td>
+<td nowrap>09:53:48</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">192,300</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">300</td>
+<td nowrap style="text-align: right;">-150</td>
+<td nowrap>利確１, period = 9</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">5</td>
+<td nowrap>09:58:01</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">192,600</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 2</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">5</td>
+<td nowrap>10:04:08</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">192,250</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap>損切１, period = 8</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">6</td>
+<td nowrap>10:11:01</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">192,650</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 2</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">6</td>
+<td nowrap>10:12:55</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">192,700</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">300</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap>利確１, period = 3</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">7</td>
+<td nowrap>10:15:01</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">192,200</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 1</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">7</td>
+<td nowrap>10:32:01</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">193,300</td>
+<td nowrap style="text-align: right;">1,100</td>
+<td nowrap style="text-align: right;">1,200</td>
+<td nowrap style="text-align: right;">-50</td>
+<td nowrap>返済, period = 17</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">8</td>
+<td nowrap>10:35:01</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">190,850</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 1</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">8</td>
+<td nowrap>10:39:01</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">190,550</td>
+<td nowrap style="text-align: right;">-300</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap style="text-align: right;">-300</td>
+<td nowrap>返済, period = 4</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">9</td>
+<td nowrap>10:40:01</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">191,350</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 1</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">9</td>
+<td nowrap>10:44:13</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">191,000</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap style="text-align: right;">150</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap>損切１, period = 5</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">10</td>
+<td nowrap>10:47:01</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">191,150</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 2</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">10</td>
+<td nowrap>10:50:01</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">191,100</td>
+<td nowrap style="text-align: right;">-50</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap style="text-align: right;">-300</td>
+<td nowrap>返済, period = 4</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">11</td>
+<td nowrap>10:52:01</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">190,950</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 1</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">11</td>
+<td nowrap>10:56:01</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">190,950</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">-250</td>
+<td nowrap>返済, period = 4</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">12</td>
+<td nowrap>10:59:01</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">190,450</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 1</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">12</td>
+<td nowrap>11:01:12</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">190,100</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap style="text-align: right;">150</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap>損切１, period = 3</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">13</td>
+<td nowrap>12:32:01</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">191,300</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 1</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">13</td>
+<td nowrap>12:38:45</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">191,400</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap style="text-align: right;">350</td>
+<td nowrap style="text-align: right;">-50</td>
+<td nowrap>利確１, period = 7</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">14</td>
+<td nowrap>13:05:01</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">191,550</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 4</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">14</td>
+<td nowrap>13:20:01</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">191,600</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">250</td>
+<td nowrap style="text-align: right;">-100</td>
+<td nowrap>返済, period = 18</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">15</td>
+<td nowrap>13:29:01</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">191,900</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 4</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">15</td>
+<td nowrap>13:37:01</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">191,750</td>
+<td nowrap style="text-align: right;">-150</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap style="text-align: right;">-150</td>
+<td nowrap>返済, period = 11</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">16</td>
+<td nowrap>13:38:01</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">191,600</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 1</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">16</td>
+<td nowrap>13:50:01</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">191,450</td>
+<td nowrap style="text-align: right;">-150</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">-200</td>
+<td nowrap>返済, period = 12</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">17</td>
+<td nowrap>13:56:01</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">191,450</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 3</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">17</td>
+<td nowrap>13:59:01</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">191,250</td>
+<td nowrap style="text-align: right;">-200</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap style="text-align: right;">-300</td>
+<td nowrap>返済, period = 5</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">18</td>
+<td nowrap>14:01:01</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">191,750</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 2</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">18</td>
+<td nowrap>14:01:28</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">191,400</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap>損切１, period = 2</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">19</td>
+<td nowrap>14:14:01</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">191,700</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 3</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">19</td>
+<td nowrap>14:23:01</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">191,450</td>
+<td nowrap style="text-align: right;">-250</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">-250</td>
+<td nowrap>返済, period = 11</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">20</td>
+<td nowrap>15:06:01</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">192,750</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 1</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">20</td>
+<td nowrap>15:18:01</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">192,700</td>
+<td nowrap style="text-align: right;">-50</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap style="text-align: right;">-250</td>
+<td nowrap>返済, period = 12</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">21</td>
+<td nowrap>15:23:01</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">193,150</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap>建玉, period = 2</td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">21</td>
+<td nowrap>15:24:50</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">193,200</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap style="text-align: right;">-50</td>
+<td nowrap>強制（大引け前）, period = 3</td>
+</tr>
+<tr>
+<td nowrap>---</td>
+<td nowrap>---</td>
+<td nowrap>---</td>
+<td nowrap>実現損益</td>
+<td nowrap style="text-align: right;">-1,800</td>
+<td nowrap>---</td>
+<td nowrap>---</td>
+<td nowrap>---</td>
+</tr>
+</tbody>
+</table>
