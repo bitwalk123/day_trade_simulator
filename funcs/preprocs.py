@@ -90,6 +90,19 @@ def save_transaction_history(dict_target, file_excel, res):
     with open(file_transaction, mode='w') as f:
         f.writelines(list_html)
 
+    # 時酷烈に日付情報を付加、文字列から日付フォーマットへ変更
+    df_transaction = df_transaction.iloc[:len(df_transaction) - 1]
+    df_transaction.index = pd.to_datetime(
+        [
+            '%s %s' % (
+                dict_target['date_format'], df_transaction['時刻'].iloc[r],
+            ) for r in range(len(df_transaction))
+        ]
+    )
+
+    df_transaction.index.name = 'Datetime'
+    dict_target['transaction'] = pd.DataFrame(df_transaction['売買'])
+
 
 def prep_ohlc(dict_target, file_excel, interval):
     # Excel から指定したワークシートのみ読み込む
