@@ -173,7 +173,7 @@ class Canvas(FigureCanvas):
         )
         self.ax[3].set_ylabel('IQR')
 
-        flag_timing = False
+        flag_timing = True
         if flag_timing:
             # 売買タイミング
             df_transaction = dict_target['transaction']
