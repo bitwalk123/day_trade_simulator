@@ -143,7 +143,7 @@ class Canvas(FigureCanvas):
             color='#444',
         )
 
-        # IQR
+        # Slope
         df_slope = df_ohlc_1m['Slope']
         self.ax[2].plot(
             df_slope,
@@ -173,44 +173,43 @@ class Canvas(FigureCanvas):
         )
         self.ax[3].set_ylabel('IQR')
 
-        flag_timing = True
-        if flag_timing:
-            # 売買タイミング
-            df_transaction = dict_target['transaction']
-            num = int(len(df_transaction) / 2)
-            for idx in range(num):
-                r1 = idx * 2
-                r2 = r1 + 1
-                dt1 = df_transaction.index[r1]
-                dt2 = df_transaction.index[r2]
-                if df_transaction.iat[r1, 0] == '売建':
-                    color = 'blue'
-                elif df_transaction.iat[r1, 0] == '買建':
-                    color = 'red'
-                else:
-                    color = 'black'
+        # 売買タイミング
+        df_transaction = dict_target['transaction']
+        # １つ飛びでループ
+        num = int(len(df_transaction) / 2)
+        for idx in range(num):
+            r1 = idx * 2
+            r2 = r1 + 1
+            dt1 = df_transaction.index[r1]
+            dt2 = df_transaction.index[r2]
+            if df_transaction.iat[r1, 0] == '売建':
+                color = 'blue'
+            elif df_transaction.iat[r1, 0] == '買建':
+                color = 'red'
+            else:
+                color = 'black'
 
-                for i in self.ax:
-                    self.ax[i].fill_between(
-                        [dt1, dt2], 0, 1,
-                        color=color,
-                        alpha=0.05,
-                        transform=self.ax[i].get_xaxis_transform(),
-                    )
+            for i in self.ax.keys():
+                self.ax[i].fill_between(
+                    [dt1, dt2], 0.05, 0.95,
+                    color=color,
+                    alpha=0.1,
+                    transform=self.ax[i].get_xaxis_transform(),
+                )
 
-                    self.ax[i].axvline(
-                        dt1,
-                        linewidth=0.5,
-                        color=color,
-                        alpha=0.25,
-                    )
+                self.ax[i].axvline(
+                    dt1,
+                    linewidth=0.5,
+                    color=color,
+                    alpha=0.25,
+                )
 
-                    self.ax[i].axvline(
-                        dt2,
-                        linewidth=0.5,
-                        color=color,
-                        alpha=0.25,
-                    )
+                self.ax[i].axvline(
+                    dt2,
+                    linewidth=0.5,
+                    color=color,
+                    alpha=0.25,
+                )
 
         # グリッド線
         drawGrid(self.fig)
