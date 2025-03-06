@@ -143,7 +143,7 @@ class Canvas(FigureCanvas):
             color='#444',
         )
 
-        # IQR
+        # Slope
         df_slope = df_ohlc_1m['Slope']
         self.ax[2].plot(
             df_slope,

@@ -19,7 +19,7 @@ def get_ohlc4analysis(df: pd.DataFrame) -> pd.DataFrame:
     :return:
     """
     # 最後の行を除外
-    df = df.iloc[:len(df) - 1]
+    df = df.iloc[1:len(df) - 1]
 
     # インデックスを時刻情報に
     df.index = [pd.to_datetime(
@@ -31,5 +31,9 @@ def get_ohlc4analysis(df: pd.DataFrame) -> pd.DataFrame:
 
     # 列名を英語に
     df.columns = list_col_part_en
+
+    # 全列を数値として扱う
+    for col in df.columns:
+        df[col] = df[col].astype(float)
 
     return df
