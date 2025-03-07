@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 
 list_col_part = [
     '始値', '高値', '安値', '終値', '出来高',
@@ -10,6 +11,19 @@ list_col_part_en = [
     'H_Open', 'H_High', 'H_Low', 'H_Close',
     'TREND', 'EP', 'AF', 'PSAR', 'Period', 'Diff', 'Slope', 'IQR'
 ]
+
+
+def get_date_formatted(dateStr: str) -> str:
+    pattern = re.compile(r'^([0-9]{4})([0-9]{2})([0-9]{2})$')
+    m = pattern.match(dateStr)
+    if m:
+        return '%s-%s-%s' % (
+            m.group(1),
+            m.group(2),
+            m.group(3),
+        )
+    else:
+        return '1970-01-01'
 
 
 def get_ohlc4analysis(df: pd.DataFrame) -> pd.DataFrame:
@@ -37,3 +51,13 @@ def get_ohlc4analysis(df: pd.DataFrame) -> pd.DataFrame:
         df[col] = df[col].astype(float)
 
     return df
+
+
+def get_tick4analysis(df: pd.DataFrame, dateFmt: str) -> pd.DataFrame:
+    df.index = [pd.to_datetime(
+        '%s %s' % (dateFmt, df.iat[r, 0])
+    ) for r in range(len(df))]
+    df.index.name = 'Datetime'
+    df['Price'] = df['Price'].astype(float)
+
+    return pd.DataFrame(df['Price'])
