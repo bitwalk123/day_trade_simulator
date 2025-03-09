@@ -108,6 +108,17 @@ class PositionManager:
         self.df_profit.at[r, 'Profit'] = profit
         self.df_profit.at[r, 'Order'] = self.order
 
+    def get_profit(self, t, price):
+        if not self.has_position():
+            return
+
+        if self.trend > 0:
+            return (price - self.price) * self.unit
+        elif self.trend < 0:
+            return (self.price - price) * self.unit
+        else:
+            return
+
     def get_profit_history(self) -> pd.DataFrame:
         return pd.DataFrame(
             {
