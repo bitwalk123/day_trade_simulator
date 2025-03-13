@@ -83,6 +83,7 @@ class RealTimePSAR:
         self.df.loc[t1, 'Price'] = p1
 
         if r == 0:
+            self.add_psar(t1, 0, np.nan, np.nan, np.nan)
             return
 
         t0 = self.df.index[r - 1]
