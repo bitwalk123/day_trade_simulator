@@ -1,7 +1,8 @@
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMainWindow
 
 from structs.res import AppRes
-from widgets.charts import Canvas
+from widgets.charts import Canvas, ChartNavigation
 
 
 class WinMain(QMainWindow):
@@ -12,5 +13,11 @@ class WinMain(QMainWindow):
 
         canvas = Canvas(res)
         self.setCentralWidget(canvas)
+
+        self.navtoolbar = navtoolbar = ChartNavigation(canvas)
+        self.addToolBar(
+            Qt.ToolBarArea.BottomToolBarArea,
+            navtoolbar,
+        )
 
         canvas.plot(dict_target)
