@@ -2,6 +2,31 @@ import numpy as np
 import pandas as pd
 
 
+def calc_robust_bollinger(df: pd.DataFrame, period: int):
+    r_last = len(df)
+    r1 = 0
+    df['Median'] = np.nan
+    df['Q1'] = np.nan
+    df['Q3'] = np.nan
+    df['Lower'] = np.nan
+    df['Upper'] = np.nan
+    while r1 < r_last - period:
+        r2 = r1 + period
+        df1 = df.iloc[r1:r2].copy()
+        med = np.median(df1['Close'])
+        q3, q1 = np.percentile(df1['Close'], [75, 25])
+        iqr = q3 - q1
+        lower_bound = q1 - (1.5 * iqr)  # 下限を設定
+        upper_bound = q3 + (1.5 * iqr)  # 上限を設定
+        name_index = df.index[r2]
+        df.at[name_index, 'Median'] = med
+        df.at[name_index, 'Q1'] = q1
+        df.at[name_index, 'Q3'] = q3
+        df.at[name_index, 'Lower'] = lower_bound
+        df.at[name_index, 'Upper'] = upper_bound
+        r1 += 1
+
+
 def psar(ohlc: pd.DataFrame, iaf: float = 0.02, maxaf: float = 0.2) -> dict:
     length = len(ohlc)
     high = ohlc['High'].tolist()

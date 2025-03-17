@@ -1,75 +1,53 @@
 import os
 
-from PySide6.QtCore import QDate, Signal
+from PySide6.QtCore import Signal
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
-    QCalendarWidget,
-    QComboBox,
     QToolBar,
-    QToolButton,
+    QToolButton, QFileDialog,
 )
 
-from funcs.io import (
-    read_json,
-)
-from funcs.preprocs import prep_dataset
 from structs.res import AppRes
 
 
 class ToolBar(QToolBar):
-    readyDataset = Signal(dict)
-
+    fileSelected = Signal(str)
     def __init__(self, res: AppRes):
         super().__init__()
         self.res = res
-        # 銘柄リスト（辞書）の読み込み
-        json_ticker = os.path.join(res.dir_config, 'ticker.json')
-        self.tickers = read_json(json_ticker)
 
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # UI
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-        self.calendar = QCalendarWidget()
-        self.calendar.setWindowTitle('データ取得日')
-        self.calendar.activated.connect(self.on_date_selected)
-
-        # カレンダー表示用のアイコン
-        but_calendar = QToolButton()
-        but_calendar.setIcon(
-            QIcon(os.path.join(self.res.dir_image, 'calendar.png'))
+        # ファイル選択用アイコン
+        but_folder = QToolButton()
+        but_folder.setIcon(
+            QIcon(os.path.join(self.res.dir_image, 'folder.png'))
         )
-        but_calendar.setToolTip('日付選択')
-        but_calendar.clicked.connect(self.on_calendar_clicked)
-        self.addWidget(but_calendar)
+        but_folder.setToolTip('ファイル選択')
+        but_folder.clicked.connect(self.on_file_dialog_open)
+        self.addWidget(but_folder)
 
-        # 銘柄
-        self.combo_tickers = combo_tickers = QComboBox()
-        combo_tickers.addItems([key for key in self.tickers.keys()])
-        combo_tickers.setToolTip('銘柄選択')
-        self.addWidget(combo_tickers)
-
-    def on_calendar_clicked(self):
+    def on_file_dialog_open(self):
         """
-        カレンダーボタンがクリックされたときの処理
+        Excel Macro ファイルの読み込み
         :return:
         """
-        if self.calendar is not None:
-            self.calendar.show()
+        dialog = QFileDialog()
+        # 初期ディレクトリを指定
+        dialog.setDirectory(self.res.dir_excel)
+        # 拡張子のフィルターを設定
+        dialog.setNameFilters(
+            [
+                'Excel Macro (*.xlsm)',
+                'All files (*)',
+            ]
+        )
+        # ファイルを選択されなければ何もしない
+        if not dialog.exec():
+            return
 
-    def on_date_selected(self, qdate: QDate):
-        """
-        カレンダーで日付が選択されたときの処理
-        :param qdate:
-        :return:
-        """
-        if self.calendar is not None:
-            self.calendar.hide()
-
-        key = self.combo_tickers.currentText()
-        # key（銘柄の名前）をキーにして入れ子になっている辞書を取り出す。
-        info = self.tickers[key]
-        info['name'] = key
-        dict_target = prep_dataset(info, qdate, self.res)
-
-        # データフレーム準備完了シグナル
-        self.readyDataset.emit(dict_target)
+        # 選択されたファイルが存在して入ればシグナル
+        file_excel = dialog.selectedFiles()[0]
+        if os.path.isfile(file_excel):
+            self.fileSelected.emit(file_excel)
