@@ -52,6 +52,24 @@ def prep_dataset(file_excel: str) -> list:
         date = df_cover.iloc[r, c].replace('/', '-')
         dict_target['date'] = date
 
+        # 呼び値
+        r = list(df_cover.index).index('呼値')
+        price_tick_min = df_cover.iloc[r, c]
+        dict_target['price_tick_min'] = price_tick_min
+
+        # AF
+        r = list(df_cover.index).index('AF（初期値）')
+        af_init = df_cover.iloc[r, c]
+        dict_target['af_init'] = af_init
+
+        r = list(df_cover.index).index('AF（ステップ）')
+        af_step = df_cover.iloc[r, c]
+        dict_target['af_step'] = af_step
+
+        r = list(df_cover.index).index('AF（最大値）')
+        af_max = df_cover.iloc[r, c]
+        dict_target['af_max'] = af_max
+
         # 銘柄コードから、ティックデータ用ワークシート名を特定しティックデータを読み込む
         name_sheet_tick = 'tick_%s' % code
         df_tick = pd.read_excel(
