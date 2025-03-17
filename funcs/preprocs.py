@@ -49,7 +49,7 @@ def prep_dataset(file_excel: str) -> list:
 
         # 現在日付の保持
         r = list(df_cover.index).index('現在日付')
-        date = df_cover.iloc[r, c]
+        date = df_cover.iloc[r, c].replace('/', '-')
         dict_target['date'] = date
 
         # 銘柄コードから、ティックデータ用ワークシート名を特定しティックデータを読み込む

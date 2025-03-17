@@ -12,6 +12,10 @@ class WinMain(QMainWindow):
         self.dict_darget = dict_target
 
         canvas = Canvas(res)
+        canvas.get_default_filename = lambda: '%s_%s.png' % (
+            dict_target['code'],
+            dict_target['date'],
+        )
         self.setCentralWidget(canvas)
 
         self.navtoolbar = navtoolbar = ChartNavigation(canvas)
