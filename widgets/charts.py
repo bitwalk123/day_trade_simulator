@@ -36,7 +36,7 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.size'] = 14
 
         self.ax = dict()
-        n = 4
+        n = 1
 
         if n > 1:
             gs = self.fig.add_gridspec(
@@ -68,18 +68,17 @@ class Canvas(FigureCanvas):
 
         # ティックデータ
         df_tick = dict_target['tick']
-        df_ohlc_1m = dict_target['1m']
 
         # Tick
         self.ax[0].plot(
-            df_tick,
+            df_tick['Price'],
             color='black',
             linewidth=0.5,
             alpha=0.5,
         )
 
-        df_bear = df_ohlc_1m[df_ohlc_1m['TREND'] < 0]
-        df_bull = df_ohlc_1m[df_ohlc_1m['TREND'] > 0]
+        df_bear = df_tick[df_tick['TREND'] < 0]
+        df_bull = df_tick[df_tick['TREND'] > 0]
 
         # PSAR bear - Downward trend
         self.ax[0].scatter(
@@ -101,7 +100,7 @@ class Canvas(FigureCanvas):
         title_chart = '%s (%s) on %s' % (
             dict_target['name'],
             dict_target['code'],
-            dict_target['date_format'],
+            dict_target['date'],
         )
         self.ax[0].set_title(title_chart)
 
@@ -117,99 +116,12 @@ class Canvas(FigureCanvas):
         self.ax[0].xaxis.set_major_formatter(
             mdates.DateFormatter('%H:%M')
         )
-        """
-        self.ax[0].xaxis.set_minor_locator(
-            mdates.MinuteLocator(interval=5)
-        )
-        """
+        #self.ax[0].xaxis.set_minor_locator(
+        #    mdates.MinuteLocator(interval=5)
+        #)
         self.ax[0].set_xlim(
             get_range_xaxis(df_tick)
         )
-
-        # Diff
-        df_diff = df_ohlc_1m['Diff']
-        self.ax[1].plot(
-            df_diff,
-            linewidth=0.75,
-            color='black',
-            alpha=0.75,
-        )
-        self.ax[1].set_ylabel('Profit/Loss')
-
-        # ax[1] では　y = 0 を黒線で表示、正負を解りやすくする。
-        self.ax[1].axhline(
-            0,
-            linewidth=0.75,
-            color='#444',
-        )
-
-        # Slope
-        df_slope = df_ohlc_1m['Slope']
-        self.ax[2].plot(
-            df_slope,
-            linewidth=0.75,
-            color='black',
-            alpha=0.75,
-        )
-        self.ax[2].axhline(
-            0,
-            linewidth=0.75,
-            color='#444',
-        )
-        self.ax[2].set_ylabel('Slope')
-
-        # IQR
-        df_iqr = df_ohlc_1m['IQR']
-        self.ax[3].plot(
-            df_iqr,
-            linewidth=0.75,
-            color='black',
-            alpha=0.75,
-        )
-        self.ax[3].axhline(
-            0,
-            linewidth=0.75,
-            color='#444',
-        )
-        self.ax[3].set_ylabel('IQR')
-
-        # 売買タイミング
-        df_transaction = dict_target['transaction']
-        # １つ飛びでループ
-        num = int(len(df_transaction) / 2)
-        for idx in range(num):
-            r1 = idx * 2
-            r2 = r1 + 1
-            dt1 = df_transaction.index[r1]
-            dt2 = df_transaction.index[r2]
-            if df_transaction.iat[r1, 0] == '売建':
-                color = 'blue'
-            elif df_transaction.iat[r1, 0] == '買建':
-                color = 'red'
-            else:
-                color = 'black'
-
-            for i in self.ax.keys():
-                self.ax[i].fill_between(
-                    [dt1, dt2], 0.05, 0.95,
-                    color=color,
-                    alpha=0.1,
-                    transform=self.ax[i].get_xaxis_transform(),
-                )
-
-                self.ax[i].axvline(
-                    dt1,
-                    linewidth=0.5,
-                    color=color,
-                    alpha=0.25,
-                )
-
-                self.ax[i].axvline(
-                    dt2,
-                    linewidth=0.5,
-                    color=color,
-                    alpha=0.25,
-                )
 
         # グリッド線
         drawGrid(self.fig)

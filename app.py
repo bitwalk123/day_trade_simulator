@@ -4,10 +4,13 @@ from PySide6.QtCore import QThreadPool
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
+    QTabWidget,
 )
 
+from funcs.preprocs import prep_dataset
 from structs.res import AppRes
 from ui.toolbar import ToolBar
+from ui.win_main import WinMain
 
 
 class TradeSimulator(QMainWindow):
@@ -25,8 +28,15 @@ class TradeSimulator(QMainWindow):
         toolbar.fileSelected.connect(self.on_file_selected)
         self.addToolBar(toolbar)
 
+        self.base = base = QTabWidget()
+        base.setTabPosition(QTabWidget.TabPosition.South)
+        self.setCentralWidget(base)
+
     def on_file_selected(self, file_excel: str):
-        print(file_excel)
+        list_target = prep_dataset(file_excel)
+        for dict_target in list_target:
+            code = dict_target['code']
+            self.base.addTab(WinMain(self.res, dict_target), code)
 
 
 def main():
