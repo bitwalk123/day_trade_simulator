@@ -14,7 +14,7 @@ class WinMain(QMainWindow):
         canvas = Canvas(res)
         canvas.get_default_filename = lambda: '%s_%s.png' % (
             dict_target['code'],
-            dict_target['date'],
+            dict_target['date'].replace('-', ''),
         )
         self.setCentralWidget(canvas)
 

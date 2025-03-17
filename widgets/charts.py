@@ -80,21 +80,13 @@ class Canvas(FigureCanvas):
         df_bear = df_tick[df_tick['TREND'] < 0]
         df_bull = df_tick[df_tick['TREND'] > 0]
 
-        # PSAR bear - Downward trend
-        self.ax[0].scatter(
-            x=df_bear.index,
-            y=df_bear['PSAR'],
-            color='blue',
-            s=10,
-        )
-
-        # PSAR bull - Upward trend
-        self.ax[0].scatter(
-            x=df_bull.index,
-            y=df_bull['PSAR'],
-            color='red',
-            s=10,
-        )
+        for df, color in zip([df_bear, df_bull], ['blue', 'red']):
+            self.ax[0].scatter(
+                x=df.index,
+                y=df['PSAR'],
+                color=color,
+                s=5,
+            )
 
         # チャート・タイトル
         title_chart = '%s (%s) on %s' % (
@@ -116,9 +108,9 @@ class Canvas(FigureCanvas):
         self.ax[0].xaxis.set_major_formatter(
             mdates.DateFormatter('%H:%M')
         )
-        #self.ax[0].xaxis.set_minor_locator(
+        # self.ax[0].xaxis.set_minor_locator(
         #    mdates.MinuteLocator(interval=5)
-        #)
+        # )
         self.ax[0].set_xlim(
             get_range_xaxis(df_tick)
         )
