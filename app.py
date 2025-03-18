@@ -41,12 +41,22 @@ class TradeSimulator(QMainWindow):
         statusbar.addPermanentWidget(pbar, stretch=1)
 
     def on_file_selected(self, file_excel: str):
+        """
+        選択した Excel ファイルの読み込みと解析用データ準備
+        :param file_excel:
+        :return:
+        """
         prep_datasheet = WorkerPrepDataset(file_excel)
         prep_datasheet.updateProgress.connect(self.on_status_update)
         prep_datasheet.threadFinished.connect(self.on_dataset_ready)
         self.threadpool.start(prep_datasheet)
 
     def on_dataset_ready(self, list_target):
+        """
+        データセットに基づき、銘柄毎のタブ画面を作成
+        :param list_target:
+        :return:
+        """
         for dict_target in list_target:
             code = dict_target['code']
             self.base.addTab(WinMain(self.res, dict_target), code)
