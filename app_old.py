@@ -11,10 +11,10 @@ from PySide6.QtWidgets import (
 )
 
 from funcs.conv import df_to_html
-from sim.simulator import WorkerSimulator
+from sim.simulator_old import WorkerSimulator
 from structs.app_enum import SimulationMode
 from structs.res import AppRes
-from ui.dock import DockSimulator
+from ui.dock_old import DockSimulator
 from ui.toolbar import ToolBar
 from ui.win_order_history import WinOrderHistory
 from ui.win_overlay import WinOverlayAnalysis

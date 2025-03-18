@@ -31,6 +31,7 @@ class LabelFlat(QLabel):
         self.setLineWidth(1)
         self.setStyleSheet('QLabel {font-family: monospace;}')
 
+
 class LabelUnit(LabelFlat):
     def __init__(self, title: str):
         super().__init__(title)
@@ -40,6 +41,7 @@ class LabelUnit(LabelFlat):
                 padding-left: 5px;
             }
         """)
+
 
 class LabelRight(QLabel):
     def __init__(self):
@@ -91,6 +93,7 @@ class LabelTitle(QLabel):
             }
         """)
 
+
 class LabelTitle2(LabelTitle):
     def __init__(self, title: str):
         super().__init__(title)
@@ -121,7 +124,7 @@ class LabelTime(QLabel):
         )
         self.setLineWidth(1)
         self.setAlignment(
-            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter
         )
         self.setStyleSheet("""
             QLabel {
@@ -166,6 +169,7 @@ class LabelValue(QLabel):
         else:
             self.setText('%d' % int(value))
 
+
 class LabelValue2(LabelValue):
     def __init__(self):
         super().__init__()
@@ -176,6 +180,7 @@ class LabelValue2(LabelValue):
             self.setText('%.3f' % float(value))
         else:
             self.setText('%d' % int(value))
+
 
 class LabelInt(QLabel):
     def __init__(self):
@@ -203,3 +208,31 @@ class LabelInt(QLabel):
 
     def setValue(self, value: int):
         self.setText('%d' % int(value))
+
+
+class LabelFloat(QLabel):
+    def __init__(self):
+        super().__init__()
+        self.setFrameStyle(
+            QFrame.Shape.Panel | QFrame.Shadow.Sunken
+        )
+        self.setMinimumWidth(100)
+        self.setLineWidth(1)
+        self.setAlignment(
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        )
+        self.setStyleSheet("""
+            QLabel {
+                font-family: monospace;
+                background-color: white;
+                color: black;
+                padding-right: 2px;
+            }
+        """)
+
+    def getValue(self) -> float:
+        return float(self.text())
+
+    def setValue(self, value: float, decimal: int = 5):
+        format_str = '%%.%df' % decimal
+        self.setText(format_str % value)
