@@ -46,10 +46,10 @@ class TradeSimulator(QMainWindow):
         :param file_excel:
         :return:
         """
-        prep_datasheet = WorkerPrepDataset(file_excel)
-        prep_datasheet.updateProgress.connect(self.on_status_update)
-        prep_datasheet.threadFinished.connect(self.on_dataset_ready)
-        self.threadpool.start(prep_datasheet)
+        prep_ds = WorkerPrepDataset(file_excel)
+        prep_ds.updateProgress.connect(self.on_status_update)
+        prep_ds.threadFinished.connect(self.on_dataset_ready)
+        self.threadpool.start(prep_ds)
 
     def on_dataset_ready(self, list_target):
         """
