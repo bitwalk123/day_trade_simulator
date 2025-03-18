@@ -14,7 +14,7 @@ class WinMain(QMainWindow):
         self.dict_darget = dict_target
 
         # ドック
-        self.dock = dock = DockMain(self.res)
+        self.dock = dock = DockMain(res, dict_target)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
         # メイン・ウィンドウ

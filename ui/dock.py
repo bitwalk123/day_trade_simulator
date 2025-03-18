@@ -15,14 +15,15 @@ from widgets.labels import (
     LabelTime,
     LabelTitle,
     LabelValue,
-    LabelUnit,
+    LabelUnit, LabelFloat,
 )
 
 
 class DockMain(QDockWidget):
-    def __init__(self, res: AppRes):
+    def __init__(self, res: AppRes, dict_target:dict):
         super().__init__()
         self.res = res
+        self.dict_target = dict_target
 
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # UI
@@ -69,6 +70,8 @@ class DockMain(QDockWidget):
         layout.addWidget(labCode, r, 0)
 
         self.objCode = objCode = LabelString()
+        objCode.setText(dict_target['code'])
+        objCode.setToolTip(dict_target['name'])
         layout.addWidget(objCode, r, 1)
 
         r += 1
@@ -76,6 +79,7 @@ class DockMain(QDockWidget):
         layout.addWidget(labDate, r, 0)
 
         self.objDate = objDate = LabelDate()
+        objDate.setText(dict_target['date'])
         layout.addWidget(objDate, r, 1)
 
         r += 1
@@ -189,21 +193,24 @@ class DockMain(QDockWidget):
         labAFinit = LabelTitle('AF（初期値）')
         layout.addWidget(labAFinit, r, 0)
 
-        self.objAFinit = objAFinit = LabelValue()
+        self.objAFinit = objAFinit = LabelFloat()
+        objAFinit.setValue(dict_target['af_init'])
         layout.addWidget(objAFinit, r, 1, 1, 2)
 
         r += 1
         labAFstep = LabelTitle('AF（ステップ）')
         layout.addWidget(labAFstep, r, 0)
 
-        self.objAFstep = objAFstep = LabelValue()
+        self.objAFstep = objAFstep = LabelFloat()
+        objAFstep.setValue(dict_target['af_step'])
         layout.addWidget(objAFstep, r, 1, 1, 2)
 
         r += 1
         labAFmax = LabelTitle('AF（最大値）')
         layout.addWidget(labAFmax, r, 0)
 
-        self.objAFmax = objAFmax = LabelValue()
+        self.objAFmax = objAFmax = LabelFloat()
+        objAFmax.setValue(dict_target['af_max'])
         layout.addWidget(objAFmax, r, 1, 1, 2)
 
         r += 1
