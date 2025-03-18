@@ -12,6 +12,7 @@ from structs.res import AppRes
 
 class ToolBar(QToolBar):
     fileSelected = Signal(str)
+
     def __init__(self, res: AppRes):
         super().__init__()
         self.res = res
@@ -47,7 +48,9 @@ class ToolBar(QToolBar):
         if not dialog.exec():
             return
 
-        # 選択されたファイルが存在して入ればシグナル
+        # ----------------------------------
+        # 🔆 選択されたファイルが存在して入れば通知
+        # ----------------------------------
         file_excel = dialog.selectedFiles()[0]
         if os.path.isfile(file_excel):
             self.fileSelected.emit(file_excel)

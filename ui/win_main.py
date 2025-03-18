@@ -62,7 +62,9 @@ class WinMain(QMainWindow):
     def on_update_tickprice(self, time_str: str, price: float):
         self.dock.setTickPrice(time_str, price)
 
-    def on_finished(self):
+    def on_finished(self, df):
         self.dock.setStatus('停止')
         # 進捗をリセット
         self.pbar.reset()
+
+        print(df)
