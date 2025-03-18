@@ -52,6 +52,24 @@ def prep_dataset(file_excel: str) -> list:
         date = df_cover.iloc[r, c].replace('/', '-')
         dict_target['date'] = date
 
+        # 呼び値
+        r = list(df_cover.index).index('呼値')
+        price_tick_min = df_cover.iloc[r, c]
+        dict_target['price_tick_min'] = price_tick_min
+
+        # AF
+        r = list(df_cover.index).index('AF（初期値）')
+        af_init = df_cover.iloc[r, c]
+        dict_target['af_init'] = af_init
+
+        r = list(df_cover.index).index('AF（ステップ）')
+        af_step = df_cover.iloc[r, c]
+        dict_target['af_step'] = af_step
+
+        r = list(df_cover.index).index('AF（最大値）')
+        af_max = df_cover.iloc[r, c]
+        dict_target['af_max'] = af_max
+
         # 銘柄コードから、ティックデータ用ワークシート名を特定しティックデータを読み込む
         name_sheet_tick = 'tick_%s' % code
         df_tick = pd.read_excel(
@@ -216,3 +234,105 @@ def prep_result_df(params: dict) -> pd.DataFrame:
     df_result = df.astype(object)
 
     return df_result
+
+
+# _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+def read_sheet_cover(file_excel: str) -> pd.DataFrame:
+    """
+    シート Cover の読み込み
+    :param file_excel:
+    :return:
+    """
+    # ワークシート Cover の読み込み
+    name_sheet_cover = 'Cover'
+    df = pd.read_excel(
+        file_excel,
+        sheet_name=name_sheet_cover,
+        header=None,
+        index_col=0,
+    )
+    return df
+
+
+def read_sheet_cover_params(
+        df_cover: pd.DataFrame,
+        col: int,
+        dict_target: dict) -> tuple[str, str]:
+    """
+    シート Cover 上、指定銘柄の列のパラメータを読み込む
+    :param df_cover:
+    :param col:
+    :param dict_target:
+    :return:
+    """
+    # 銘柄コード
+    row = list(df_cover.index).index('銘柄コード')
+    code = df_cover.iloc[row, col]
+    dict_target['code'] = code
+
+    # Yahoo Finance から会社名を取得
+    symbol = '%s.T' % code
+    ticker = yf.Ticker(symbol)
+    name = ticker.info['longName']
+    dict_target['name'] = name
+
+    # 現在日付の保持
+    row = list(df_cover.index).index('現在日付')
+    date = df_cover.iloc[row, col].replace('/', '-')
+    dict_target['date'] = date
+
+    # 呼び値
+    row = list(df_cover.index).index('呼値')
+    price_tick_min = df_cover.iloc[row, col]
+    dict_target['price_tick_min'] = price_tick_min
+
+    # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+    # Parabolic SAR 関連
+    # AF（初期値）
+    row = list(df_cover.index).index('AF（初期値）')
+    af_init = df_cover.iloc[row, col]
+    dict_target['af_init'] = af_init
+    # AF（ステップ）
+    row = list(df_cover.index).index('AF（ステップ）')
+    af_step = df_cover.iloc[row, col]
+    dict_target['af_step'] = af_step
+    # AF（最大値）
+    row = list(df_cover.index).index('AF（最大値）')
+    af_max = df_cover.iloc[row, col]
+    dict_target['af_max'] = af_max
+
+    # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+    # チャート用
+    dict_target['title'] = '%s (%s) on %s' % (
+        dict_target['name'],
+        dict_target['code'],
+        dict_target['date'],
+    )
+
+    return code, date
+
+
+def read_sheet_tick(
+        file_excel: str,
+        code: str,
+        date: str,
+        dict_target: dict):
+    """
+    シート tick_**** の読み込み
+    :param file_excel:
+    :param code:
+    :param date:
+    :param dict_target:
+    :return:
+    """
+    name_sheet_tick = 'tick_%s' % code
+    df = pd.read_excel(
+        file_excel,
+        sheet_name=name_sheet_tick,
+        header=0,
+    )
+    # 時刻データを日付を含んだ Matplotlib で扱える形式に変換、インデックスへ
+    df.index = [pd.to_datetime('%s %s' % (date, t)) for t in df['Time']]
+    df.index.name = 'Datetime'
+    df = df[['Price', 'TREND', 'EP', 'AF', 'PSAR']]
+    dict_target['tick'] = df
