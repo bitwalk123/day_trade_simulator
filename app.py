@@ -5,7 +5,6 @@ from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
     QProgressBar,
-    QStatusBar,
     QTabWidget,
 )
 
@@ -13,6 +12,7 @@ from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
 from ui.toolbar import ToolBar
 from ui.win_main import WinMain
+from widgets.statusbar import StatusBar
 from widgets.tabwidget import TabWidget
 
 
@@ -36,7 +36,7 @@ class TradeSimulator(QMainWindow):
         base.setTabPosition(QTabWidget.TabPosition.South)
         self.setCentralWidget(base)
 
-        statusbar = QStatusBar()
+        statusbar = StatusBar()
         self.setStatusBar(statusbar)
 
         self.pbar = pbar = QProgressBar()
@@ -65,7 +65,8 @@ class TradeSimulator(QMainWindow):
         # 新しいタブを追加
         for dict_target in list_target:
             code = dict_target['code']
-            self.base.addTab(WinMain(self.res, dict_target), code)
+            tabobj = WinMain(self.res, dict_target, self.threadpool, self.pbar)
+            self.base.addTab(tabobj, code)
         # 進捗をリセット
         self.pbar.reset()
 

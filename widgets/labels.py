@@ -124,7 +124,7 @@ class LabelTime(QLabel):
         )
         self.setLineWidth(1)
         self.setAlignment(
-            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter
         )
         self.setStyleSheet("""
             QLabel {

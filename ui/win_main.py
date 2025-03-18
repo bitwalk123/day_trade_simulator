@@ -1,20 +1,30 @@
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QMainWindow
+from PySide6.QtCore import Qt, QThreadPool
+from PySide6.QtWidgets import QMainWindow, QProgressBar
 
 from funcs.plots import get_dict4plot
 from structs.res import AppRes
+from threads.simulator import WorkerSimulator
 from ui.dock import DockMain
 from widgets.charts import Canvas, ChartNavigation
 
 
 class WinMain(QMainWindow):
-    def __init__(self, res: AppRes, dict_target: dict):
+    def __init__(
+            self,
+            res: AppRes,
+            dict_target: dict,
+            threadpool: QThreadPool,
+            pbar: QProgressBar,
+    ):
         super().__init__()
         self.res = res
         self.dict_darget = dict_target
+        self.threadpool = threadpool
+        self.pbar = pbar
 
         # ドック
         self.dock = dock = DockMain(res, dict_target)
+        dock.requestSimulationStart.connect(self.on_start_simulation)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
         # メイン・ウィンドウ
@@ -36,3 +46,23 @@ class WinMain(QMainWindow):
         # これは、パラメータを変更して再描画するために自由度を確保するため。
         dict_plot = get_dict4plot(dict_target['tick'], dict_target['title'])
         canvas.plot(dict_plot)
+
+    def on_start_simulation(self, dict_info):
+        self.dock.setStatus('稼働中')
+        sim = WorkerSimulator(dict_info)
+        sim.updateSystemTime.connect(self.on_update_systemtime)
+        sim.updateTickPrice.connect(self.on_update_tickprice)
+        sim.threadFinished.connect(self.on_finished)
+        self.threadpool.start(sim)
+
+    def on_update_systemtime(self, time_str: str, progress: int):
+        self.dock.setSystemTime(time_str)
+        self.pbar.setValue(progress)
+
+    def on_update_tickprice(self, time_str: str, price: float):
+        self.dock.setTickPrice(time_str, price)
+
+    def on_finished(self):
+        self.dock.setStatus('停止')
+        # 進捗をリセット
+        self.pbar.reset()

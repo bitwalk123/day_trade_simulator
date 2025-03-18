@@ -1,26 +1,34 @@
-from PySide6.QtCore import QMargins, Qt
+from PySide6.QtCore import (
+    QMargins,
+    Qt,
+    Signal,
+)
 from PySide6.QtWidgets import (
     QDockWidget,
     QGridLayout,
+    QPushButton,
     QSizePolicy,
     QVBoxLayout,
-    QWidget, QPushButton,
+    QWidget,
 )
 
 from structs.res import AppRes
 from widgets.labels import (
     LabelDate,
     LabelFlat,
+    LabelFloat,
     LabelString,
     LabelTime,
     LabelTitle,
     LabelValue,
-    LabelUnit, LabelFloat,
+    LabelUnit,
 )
 
 
 class DockMain(QDockWidget):
-    def __init__(self, res: AppRes, dict_target:dict):
+    requestSimulationStart = Signal(dict)
+
+    def __init__(self, res: AppRes, dict_target: dict):
         super().__init__()
         self.res = res
         self.dict_target = dict_target
@@ -104,6 +112,7 @@ class DockMain(QDockWidget):
         layout.addWidget(labTickPriceMin, r, 0)
 
         self.objTickPriceMin = objTickPriceMin = LabelValue()
+        objTickPriceMin.setValue(dict_target['price_tick_min'])
         layout.addWidget(objTickPriceMin, r, 1)
 
         unitTickPriceMin = LabelUnit('円')
@@ -225,8 +234,21 @@ class DockMain(QDockWidget):
         self.btnStart = but_start = QPushButton('START')
         but_start.setFixedHeight(50)
         but_start.clicked.connect(self.on_start)
-        but_start.setDisabled(True)
+        # but_start.setDisabled(True)
         vbox.addWidget(but_start)
 
     def on_start(self):
-        pass
+        dict_info = dict()
+        dict_info['date'] = self.dict_target['date']
+        dict_info['tick'] = self.dict_target['tick']['Price']
+        self.requestSimulationStart.emit(dict_info)
+
+    def setStatus(self, status_str: str):
+        self.objStatus.setText(status_str)
+
+    def setSystemTime(self, time_str: str):
+        self.objSystemTime.setText(time_str)
+
+    def setTickPrice(self, time_str: str, price: float):
+        self.objTickTime.setText(time_str)
+        self.objTickPrice.setValue(price)
