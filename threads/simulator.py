@@ -15,22 +15,35 @@ class SimulatorSignal(QObject):
 
 
 class WorkerSimulator(QRunnable, SimulatorSignal):
-    def __init__(self, dict_info: dict):
+    def __init__(self, dict_param: dict):
         super().__init__()
-        self.dict_info = dict_info
+
+        # =====================================================================
+        # シミュレーション用データ＆パラメータ（はじめ）
 
         # ログデータ
-        self.ser_tick: pd.Series = self.dict_info['tick']
+        self.ser_tick: pd.Series = dict_param['tick']
+
+        # 日付文字列
+        date_str = dict_param['date']
+
+        # Parabolic SAR 関連パラメータ（加速度因数）
+        self.af_init = dict_param['af_init']
+        self.af_step = dict_param['af_step']
+        self.af_max = dict_param['af_max']
+
+        # シミュレーション用データ＆パラメータ（おわり）
+        # =====================================================================
+
+        # 取引時間
+        self.t_start = pd.to_datetime('%s 09:00:00' % date_str)
+        self.t_end = pd.to_datetime('%s 15:30:00' % date_str)
 
         # 時刻フォーマット用文字列
         self.time_format = '%H:%M:%S'
 
-        # 取引時間
-        self.t_start = pd.to_datetime('%s 09:00:00' % dict_info['date'])
-        self.t_end = pd.to_datetime('%s 15:30:00' % dict_info['date'])
-
         # シミュレータ用時間定数
-        self.t_second = datetime.timedelta(seconds=1)  # 1 秒
+        self.t_second = datetime.timedelta(seconds=1)  # 1 秒（インクリメント用）
 
         # プロット用データフレーム
         dict_columns = {
@@ -40,9 +53,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             'AF': [],
             'PSAR': [],
         }
-        df = pd.DataFrame.from_dict(dict_columns)
-        df.index.name = 'Datetime'
-        self.df = df.astype(float)
+        df = pd.DataFrame.from_dict(dict_columns)  # 空のデータフレーム
+        df.index.name = 'Datetime'  # インデックス名
+        self.df = df.astype(float)  # セル全てが float とする
 
     def get_progress(self, t) -> int:
         """
@@ -56,8 +69,11 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         return int(numerator / denominator)
 
     def run(self):
+        """
+        シミュレータ本体
+        :return:
+        """
         t_current = self.t_start
-        p_current = 0
 
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # 時刻ループ（はじめ）
