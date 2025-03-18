@@ -234,7 +234,6 @@ class DockMain(QDockWidget):
         self.btnStart = but_start = QPushButton('START')
         but_start.setFixedHeight(50)
         but_start.clicked.connect(self.on_start)
-        # but_start.setDisabled(True)
         vbox.addWidget(but_start)
 
     def on_start(self):
@@ -245,6 +244,10 @@ class DockMain(QDockWidget):
         dict_param['af_init'] = self.objAFinit.getValue()
         dict_param['af_step'] = self.objAFstep.getValue()
         dict_param['af_max'] = self.objAFmax.getValue()
+
+        # -----------------------------
+        # 🔆 シミュレーション開始のリクエスト
+        # -----------------------------
         self.requestSimulationStart.emit(dict_param)
 
     def setStatus(self, status_str: str):

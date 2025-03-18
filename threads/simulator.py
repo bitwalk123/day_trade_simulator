@@ -7,6 +7,8 @@ from PySide6.QtCore import (
     Signal,
 )
 
+from funcs.technical import RealTimePSAR
+
 
 class SimulatorSignal(QObject):
     threadFinished = Signal(pd.DataFrame)
@@ -28,9 +30,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         date_str = dict_param['date']
 
         # Parabolic SAR 関連パラメータ（加速度因数）
-        self.af_init = dict_param['af_init']
-        self.af_step = dict_param['af_step']
-        self.af_max = dict_param['af_max']
+        af_init = dict_param['af_init']
+        af_step = dict_param['af_step']
+        af_max = dict_param['af_max']
 
         # シミュレーション用データ＆パラメータ（おわり）
         # =====================================================================
@@ -45,17 +47,8 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # シミュレータ用時間定数
         self.t_second = datetime.timedelta(seconds=1)  # 1 秒（インクリメント用）
 
-        # プロット用データフレーム
-        dict_columns = {
-            'Price': [],
-            'TREND': [],
-            'EP': [],
-            'AF': [],
-            'PSAR': [],
-        }
-        df = pd.DataFrame.from_dict(dict_columns)  # 空のデータフレーム
-        df.index.name = 'Datetime'  # インデックス名
-        self.df = df.astype(float)  # セル全てが float とする
+        # RealTimePSAR クラスのインスタンス
+        self.psar = RealTimePSAR(af_init, af_step, af_max)
 
     def get_progress(self, t) -> int:
         """
@@ -78,9 +71,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # 時刻ループ（はじめ）
         while t_current <= self.t_end:
-            # ---------------------
-            #  システム時刻と進捗の通知
-            # ---------------------
+            # -----------------------
+            # 🔆 システム時刻と進捗の通知
+            # -----------------------
             self.updateSystemTime.emit(
                 t_current.strftime(self.time_format),
                 self.get_progress(t_current)
@@ -91,12 +84,12 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                 # 現在価格の取得
                 p_current = self.ser_tick.at[t_current]
 
-                # データフレームへデータを追加
-                self.df.at[t_current, 'Price'] = p_current
+                # Parabolic SAR の算出
+                self.psar.add(t_current, p_current)
 
-                # --------------------------
-                #  現在時刻＆現在価格の更新を通知
-                # --------------------------
+                # ----------------------------
+                # 🔆 現在時刻＆現在価格の更新を通知
+                # ----------------------------
                 self.updateTickPrice.emit(
                     t_current.strftime(self.time_format),
                     p_current
@@ -107,7 +100,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # 時刻ループ（おわり）
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
-        # ---------------------
-        #  スレッド処理の終了を通知
-        # ---------------------
-        self.threadFinished.emit(self.df)
+        # -----------------------
+        # 🔆 スレッド処理の終了を通知
+        # -----------------------
+        self.threadFinished.emit(self.psar.get_df())
