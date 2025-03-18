@@ -50,6 +50,7 @@ class TradeSimulator(QMainWindow):
         for dict_target in list_target:
             code = dict_target['code']
             self.base.addTab(WinMain(self.res, dict_target), code)
+        self.pbar.reset()
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)
