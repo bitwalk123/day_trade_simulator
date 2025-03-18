@@ -2,6 +2,26 @@ import pandas as pd
 from matplotlib.figure import Figure
 
 
+def get_dict4plot(
+        df_tick: pd.DataFrame,
+        title: str,
+        ylabel: str = 'Price'
+) -> dict:
+    """
+    Canvas オブジェクトで描画する plot メソッドへ渡す情報
+    :param df_tick:
+    :param title:
+    :param ylabel:
+    :return:
+    """
+    dict_plot = dict()
+    dict_plot['tick'] = df_tick
+    dict_plot['title'] = title
+    dict_plot['ylabel'] = ylabel
+
+    return dict_plot
+
+
 def clearAxes(fig: Figure):
     """Clear axes
 

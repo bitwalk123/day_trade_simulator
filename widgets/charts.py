@@ -56,10 +56,10 @@ class Canvas(FigureCanvas):
             bottom=0.06,
         )
 
-    def plot(self, dict_target: dict):
+    def plot(self, dict_plot: dict):
         """
         プロット
-        :param dict_target:
+        :param dict_plot:
         :return:
         """
 
@@ -67,7 +67,7 @@ class Canvas(FigureCanvas):
         clearAxes(self.fig)
 
         # ティックデータ
-        df_tick = dict_target['tick']
+        df_tick = dict_plot['tick']
 
         # Tick
         self.ax[0].plot(
@@ -89,15 +89,10 @@ class Canvas(FigureCanvas):
             )
 
         # チャート・タイトル
-        title_chart = '%s (%s) on %s' % (
-            dict_target['name'],
-            dict_target['code'],
-            dict_target['date'],
-        )
-        self.ax[0].set_title(title_chart)
+        self.ax[0].set_title(dict_plot['title'])
 
         # Y軸タイトル
-        self.ax[0].set_ylabel('Price')
+        self.ax[0].set_ylabel(dict_plot['ylabel'])
 
         # X軸の時刻刻みを調整
         tick_position, tick_labels = getMajorXTicks(df_tick)

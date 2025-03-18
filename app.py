@@ -23,8 +23,9 @@ class TradeSimulator(QMainWindow):
         self.threadpool = QThreadPool()
 
         self.setWindowTitle(self.__app_name__)
-        self.setFixedSize(1200, 800)
+        self.setFixedSize(1200, 900)
 
+        # ツールバー
         toolbar = ToolBar(self.res)
         toolbar.fileSelected.connect(self.on_file_selected)
         self.addToolBar(toolbar)
