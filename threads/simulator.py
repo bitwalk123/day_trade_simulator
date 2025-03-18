@@ -9,7 +9,7 @@ from PySide6.QtCore import (
 
 
 class SimulatorSignal(QObject):
-    threadFinished = Signal()
+    threadFinished = Signal(pd.DataFrame)
     updateSystemTime = Signal(str, int)
     updateTickPrice = Signal(str, float)
 
@@ -30,6 +30,18 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # シミュレータ用時間定数
         self.t_second = datetime.timedelta(seconds=1)  # 1 秒
 
+        # プロット用データフレーム
+        dict_columns = {
+            'Price': [],
+            'TREND': [],
+            'EP': [],
+            'AF': [],
+            'PSAR': [],
+        }
+        df = pd.DataFrame.from_dict(dict_columns)
+        df.index.name = 'Datetime'
+        self.df = df.astype(float)
+
     def get_progress(self, t) -> int:
         numerator = (t.timestamp() - self.t_start.timestamp()) * 100.
         denominator = self.t_end.timestamp() - self.t_start.timestamp()
@@ -47,12 +59,15 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             )
 
             if t_current in self.ser_tick.index:
+                p_current = self.ser_tick.at[t_current]
                 self.updateTickPrice.emit(
                     t_current.strftime(self.time_format),
-                    self.ser_tick.at[t_current]
+                    p_current
                 )
+                # データフレームへデータを追加
+                self.df.at[t_current, 'Price'] = p_current
 
             # 時刻を１秒進める
             t_current += self.t_second
 
-        self.threadFinished.emit()
+        self.threadFinished.emit(self.df)

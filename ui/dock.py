@@ -238,9 +238,13 @@ class DockMain(QDockWidget):
         vbox.addWidget(but_start)
 
     def on_start(self):
+        # シミュレータへ渡す情報を準備
         dict_info = dict()
         dict_info['date'] = self.dict_target['date']
         dict_info['tick'] = self.dict_target['tick']['Price']
+        dict_info['af_init'] = self.objAFinit.getValue()
+        dict_info['af_step'] = self.objAFstep.getValue()
+        dict_info['af_max'] = self.objAFmax.getValue()
         self.requestSimulationStart.emit(dict_info)
 
     def setStatus(self, status_str: str):
