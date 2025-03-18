@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QSizePolicy,
     QVBoxLayout,
-    QWidget,
+    QWidget, QPushButton,
 )
 
 from structs.res import AppRes
@@ -175,10 +175,6 @@ class DockMain(QDockWidget):
         layout.addWidget(unitTotal, r, 2)
 
         r += 1
-        base_control = QWidget()
-        layout.addWidget(base_control, r, 0, 1, 3)
-
-        r += 1
         labParameter = LabelFlat('【パラメータ】')
         layout.addWidget(labParameter, r, 0)
 
@@ -210,7 +206,20 @@ class DockMain(QDockWidget):
         self.objAFmax = objAFmax = LabelValue()
         layout.addWidget(objAFmax, r, 1, 1, 2)
 
+        r += 1
+        base_control = QWidget()
+        layout.addWidget(base_control, r, 0, 1, 3)
+
         vbox = QVBoxLayout()
         vbox.setSpacing(0)
         vbox.setContentsMargins(QMargins(0, 20, 0, 0))
         base_control.setLayout(vbox)
+
+        self.btnStart = but_start = QPushButton('START')
+        but_start.setFixedHeight(50)
+        but_start.clicked.connect(self.on_start)
+        but_start.setDisabled(True)
+        vbox.addWidget(but_start)
+
+    def on_start(self):
+        pass
