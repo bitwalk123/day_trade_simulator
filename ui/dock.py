@@ -283,7 +283,7 @@ class DockMain(QDockWidget):
         self.get_psar_af_param(dict_af)
 
         # 設定ダイアログを表示
-        dlg = DlgAFSetting(dict_af)
+        dlg = DlgAFSetting(self.res, dict_af)
         if dlg.exec():
             self.objAFinit.setValue(dict_af['af_init'])
             self.objAFstep.setValue(dict_af['af_step'])
