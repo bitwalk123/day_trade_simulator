@@ -65,16 +65,28 @@ class WinMain(QMainWindow):
     def on_simulation_update_tickprice(self, time_str: str, price: float, trend: int):
         self.dock.setTickPrice(time_str, price, trend)
 
-    def on_simulation_finished(self, df):
+    def on_simulation_finished(self, dict_result:dict):
         """
         シミュレーションのスレッド終了
         :param df:
         :return:
         """
-        self.dock.setStatus('停止')
+
+        df_tick = dict_result['tick']
+        df_profit = dict_result['profit']
+        df_order = dict_result['order']
+        total = dict_result['total']
+
+        print(df_profit)
+        print(df_order)
+        print(total)
+
+        # プロットを更新
+        dict_plot = get_dict4plot(df_tick, self.dict_target['title'])
+        self.canvas.plot(dict_plot)
+
         # 進捗をリセット
         self.pbar.reset()
 
-        # プロットを更新
-        dict_plot = get_dict4plot(df, self.dict_target['title'])
-        self.canvas.plot(dict_plot)
+        # タイマー状態
+        self.dock.setStatus('停止')

@@ -12,7 +12,7 @@ from sim.position_manager import PositionManager
 
 
 class SimulatorSignal(QObject):
-    threadFinished = Signal(pd.DataFrame)
+    threadFinished = Signal(dict)
     updateSystemTime = Signal(str, int)
     updateTickPrice = Signal(str, float, int)
 
@@ -85,7 +85,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # 時刻ループ（はじめ）
-        while t_current <= self.t_end:
+        while t_current < self.t_end:
             # -----------------------
             # 🧿 システム時刻と進捗の通知
             # -----------------------
@@ -133,14 +133,15 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
         # 建玉を持って入れば返済
-        # 建玉を持って入れば返済
         if self.posman.has_position():
-            self.posman.close(t_current, p_current)
-
-        print(self.posman.get_order_history())
-        print(self.posman.get_total())
+            self.posman.close(t_current, p_current, '強制（大引け）')
 
         # -----------------------
         # 🧿 スレッド処理の終了を通知
         # -----------------------
-        self.threadFinished.emit(self.psar.get_df())
+        dict_result = dict()
+        dict_result['tick'] = self.psar.get_df()
+        dict_result['profit'] = self.posman.get_profit_history()
+        dict_result['order'] = self.posman.get_order_history()
+        dict_result['total'] = self.posman.get_total()
+        self.threadFinished.emit(dict_result)
