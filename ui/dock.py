@@ -6,7 +6,6 @@ from PySide6.QtCore import (
 from PySide6.QtWidgets import (
     QDockWidget,
     QGridLayout,
-    QPushButton,
     QSizePolicy,
     QVBoxLayout,
     QWidget,

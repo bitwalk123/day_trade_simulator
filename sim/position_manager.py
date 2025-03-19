@@ -6,7 +6,7 @@ class PositionManager:
     建玉管理クラス
     """
 
-    def __init__(self, unit):
+    def __init__(self, unit: int):
         self.unit = unit
         self.trend = 0
         self.price = 0
@@ -116,12 +116,12 @@ class PositionManager:
         """
         return self.trend
 
-    def get_total(self):
+    def get_total(self) -> float:
         """
         保持している実現損益を返す
         :return:
         """
-        return int(self.total)
+        return self.total
 
     def get_order_history(self) -> pd.DataFrame:
         """
@@ -130,22 +130,14 @@ class PositionManager:
         """
         return self.df_order
 
-    def eval_profit(self, t, price):
+    def eval_profit(self, t, price) -> float:
         """
         含み損益を評価
         :param t:
         :param price:
         :return:
         """
-        if not self.has_position():
-            return 0
-
-        if self.trend > 0:
-            profit = (price - self.price) * self.unit
-        elif self.trend < 0:
-            profit = (self.price - price) * self.unit
-        else:
-            return 0
+        profit = self.get_profit(t, price)
 
         r = len(self.df_profit)
         self.df_profit.at[r, 'Datetime'] = t
@@ -157,14 +149,14 @@ class PositionManager:
 
     def get_profit(self, t, price):
         if not self.has_position():
-            return
+            return 0.
 
         if self.trend > 0:
             return (price - self.price) * self.unit
         elif self.trend < 0:
             return (self.price - price) * self.unit
         else:
-            return 0
+            return 0,
 
     def get_profit_history(self) -> pd.DataFrame:
         return pd.DataFrame(

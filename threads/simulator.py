@@ -67,7 +67,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         :param t:
         :return:
         """
-        numerator = (t.timestamp() - self.t_start.timestamp()) * 100.
+        # 分子
+        numerator = (t.timestamp() - self.t_start.timestamp()) * 100.0
+        # 分母
         denominator = self.t_end.timestamp() - self.t_start.timestamp()
 
         return int(numerator / denominator)
@@ -77,7 +79,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         シミュレータ本体
         :return:
         """
+        # 時刻、株価の初期化
         t_current = self.t_start
+        p_current = 0
 
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # 時刻ループ（はじめ）
@@ -107,11 +111,34 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     trend
                 )
 
+                # トレンド反転か確認
+                if self.posman.get_trend() != trend:
+                    # 建玉を持って入れば返済
+                    if self.posman.has_position():
+                        self.posman.close(t_current, p_current)
+
+                    # トレンドを更新
+                    self.posman.set_trend(trend)
+
+                    # 建玉を持つ
+                    self.posman.open(t_current, p_current)
+
+            # 含み益の評価
+            profit = self.posman.eval_profit(t_current, p_current)
+
             # 時刻を１秒進める
             t_current += self.t_second
 
         # 時刻ループ（おわり）
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+
+        # 建玉を持って入れば返済
+        # 建玉を持って入れば返済
+        if self.posman.has_position():
+            self.posman.close(t_current, p_current)
+
+        print(self.posman.get_order_history())
+        print(self.posman.get_total())
 
         # -----------------------
         # 🧿 スレッド処理の終了を通知
