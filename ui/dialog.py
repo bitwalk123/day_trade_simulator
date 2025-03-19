@@ -36,7 +36,7 @@ class DlgAFSetting(QDialog):
         super().__init__()
         self.dict_af = dict_af
 
-        icon = QIcon(os.path.join(res.dir_image, 'trading.png'))
+        icon = QIcon(os.path.join(res.dir_image, 'pencil.png'))
         self.setWindowIcon(icon)
         self.setWindowTitle('AF（加速因数）の設定')
 
