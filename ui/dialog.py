@@ -78,6 +78,7 @@ class DlgAFSetting(QDialog):
         objAFmax.setValue(self.dict_af['af_max'])
         layout.addWidget(objAFmax, r, 1)
 
+        # ダイアログ用ボタンボックス
         dlgbtn = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
         bbox = QDialogButtonBox(dlgbtn)
         bbox.accepted.connect(self.clickedAcceptButton)
@@ -85,10 +86,18 @@ class DlgAFSetting(QDialog):
         layout_base.addWidget(bbox)
 
     def clickedAcceptButton(self):
+        """
+        Ok ボタンをクリックしたときの処理
+        :return:
+        """
         self.dict_af['af_init'] = self.objAFinit.value()
         self.dict_af['af_step'] = self.objAFstep.value()
         self.dict_af['af_max'] = self.objAFmax.value()
         self.accept()
 
     def clickedRejectButton(self):
+        """
+        Cancel ボタンをクリックしたときの処理
+        :return:
+        """
         self.reject()
