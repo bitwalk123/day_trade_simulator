@@ -28,7 +28,9 @@ class WorkerPrepDataset(QRunnable, PrepDatasetSignal):
         df_cover = read_sheet_cover(self.file_excel)
         # ワークシート Cover の列数
         n = len(df_cover.columns)
-        # 進捗更新
+        # -------------
+        # 🔆 進捗更新通知
+        # -------------
         self.updateProgress.emit(int(100. * 1 / (n + 1)))
 
         # 銘柄毎にループ
@@ -37,14 +39,23 @@ class WorkerPrepDataset(QRunnable, PrepDatasetSignal):
 
             # シート Cover から個別銘柄の情報を取得
             code, date = read_sheet_cover_params(df_cover, col, dict_target)
-            # 進捗更新
+
+            # -------------
+            # 🔆 進捗更新通知
+            # -------------
             self.updateProgress.emit(int(100. * (1 + col + 0.5) / (n + 1)))
 
             # 銘柄コードから、ティックデータ用ワークシート名を特定しティックデータを読み込む
             read_sheet_tick(file_excel, code, date, dict_target)
-            # 進捗更新
+
+            # -------------
+            # 🔆 進捗更新通知
+            # -------------
             self.updateProgress.emit(int(100. * (1 + col + 1) / (n + 1)))
 
             list_target.append(dict_target)
 
+        # ------------------
+        # 🔆 スレッド収量の通知
+        # ------------------
         self.threadFinished.emit(list_target)

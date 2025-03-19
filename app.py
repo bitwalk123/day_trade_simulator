@@ -4,14 +4,16 @@ from PySide6.QtCore import QThreadPool
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
-    QTabWidget, QStatusBar, QProgressBar,
+    QProgressBar,
+    QTabWidget,
 )
 
-from funcs.preprocs import prep_dataset
 from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
 from ui.toolbar import ToolBar
 from ui.win_main import WinMain
+from widgets.statusbar import StatusBar
+from widgets.tabwidget import TabWidget
 
 
 class TradeSimulator(QMainWindow):
@@ -30,11 +32,11 @@ class TradeSimulator(QMainWindow):
         toolbar.fileSelected.connect(self.on_file_selected)
         self.addToolBar(toolbar)
 
-        self.base = base = QTabWidget()
+        self.base = base = TabWidget()
         base.setTabPosition(QTabWidget.TabPosition.South)
         self.setCentralWidget(base)
 
-        statusbar = QStatusBar()
+        statusbar = StatusBar()
         self.setStatusBar(statusbar)
 
         self.pbar = pbar = QProgressBar()
@@ -58,10 +60,16 @@ class TradeSimulator(QMainWindow):
         :param list_target:
         :return:
         """
+        # 現在のタブをすべて削除
+        self.base.deleteAllTabs()
+        # 新しいタブを追加
         for dict_target in list_target:
             code = dict_target['code']
-            self.base.addTab(WinMain(self.res, dict_target), code)
+            tabobj = WinMain(self.res, dict_target, self.threadpool, self.pbar)
+            self.base.addTab(tabobj, code)
+        # 進捗をリセット
         self.pbar.reset()
+
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)

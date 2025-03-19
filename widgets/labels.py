@@ -115,6 +115,12 @@ class LabelTitle2(LabelTitle):
             }
         """)
 
+class LabelTitleLeft(LabelTitle):
+    def __init__(self, title: str):
+        super().__init__(title)
+        self.setAlignment(
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+        )
 
 class LabelTime(QLabel):
     def __init__(self):
@@ -124,7 +130,7 @@ class LabelTime(QLabel):
         )
         self.setLineWidth(1)
         self.setAlignment(
-            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter
         )
         self.setStyleSheet("""
             QLabel {

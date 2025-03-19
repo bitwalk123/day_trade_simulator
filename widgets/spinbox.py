@@ -27,6 +27,9 @@ class SpinBox(QSpinBox):
 class DoubleSpinBox(QDoubleSpinBox):
     def __init__(self):
         super().__init__()
+        decimals = 5
+        step_single = 0.00001
+
         self.setAlignment(
             Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
         )
@@ -43,5 +46,6 @@ class DoubleSpinBox(QDoubleSpinBox):
                 padding-right: 2px;
             }
         """)
-        self.setDecimals(3)
+        self.setDecimals(decimals)
+        self.setSingleStep(step_single)
         self.setMinimumWidth(75)
