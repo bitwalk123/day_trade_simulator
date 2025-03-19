@@ -1,15 +1,13 @@
 import os
 
 from PySide6.QtCore import Signal
-from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QToolBar,
-    QToolButton, QFileDialog,
+    QFileDialog,
 )
 
 from structs.res import AppRes
-from widgets.buttons import FolderButton
-from widgets.pads import HPad
+from widgets.buttons import FolderToolButton
 
 
 class ToolBar(QToolBar):
@@ -23,7 +21,7 @@ class ToolBar(QToolBar):
         # UI
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # ファイル選択用アイコン
-        but_folder = FolderButton(res)
+        but_folder = FolderToolButton(res)
         but_folder.setToolTip('ファイル選択')
         but_folder.clicked.connect(self.on_file_dialog_open)
         self.addWidget(but_folder)

@@ -236,7 +236,8 @@ class DockMain(QDockWidget):
         base_control.setLayout(vbox)
 
         self.btnStart = but_start = StartButton(res)
-        #but_start.setFixedHeight(50)
+        but_start.setFixedHeight(40)
+        but_start.setToolTip('シミュレーション開始')
         but_start.clicked.connect(self.on_start)
         vbox.addWidget(but_start)
 

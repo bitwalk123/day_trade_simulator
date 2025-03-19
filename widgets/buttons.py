@@ -1,7 +1,7 @@
 import os
 
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QPushButton, QSizePolicy
+from PySide6.QtWidgets import QPushButton, QSizePolicy, QToolButton
 
 from structs.res import AppRes
 from widgets.labels import LabelInt
@@ -56,9 +56,10 @@ class EditButton(Button):
             QIcon(os.path.join(res.dir_image, 'pencil.png'))
         )
         self.setSizePolicy(
-            QSizePolicy.Policy.MinimumExpanding,
-            QSizePolicy.Policy.MinimumExpanding
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding
         )
+        self.setToolTip('編集')
 
 
 class FolderButton(Button):
@@ -68,6 +69,12 @@ class FolderButton(Button):
             QIcon(os.path.join(res.dir_image, 'folder.png'))
         )
 
+class FolderToolButton(QToolButton):
+    def __init__(self, res: AppRes):
+        super().__init__()
+        self.setIcon(
+            QIcon(os.path.join(res.dir_image, 'folder.png'))
+        )
 
 class StartButton(Button):
     def __init__(self, res: AppRes):
@@ -76,6 +83,7 @@ class StartButton(Button):
             QIcon(os.path.join(res.dir_image, 'start.png'))
         )
         self.setSizePolicy(
-            QSizePolicy.Policy.MinimumExpanding,
-            QSizePolicy.Policy.MinimumExpanding
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding
         )
+        self.setToolTip('スタート')
