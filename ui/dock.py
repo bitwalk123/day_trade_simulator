@@ -33,8 +33,6 @@ class DockMain(QDockWidget):
         super().__init__()
         self.res = res
         self.dict_target = dict_target
-        # self.dict_param = dict() # シミュレータへ渡すパラメータ用
-        # self.dict_af = dict()  # AF（加速因数）用
 
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # UI
