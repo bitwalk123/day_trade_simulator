@@ -59,10 +59,15 @@ class WinMain(QMainWindow):
         self.dock.setSystemTime(time_str)
         self.pbar.setValue(progress)
 
-    def on_update_tickprice(self, time_str: str, price: float):
-        self.dock.setTickPrice(time_str, price)
+    def on_update_tickprice(self, time_str: str, price: float, trend: int):
+        self.dock.setTickPrice(time_str, price, trend)
 
     def on_finished(self, df):
+        """
+        シミュレーションのスレッド終了
+        :param df:
+        :return:
+        """
         self.dock.setStatus('停止')
         # 進捗をリセット
         self.pbar.reset()

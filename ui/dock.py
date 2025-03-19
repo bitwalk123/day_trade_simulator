@@ -256,6 +256,7 @@ class DockMain(QDockWidget):
     def setSystemTime(self, time_str: str):
         self.objSystemTime.setText(time_str)
 
-    def setTickPrice(self, time_str: str, price: float):
+    def setTickPrice(self, time_str: str, price: float, trend: int):
         self.objTickTime.setText(time_str)
         self.objTickPrice.setValue(price)
+        self.objTrend.setValue(trend, flag=False)
