@@ -48,11 +48,6 @@ class SelectButton(QPushButton):
 class Button(QPushButton):
     def __init__(self):
         super().__init__()
-        self.setStyleSheet("""
-        QPushButton {
-            background-color: #fcfcfc;
-        }
-        """)
 
 class EditButton(Button):
     def __init__(self, res: AppRes):
