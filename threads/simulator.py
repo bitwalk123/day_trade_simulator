@@ -8,6 +8,7 @@ from PySide6.QtCore import (
 )
 
 from funcs.technical import RealTimePSAR
+from sim.position_manager import PositionManager
 
 
 class SimulatorSignal(QObject):
@@ -29,6 +30,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # 日付文字列
         date_str = dict_param['date']
 
+        # 売買単位
+        unit = dict_param['unit']
+
         # Parabolic SAR 関連パラメータ（加速度因数）
         af_init = dict_param['af_init']
         af_step = dict_param['af_step']
@@ -47,8 +51,15 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # シミュレータ用時間定数
         self.t_second = datetime.timedelta(seconds=1)  # 1 秒（インクリメント用）
 
-        # RealTimePSAR クラスのインスタンス
+        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+        # 🧬 RealTimePSAR クラスのインスタンス
         self.psar = RealTimePSAR(af_init, af_step, af_max)
+        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+
+        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+        # 🧬 建玉管理クラスのインスタンス
+        self.posman = PositionManager(unit)
+        # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
     def get_progress(self, t) -> int:
         """
@@ -72,7 +83,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # 時刻ループ（はじめ）
         while t_current <= self.t_end:
             # -----------------------
-            # 🔆 システム時刻と進捗の通知
+            # 🧿 システム時刻と進捗の通知
             # -----------------------
             self.updateSystemTime.emit(
                 t_current.strftime(self.time_format),
@@ -88,7 +99,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                 trend = self.psar.add(t_current, p_current)
 
                 # ----------------------------
-                # 🔆 現在時刻＆現在価格の更新を通知
+                # 🧿 現在時刻＆現在価格の更新を通知
                 # ----------------------------
                 self.updateTickPrice.emit(
                     t_current.strftime(self.time_format),
@@ -103,6 +114,6 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
         # -----------------------
-        # 🔆 スレッド処理の終了を通知
+        # 🧿 スレッド処理の終了を通知
         # -----------------------
         self.threadFinished.emit(self.psar.get_df())

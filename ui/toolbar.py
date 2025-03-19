@@ -46,7 +46,7 @@ class ToolBar(QToolBar):
             return
 
         # ----------------------------------
-        # 🔆 選択されたファイルが存在して入れば通知
+        # 🧿 選択されたファイルが存在して入れば通知
         # ----------------------------------
         file_excel = dialog.selectedFiles()[0]
         if os.path.isfile(file_excel):

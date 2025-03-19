@@ -304,7 +304,7 @@ class DockMain(QDockWidget):
         dict_param['unit'] = self.objUnit.getValue()
 
         # -----------------------------
-        # 🔆 シミュレーション開始のリクエスト
+        # 🧿 シミュレーション開始のリクエスト
         # -----------------------------
         self.requestSimulationStart.emit(dict_param)
 
