@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 )
 
 from structs.res import AppRes
+from ui.dialog import DlgAFSetting
 from widgets.buttons import EditButton, StartButton
 from widgets.labels import (
     LabelDate,
@@ -33,6 +34,8 @@ class DockMain(QDockWidget):
         super().__init__()
         self.res = res
         self.dict_target = dict_target
+        # self.dict_param = dict() # シミュレータへ渡すパラメータ用
+        # self.dict_af = dict()  # AF（加速因数）用
 
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # UI
@@ -208,6 +211,7 @@ class DockMain(QDockWidget):
         layout.addWidget(objAFinit, r, 1)
 
         self.objAFedit = objAFedit = EditButton(res)
+        objAFedit.clicked.connect(self.on_modify_af)
         layout.addWidget(objAFedit, r, 2, 3, 1)
 
         r += 1
@@ -236,19 +240,46 @@ class DockMain(QDockWidget):
         base_control.setLayout(vbox)
 
         self.btnStart = but_start = StartButton(res)
-        but_start.setFixedHeight(40)
+        but_start.setFixedHeight(30)
         but_start.setToolTip('シミュレーション開始')
-        but_start.clicked.connect(self.on_start)
+        but_start.clicked.connect(self.on_simulation_start_request)
         vbox.addWidget(but_start)
 
-    def on_start(self):
-        # シミュレータへ渡すデータ＆パラメータを準備
-        dict_param = dict()
-        dict_param['date'] = self.dict_target['date']
-        dict_param['tick'] = self.dict_target['tick']['Price']
+    def get_psar_af_param(self, dict_param: dict):
+        """
+        Parabolic SAR の AF（加速因数）パラメータの取得
+        :param dict_param:
+        :return:
+        """
         dict_param['af_init'] = self.objAFinit.getValue()
         dict_param['af_step'] = self.objAFstep.getValue()
         dict_param['af_max'] = self.objAFmax.getValue()
+
+    def get_tick_date_price(self, dict_param: dict):
+        """
+        ログデータの内、日付とティックデータの取得
+        ※ 日付文字列はティックデータを matplotlib で扱う際に必ず必要になる
+        :param dict_param:
+        :return:
+        """
+        dict_param['date'] = self.dict_target['date']
+        dict_param['tick'] = self.dict_target['tick']['Price']
+
+    def on_modify_af(self):
+        dict_af = dict()
+        self.get_psar_af_param(dict_af)
+
+        dlg = DlgAFSetting(dict_af)
+        if dlg.exec():
+            self.objAFinit.setValue(dict_af['af_init'])
+            self.objAFstep.setValue(dict_af['af_step'])
+            self.objAFmax.setValue(dict_af['af_max'])
+
+    def on_simulation_start_request(self):
+        dict_param = dict()
+        # シミュレータへ渡すデータ＆パラメータを準備
+        self.get_tick_date_price(dict_param)
+        self.get_psar_af_param(dict_param)
 
         # -----------------------------
         # 🔆 シミュレーション開始のリクエスト
@@ -256,12 +287,29 @@ class DockMain(QDockWidget):
         self.requestSimulationStart.emit(dict_param)
 
     def setStatus(self, status_str: str):
+        """
+        タイマー状態を設定（表示）
+        :param status_str:
+        :return:
+        """
         self.objStatus.setText(status_str)
 
     def setSystemTime(self, time_str: str):
+        """
+        システム時刻を設定（表示）
+        :param time_str:
+        :return:
+        """
         self.objSystemTime.setText(time_str)
 
     def setTickPrice(self, time_str: str, price: float, trend: int):
+        """
+        ティック時刻と株価およびトレンドを設定（表示）
+        :param time_str:
+        :param price:
+        :param trend:
+        :return:
+        """
         self.objTickTime.setText(time_str)
         self.objTickPrice.setValue(price)
         self.objTrend.setValue(trend, flag=False)
