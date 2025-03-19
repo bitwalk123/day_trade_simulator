@@ -50,7 +50,7 @@ class Canvas(FigureCanvas):
             self.ax[0] = self.fig.add_subplot(111)
 
         self.fig.subplots_adjust(
-            left=0.09,
+            left=0.07,
             right=0.99,
             top=0.95,
             bottom=0.06,
