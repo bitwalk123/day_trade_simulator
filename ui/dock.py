@@ -33,7 +33,6 @@ from widgets.pads import HPad
 
 class DockMain(QDockWidget):
     requestOrderHistory = Signal()
-    requestOrderHistoryHTML = Signal()
     requestSimulationStart = Signal(dict)
 
     def __init__(self, res: AppRes, dict_target: dict):
@@ -270,14 +269,6 @@ class DockMain(QDockWidget):
         hpad = HPad()
         hbox.addWidget(hpad)
 
-        but_html = QPushButton()
-        but_html.setIcon(
-            QIcon(os.path.join(self.res.dir_image, 'html.png'))
-        )
-        but_html.setToolTip('売買履歴（HTML出力）')
-        but_html.clicked.connect(self.on_order_history_html)
-        hbox.addWidget(but_html)
-
         but_order = QPushButton()
         but_order.setIcon(
             QIcon(os.path.join(self.res.dir_image, 'cart.png'))
@@ -329,9 +320,6 @@ class DockMain(QDockWidget):
 
     def on_order_history(self):
         self.requestOrderHistory.emit()
-
-    def on_order_history_html(self):
-        self.requestOrderHistoryHTML.emit()
 
     def on_simulation_start_request(self):
         dict_param = dict()
