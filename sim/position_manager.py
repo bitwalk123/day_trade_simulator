@@ -10,6 +10,7 @@ class PositionManager:
         self.unit = unit
         self.trend = 0
         self.price = 0
+        self.profit_max = 0 # 最大含み益
         self.total = 0
         self.order = 0  # 注文番号
 
@@ -20,6 +21,7 @@ class PositionManager:
             'Position': [],
             'Price': [],
             'Profit': [],
+            'ProfitMax': [],
             'Note': [],
         }
         df = pd.DataFrame.from_dict(dict_columns)
@@ -30,6 +32,7 @@ class PositionManager:
             'Datetime': [],
             'Price': [],
             'Profit': [],
+            'ProfitMax': [],
             'Order': [],
         }
         df = pd.DataFrame.from_dict(dict_columns)
@@ -86,9 +89,11 @@ class PositionManager:
         self.df_order.at[r, 'Position'] = msg
         self.df_order.at[r, 'Price'] = price
         self.df_order.at[r, 'Profit'] = profit
+        self.df_order.at[r, 'ProfitMax'] = self.profit_max
         self.df_order.at[r, 'Note'] = note
 
         self.price = 0
+        self.profit_max = 0
         self.total += profit
 
     def has_position(self):
@@ -138,11 +143,14 @@ class PositionManager:
         :return:
         """
         profit = self.get_profit(t, price)
+        if self.profit_max < profit:
+            self.profit_max = profit
 
         r = len(self.df_profit)
         self.df_profit.at[r, 'Datetime'] = t
         self.df_profit.at[r, 'Price'] = price
         self.df_profit.at[r, 'Profit'] = profit
+        self.df_profit.at[r, 'ProfitMax'] = self.profit_max
         self.df_profit.at[r, 'Order'] = self.order
 
         return profit
@@ -162,6 +170,7 @@ class PositionManager:
         return pd.DataFrame(
             {
                 'Profit': self.df_profit['Profit'].astype(float).values,
+                'ProfitMax': self.df_profit['ProfitMax'].astype(float).values,
                 'Order': self.df_profit['Order'].astype(int).values,
             },
             index=pd.to_datetime(self.df_profit['Datetime'])

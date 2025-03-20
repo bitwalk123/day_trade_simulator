@@ -44,7 +44,7 @@ class WinMain(QMainWindow):
 
         # チャートに渡す情報を dict_target にせずに、敢えて必要分のみを dict_plot へ移して渡す。
         # これは、パラメータを変更して再描画するために自由度を確保するため。
-        dict_plot = get_dict4plot(dict_target['tick'], dict_target['title'])
+        dict_plot = get_dict4plot(dict_target['title'], dict_target['tick'])
         canvas.plot(dict_plot)
 
     # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
@@ -77,12 +77,12 @@ class WinMain(QMainWindow):
         df_order = dict_result['order']
         total = dict_result['total']
 
-        print(df_profit)
-        print(df_order)
-        print(total)
+        #print(df_profit)
+        #print(df_order)
+        #print(total)
 
         # プロットを更新
-        dict_plot = get_dict4plot(df_tick, self.dict_target['title'])
+        dict_plot = get_dict4plot(self.dict_target['title'], df_tick, df_profit)
         self.canvas.plot(dict_plot)
 
         # 進捗をリセット
