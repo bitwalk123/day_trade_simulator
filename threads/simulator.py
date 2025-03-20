@@ -141,12 +141,16 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # 建玉を持って入れば返済
         if self.posman.has_position():
             self.position_close(t_current, p_current, '強制（大引け）')
+            # 含み益の評価
+            self.eval_profit(t_current, p_current)
 
         dict_result = dict()
         dict_result['tick'] = self.psar.get_df()
         dict_result['profit'] = self.posman.get_profit_history()
         dict_result['order'] = self.posman.get_order_history()
+        dict_result['column_format'] = self.posman.get_column_format_order()
         dict_result['total'] = self.posman.get_total()
+
         # ---------------------------------------------------------------------
         # 🧿 スレッド処理の終了を通知
         self.threadFinished.emit(dict_result)
