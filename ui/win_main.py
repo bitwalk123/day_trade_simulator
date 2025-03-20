@@ -39,6 +39,8 @@ class WinMain(QMainWindow):
 
         # ドック
         self.dock = dock = DockMain(res, dict_target)
+        dock.requestOrderHistory.connect(self.on_order_history)
+        dock.requestOrderHistoryHTML.connect(self.on_order_history_html)
         dock.requestSimulationStart.connect(self.on_simulation_start)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 

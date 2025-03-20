@@ -1,19 +1,23 @@
+import os
+
 from PySide6.QtCore import (
     QMargins,
     Qt,
     Signal,
 )
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDockWidget,
     QGridLayout,
     QSizePolicy,
     QVBoxLayout,
-    QWidget,
+    QWidget, QHBoxLayout, QPushButton,
 )
 
 from structs.res import AppRes
 from ui.dialog import DlgAFSetting
 from widgets.buttons import EditButton, StartButton
+from widgets.frame import Frame
 from widgets.labels import (
     LabelDate,
     LabelFlat,
@@ -24,9 +28,12 @@ from widgets.labels import (
     LabelValue,
     LabelUnit,
 )
+from widgets.pads import HPad
 
 
 class DockMain(QDockWidget):
+    requestOrderHistory = Signal()
+    requestOrderHistoryHTML = Signal()
     requestSimulationStart = Signal(dict)
 
     def __init__(self, res: AppRes, dict_target: dict):
@@ -252,6 +259,33 @@ class DockMain(QDockWidget):
         but_start.clicked.connect(self.on_simulation_start_request)
         vbox.addWidget(but_start)
 
+        hbar = Frame()
+        vbox.addWidget(hbar)
+
+        hbox = QHBoxLayout()
+        hbox.setSpacing(0)
+        hbox.setContentsMargins(QMargins(0, 0, 0, 0))
+        hbar.setLayout(hbox)
+
+        hpad = HPad()
+        hbox.addWidget(hpad)
+
+        but_html = QPushButton()
+        but_html.setIcon(
+            QIcon(os.path.join(self.res.dir_image, 'html.png'))
+        )
+        but_html.setToolTip('売買履歴（HTML出力）')
+        but_html.clicked.connect(self.on_order_history_html)
+        hbox.addWidget(but_html)
+
+        but_order = QPushButton()
+        but_order.setIcon(
+            QIcon(os.path.join(self.res.dir_image, 'cart.png'))
+        )
+        but_order.setToolTip('売買履歴（テーブル）')
+        but_order.clicked.connect(self.on_order_history)
+        hbox.addWidget(but_order)
+
     def get_psar_af_param(self, dict_param: dict):
         """
         Parabolic SAR の AF（加速因数）パラメータの取得
@@ -292,6 +326,12 @@ class DockMain(QDockWidget):
 
     def on_modify_unit(self):
         pass
+
+    def on_order_history(self):
+        self.requestOrderHistory.emit()
+
+    def on_order_history_html(self):
+        self.requestOrderHistoryHTML.emit()
 
     def on_simulation_start_request(self):
         dict_param = dict()
@@ -360,7 +400,7 @@ class DockMain(QDockWidget):
         self.objTickPrice.setValue(price)
         self.objTrend.setValue(trend, flag=False)
 
-    def setTotal(self, price:float):
+    def setTotal(self, price: float):
         """
         合計損益額を設定（表示）
         :param price:

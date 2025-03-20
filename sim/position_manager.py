@@ -27,7 +27,7 @@ class PositionManager:
         df = pd.DataFrame.from_dict(dict_columns)
         self.df_order = df.astype(object)
         self.column_format = ['int', 'ts', 'str', 'int', 'int', 'int', 'str']
-        self.column_name = ['#', '注文時刻', '建玉', '株価', '損益', '最大含み損益', '備考']
+        self.column_name = ['#', '注文時刻', '建玉', '株価', '損益', '最大含み益', '備　　考']
 
         # 含み損益
         dict_columns = {
