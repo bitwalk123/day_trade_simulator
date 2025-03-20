@@ -47,7 +47,10 @@ class PandasModel(QAbstractTableModel):
 
         if role == Qt.ItemDataRole.DisplayRole:
             if self.formats[col] == 'int' and type(value) is not str:
-                return '{:,}'.format(int(value))
+                if np.isnan(value):
+                    return ''
+                else:
+                    return '{:,}'.format(int(value))
             elif self.formats[col] == 'ts' and type(value) is not str:
                 str_hh = '{:0=2}'.format(value.hour)
                 str_mm = '{:0=2}'.format(value.minute)
