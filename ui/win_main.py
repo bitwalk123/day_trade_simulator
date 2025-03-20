@@ -40,7 +40,6 @@ class WinMain(QMainWindow):
         # ドック
         self.dock = dock = DockMain(res, dict_target)
         dock.requestOrderHistory.connect(self.on_order_history)
-        dock.requestOrderHistoryHTML.connect(self.on_order_history_html)
         dock.requestSimulationStart.connect(self.on_simulation_start)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
@@ -85,7 +84,8 @@ class WinMain(QMainWindow):
         if self.order_hist is not None:
             self.order_hist.hide()
             self.order_hist.deleteLater()
-        self.order_hist = WinOrderHistory(self.df_order, self.column_format)
+        self.order_hist = WinOrderHistory(self.res, self.df_order, self.column_format, self.total_profit)
+        self.order_hist.requestOrderHistoryHTML.connect(self.on_order_history_html)
         self.order_hist.show()
 
     def on_order_history_html(self):
