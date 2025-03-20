@@ -1,0 +1,977 @@
+<style>
+table {border-collapse: collapse; border: solid 1px #aaa; font-family: monospace; font-size: x-small;}
+th,td {border-bottom: solid 1px #aaa; padding: 0 5px;}
+</style>
+<table>
+<thead>
+<tr>
+<th nowrap>#</th>
+<th nowrap>注文時刻</th>
+<th nowrap>建玉</th>
+<th nowrap>株価</th>
+<th nowrap>損益</th>
+<th nowrap>最大含み益</th>
+<th nowrap>備　　考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td nowrap style="text-align: right;">1</td>
+<td nowrap>09:00:01</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">1</td>
+<td nowrap>09:01:48</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,103</td>
+<td nowrap style="text-align: right;">550</td>
+<td nowrap style="text-align: right;">1,150</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">2</td>
+<td nowrap>09:01:48</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,103</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">2</td>
+<td nowrap>09:02:18</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,097</td>
+<td nowrap style="text-align: right;">-600</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">3</td>
+<td nowrap>09:02:18</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,097</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">3</td>
+<td nowrap>09:06:47</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,102</td>
+<td nowrap style="text-align: right;">-550</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">4</td>
+<td nowrap>09:06:47</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,102</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">4</td>
+<td nowrap>09:13:19</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,109</td>
+<td nowrap style="text-align: right;">700</td>
+<td nowrap style="text-align: right;">1,150</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">5</td>
+<td nowrap>09:13:19</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,109</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">5</td>
+<td nowrap>09:21:03</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,101</td>
+<td nowrap style="text-align: right;">850</td>
+<td nowrap style="text-align: right;">1,200</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">6</td>
+<td nowrap>09:21:03</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,101</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">6</td>
+<td nowrap>09:22:00</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,097</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">7</td>
+<td nowrap>09:22:00</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,097</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">7</td>
+<td nowrap>09:22:38</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,101</td>
+<td nowrap style="text-align: right;">-350</td>
+<td nowrap style="text-align: right;">350</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">8</td>
+<td nowrap>09:22:38</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,101</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">8</td>
+<td nowrap>09:30:05</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,096</td>
+<td nowrap style="text-align: right;">-500</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">9</td>
+<td nowrap>09:30:05</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,096</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">9</td>
+<td nowrap>09:34:58</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,097</td>
+<td nowrap style="text-align: right;">-150</td>
+<td nowrap style="text-align: right;">200</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">10</td>
+<td nowrap>09:34:58</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,097</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">10</td>
+<td nowrap>09:39:44</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,105</td>
+<td nowrap style="text-align: right;">750</td>
+<td nowrap style="text-align: right;">1,000</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">11</td>
+<td nowrap>09:39:44</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,105</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">11</td>
+<td nowrap>09:42:55</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,106</td>
+<td nowrap style="text-align: right;">-100</td>
+<td nowrap style="text-align: right;">200</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">12</td>
+<td nowrap>09:42:55</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,106</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">12</td>
+<td nowrap>09:47:18</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,104</td>
+<td nowrap style="text-align: right;">-200</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">13</td>
+<td nowrap>09:47:18</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,104</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">13</td>
+<td nowrap>09:51:07</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,103</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">350</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">14</td>
+<td nowrap>09:51:07</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,103</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">14</td>
+<td nowrap>09:54:09</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,101</td>
+<td nowrap style="text-align: right;">-200</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">15</td>
+<td nowrap>09:54:09</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,101</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">15</td>
+<td nowrap>09:56:22</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,104</td>
+<td nowrap style="text-align: right;">-300</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">16</td>
+<td nowrap>09:56:22</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,104</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">16</td>
+<td nowrap>10:07:42</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,110</td>
+<td nowrap style="text-align: right;">600</td>
+<td nowrap style="text-align: right;">800</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">17</td>
+<td nowrap>10:07:42</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,110</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">17</td>
+<td nowrap>10:13:47</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,107</td>
+<td nowrap style="text-align: right;">300</td>
+<td nowrap style="text-align: right;">450</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">18</td>
+<td nowrap>10:13:47</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,107</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">18</td>
+<td nowrap>10:22:46</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,109</td>
+<td nowrap style="text-align: right;">150</td>
+<td nowrap style="text-align: right;">300</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">19</td>
+<td nowrap>10:22:46</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,109</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">19</td>
+<td nowrap>10:28:40</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap style="text-align: right;">300</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">20</td>
+<td nowrap>10:28:40</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">20</td>
+<td nowrap>10:33:25</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,106</td>
+<td nowrap style="text-align: right;">-200</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">21</td>
+<td nowrap>10:33:25</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,106</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">21</td>
+<td nowrap>10:36:15</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,107</td>
+<td nowrap style="text-align: right;">-150</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">22</td>
+<td nowrap>10:36:15</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,107</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">22</td>
+<td nowrap>10:46:19</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,105</td>
+<td nowrap style="text-align: right;">-200</td>
+<td nowrap style="text-align: right;">150</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">23</td>
+<td nowrap>10:46:19</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,105</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">23</td>
+<td nowrap>10:58:06</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,103</td>
+<td nowrap style="text-align: right;">250</td>
+<td nowrap style="text-align: right;">400</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">24</td>
+<td nowrap>10:58:06</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,103</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">24</td>
+<td nowrap>11:04:29</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,107</td>
+<td nowrap style="text-align: right;">400</td>
+<td nowrap style="text-align: right;">600</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">25</td>
+<td nowrap>11:04:29</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,107</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">25</td>
+<td nowrap>11:07:56</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,109</td>
+<td nowrap style="text-align: right;">-250</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">26</td>
+<td nowrap>11:07:56</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,109</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">26</td>
+<td nowrap>11:11:58</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap style="text-align: right;">-100</td>
+<td nowrap style="text-align: right;">150</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">27</td>
+<td nowrap>11:11:58</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">27</td>
+<td nowrap>11:23:06</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,107</td>
+<td nowrap style="text-align: right;">150</td>
+<td nowrap style="text-align: right;">350</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">28</td>
+<td nowrap>11:23:06</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,107</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">28</td>
+<td nowrap>11:30:00</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap style="text-align: right;">150</td>
+<td nowrap style="text-align: right;">300</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">29</td>
+<td nowrap>11:30:00</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">29</td>
+<td nowrap>12:32:17</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">350</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">30</td>
+<td nowrap>12:32:17</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">30</td>
+<td nowrap>12:36:00</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,106</td>
+<td nowrap style="text-align: right;">-200</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">31</td>
+<td nowrap>12:36:00</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,106</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">31</td>
+<td nowrap>12:41:00</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,107</td>
+<td nowrap style="text-align: right;">-150</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">32</td>
+<td nowrap>12:41:00</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,107</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">32</td>
+<td nowrap>12:49:43</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,106</td>
+<td nowrap style="text-align: right;">-100</td>
+<td nowrap style="text-align: right;">150</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">33</td>
+<td nowrap>12:49:43</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,106</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">33</td>
+<td nowrap>12:54:40</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap style="text-align: right;">-200</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">34</td>
+<td nowrap>12:54:40</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">34</td>
+<td nowrap>12:58:57</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,109</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap style="text-align: right;">300</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">35</td>
+<td nowrap>12:58:57</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,109</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">35</td>
+<td nowrap>13:12:43</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,106</td>
+<td nowrap style="text-align: right;">350</td>
+<td nowrap style="text-align: right;">450</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">36</td>
+<td nowrap>13:12:43</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,106</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">36</td>
+<td nowrap>13:14:09</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,105</td>
+<td nowrap style="text-align: right;">-100</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">37</td>
+<td nowrap>13:14:09</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,105</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">37</td>
+<td nowrap>13:20:48</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,104</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap style="text-align: right;">250</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">38</td>
+<td nowrap>13:20:48</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,104</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">38</td>
+<td nowrap>13:30:17</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,107</td>
+<td nowrap style="text-align: right;">350</td>
+<td nowrap style="text-align: right;">550</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">39</td>
+<td nowrap>13:30:17</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,107</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">39</td>
+<td nowrap>13:37:01</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap style="text-align: right;">-100</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">40</td>
+<td nowrap>13:37:01</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,108</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">40</td>
+<td nowrap>13:50:38</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,109</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">250</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">41</td>
+<td nowrap>13:50:38</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,109</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">41</td>
+<td nowrap>13:55:38</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,111</td>
+<td nowrap style="text-align: right;">-200</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">42</td>
+<td nowrap>13:55:38</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,111</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">42</td>
+<td nowrap>14:01:40</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,110</td>
+<td nowrap style="text-align: right;">-100</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">43</td>
+<td nowrap>14:01:40</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,110</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">43</td>
+<td nowrap>14:06:45</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,111</td>
+<td nowrap style="text-align: right;">-100</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">44</td>
+<td nowrap>14:06:45</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,111</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">44</td>
+<td nowrap>14:16:45</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,115</td>
+<td nowrap style="text-align: right;">400</td>
+<td nowrap style="text-align: right;">550</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">45</td>
+<td nowrap>14:16:45</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,115</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">45</td>
+<td nowrap>14:27:00</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,114</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap style="text-align: right;">250</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">46</td>
+<td nowrap>14:27:00</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,114</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">46</td>
+<td nowrap>14:42:43</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,116</td>
+<td nowrap style="text-align: right;">250</td>
+<td nowrap style="text-align: right;">400</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">47</td>
+<td nowrap>14:42:43</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,116</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">47</td>
+<td nowrap>14:51:49</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,117</td>
+<td nowrap style="text-align: right;">-50</td>
+<td nowrap style="text-align: right;">100</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">48</td>
+<td nowrap>14:51:49</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,117</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">48</td>
+<td nowrap>15:00:42</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,117</td>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap style="text-align: right;">200</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">49</td>
+<td nowrap>15:00:42</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,117</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">49</td>
+<td nowrap>15:09:09</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,115</td>
+<td nowrap style="text-align: right;">250</td>
+<td nowrap style="text-align: right;">500</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap>15:09:09</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,115</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">50</td>
+<td nowrap>15:14:47</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,113</td>
+<td nowrap style="text-align: right;">-200</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">51</td>
+<td nowrap>15:14:47</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,113</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">51</td>
+<td nowrap>15:22:58</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,111</td>
+<td nowrap style="text-align: right;">200</td>
+<td nowrap style="text-align: right;">300</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">52</td>
+<td nowrap>15:22:58</td>
+<td nowrap>買建</td>
+<td nowrap style="text-align: right;">2,111</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">52</td>
+<td nowrap>15:23:01</td>
+<td nowrap>売埋</td>
+<td nowrap style="text-align: right;">2,110</td>
+<td nowrap style="text-align: right;">-100</td>
+<td nowrap style="text-align: right;">0</td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">53</td>
+<td nowrap>15:23:01</td>
+<td nowrap>売建</td>
+<td nowrap style="text-align: right;">2,110</td>
+<td nowrap></td>
+<td nowrap></td>
+<td nowrap></td>
+</tr>
+<tr>
+<td nowrap style="text-align: right;">53</td>
+<td nowrap>15:30:00</td>
+<td nowrap>買埋</td>
+<td nowrap style="text-align: right;">2,106</td>
+<td nowrap style="text-align: right;">400</td>
+<td nowrap style="text-align: right;">400</td>
+<td nowrap>強制（大引け）</td>
+</tr>
+<tr>
+<td colspan="4" style="text-align: right;">実現損益</td>
+<td nowrap style="text-align: right;">1,850</td>
+</tr>
+</tbody>
+</table>
