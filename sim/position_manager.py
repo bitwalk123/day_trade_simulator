@@ -10,7 +10,7 @@ class PositionManager:
         self.unit = unit
         self.trend = 0
         self.price = 0
-        self.profit_max = 0 # 最大含み益
+        self.profit_max = 0  # 最大含み益
         self.total = 0
         self.order = 0  # 注文番号
 
@@ -38,7 +38,7 @@ class PositionManager:
         df = pd.DataFrame.from_dict(dict_columns)
         self.df_profit = df.astype(object)
 
-    def open(self, t, price, note=''):
+    def open(self, t, price, note='') -> dict:
         """
         建玉の取得
         :param t:
@@ -56,7 +56,7 @@ class PositionManager:
             msg = '不明'
 
         # 注文履歴
-        self.order += 1
+        self.order += 1  # 注文番号のインクリメント
         r = len(self.df_order)
         self.df_order.at[r, 'Order'] = self.order
         self.df_order.at[r, 'Datetime'] = t
@@ -64,7 +64,12 @@ class PositionManager:
         self.df_order.at[r, 'Price'] = self.price
         self.df_order.at[r, 'Note'] = note
 
-    def close(self, t, price, note=''):
+        dict_position = dict()
+        dict_position['position'] = msg
+        dict_position['price'] = price
+        return dict_position
+
+    def close(self, t, price, note='') -> float:
         """
         建玉の返却
         :param t:
@@ -95,6 +100,8 @@ class PositionManager:
         self.price = 0
         self.profit_max = 0
         self.total += profit
+
+        return self.total
 
     def has_position(self):
         """
@@ -135,7 +142,7 @@ class PositionManager:
         """
         return self.df_order
 
-    def eval_profit(self, t, price) -> float:
+    def eval_profit(self, t, price) -> dict:
         """
         含み損益を評価
         :param t:
@@ -153,7 +160,11 @@ class PositionManager:
         self.df_profit.at[r, 'ProfitMax'] = self.profit_max
         self.df_profit.at[r, 'Order'] = self.order
 
-        return profit
+        dict_profit = dict()
+        dict_profit['profit'] = profit
+        dict_profit['profit_max'] = self.profit_max
+
+        return dict_profit
 
     def get_profit(self, t, price):
         if not self.has_position():

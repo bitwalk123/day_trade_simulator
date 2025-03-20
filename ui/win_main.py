@@ -50,25 +50,10 @@ class WinMain(QMainWindow):
     # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
     #  取引シミュレーション
     # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-    def on_simulation_start(self, dict_info):
-        self.dock.setStatus('稼働中')
-        sim = WorkerSimulator(dict_info)
-        sim.updateSystemTime.connect(self.on_simulation_update_systemtime)
-        sim.updateTickPrice.connect(self.on_simulation_update_tickprice)
-        sim.threadFinished.connect(self.on_simulation_finished)
-        self.threadpool.start(sim)
-
-    def on_simulation_update_systemtime(self, time_str: str, progress: int):
-        self.dock.setSystemTime(time_str)
-        self.pbar.setValue(progress)
-
-    def on_simulation_update_tickprice(self, time_str: str, price: float, trend: int):
-        self.dock.setTickPrice(time_str, price, trend)
-
-    def on_simulation_finished(self, dict_result:dict):
+    def on_simulation_finished(self, dict_result: dict):
         """
-        シミュレーションのスレッド終了
-        :param df:
+        取引シミュレーションのスレッド処理終了
+        :param dict_result:
         :return:
         """
 
@@ -76,10 +61,6 @@ class WinMain(QMainWindow):
         df_profit = dict_result['profit']
         df_order = dict_result['order']
         total = dict_result['total']
-
-        #print(df_profit)
-        #print(df_order)
-        #print(total)
 
         # プロットを更新
         dict_plot = get_dict4plot(self.dict_target['title'], df_tick, df_profit)
@@ -90,3 +71,68 @@ class WinMain(QMainWindow):
 
         # タイマー状態
         self.dock.setStatus('停止')
+
+    def on_simulation_start(self, dict_info):
+        """
+        取引シミュレーションのスレッド処理開始
+        :param dict_info:
+        :return:
+        """
+        self.dock.setStatus('稼働中')
+
+        sim = WorkerSimulator(dict_info)
+        sim.positionOpen.connect(self.on_simulation_position_open)
+        sim.positionClose.connect(self.on_simulation_position_close)
+        sim.updateProfit.connect(self.on_simulation_update_profit)
+        sim.updateSystemTime.connect(self.on_simulation_update_systemtime)
+        sim.updateTickPrice.connect(self.on_simulation_update_tickprice)
+        sim.threadFinished.connect(self.on_simulation_finished)
+        self.threadpool.start(sim)
+
+    def on_simulation_position_open(self, dict_position: dict):
+        """
+        新しい建玉の売買と値段
+        :param dict_position:
+        :return:
+        """
+        position = dict_position['position']
+        price = dict_position['price']
+        self.dock.setPosition(position, price)
+
+    def on_simulation_position_close(self, total: float):
+        """
+        建玉返済による合計損益の更新
+        :param total:
+        :return:
+        """
+        self.dock.setPosition('無し', 0)
+        self.dock.setTotal(total)
+
+    def on_simulation_update_profit(self, dict_profit):
+        """
+        シミュレーションの更新された含み益
+        :param dict_profit:
+        :return:
+        """
+        self.dock.setProfit(dict_profit['profit'])
+        self.dock.setProfitMax(dict_profit['profit_max'])
+
+    def on_simulation_update_systemtime(self, time_str: str, progress: int):
+        """
+        シミュレーションの時刻と進捗度の更新
+        :param time_str:
+        :param progress:
+        :return:
+        """
+        self.dock.setSystemTime(time_str)
+        self.pbar.setValue(progress)
+
+    def on_simulation_update_tickprice(self, time_str: str, price: float, trend: int):
+        """
+        ティックデータの時刻、株価およびトレンドの更新
+        :param time_str:
+        :param price:
+        :param trend:
+        :return:
+        """
+        self.dock.setTickPrice(time_str, price, trend)

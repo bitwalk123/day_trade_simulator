@@ -192,6 +192,7 @@ class DockMain(QDockWidget):
         layout.addWidget(labTotal, r, 0)
 
         self.objTotal = objTotal = LabelValue()
+        objTotal.setValue(0)
         layout.addWidget(objTotal, r, 1)
 
         unitTotal = LabelUnit('円')
@@ -305,6 +306,32 @@ class DockMain(QDockWidget):
         # -----------------------------
         self.requestSimulationStart.emit(dict_param)
 
+    def setPosition(self, position: str, price: float):
+        """
+        建玉のポジションと価格を設定（表示）
+        :param position:
+        :param price:
+        :return:
+        """
+        self.objPosition.setText(position)
+        self.objPositionPrice.setValue(price)
+
+    def setProfit(self, profit: float):
+        """
+        含み損益を設定（表示）
+        :param profit:
+        :return:
+        """
+        self.objProfit.setValue(profit)
+
+    def setProfitMax(self, profit_max: float):
+        """
+        最大含み損益を設定（表示）
+        :param profit_max: 
+        :return: 
+        """
+        self.objProfitMax.setValue(profit_max)
+
     def setStatus(self, status_str: str):
         """
         タイマー状態を設定（表示）
@@ -332,3 +359,11 @@ class DockMain(QDockWidget):
         self.objTickTime.setText(time_str)
         self.objTickPrice.setValue(price)
         self.objTrend.setValue(trend, flag=False)
+
+    def setTotal(self, price:float):
+        """
+        合計損益額を設定（表示）
+        :param price:
+        :return:
+        """
+        self.objTotal.setValue(price)
