@@ -44,37 +44,95 @@ class WinMain(QMainWindow):
 
         # チャートに渡す情報を dict_target にせずに、敢えて必要分のみを dict_plot へ移して渡す。
         # これは、パラメータを変更して再描画するために自由度を確保するため。
-        dict_plot = get_dict4plot(dict_target['tick'], dict_target['title'])
+        dict_plot = get_dict4plot(dict_target['title'], dict_target['tick'])
         canvas.plot(dict_plot)
 
     # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
     #  取引シミュレーション
     # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+    def on_simulation_finished(self, dict_result: dict):
+        """
+        取引シミュレーションのスレッド処理終了
+        :param dict_result:
+        :return:
+        """
+
+        df_tick = dict_result['tick']
+        df_profit = dict_result['profit']
+        df_order = dict_result['order']
+        total = dict_result['total']
+
+        # プロットを更新
+        dict_plot = get_dict4plot(self.dict_target['title'], df_tick, df_profit)
+        self.canvas.plot(dict_plot)
+
+        # 進捗をリセット
+        self.pbar.reset()
+
+        # タイマー状態
+        self.dock.setStatus('停止')
+
     def on_simulation_start(self, dict_info):
+        """
+        取引シミュレーションのスレッド処理開始
+        :param dict_info:
+        :return:
+        """
         self.dock.setStatus('稼働中')
+
         sim = WorkerSimulator(dict_info)
+        sim.positionOpen.connect(self.on_simulation_position_open)
+        sim.positionClose.connect(self.on_simulation_position_close)
+        sim.updateProfit.connect(self.on_simulation_update_profit)
         sim.updateSystemTime.connect(self.on_simulation_update_systemtime)
         sim.updateTickPrice.connect(self.on_simulation_update_tickprice)
         sim.threadFinished.connect(self.on_simulation_finished)
         self.threadpool.start(sim)
 
+    def on_simulation_position_open(self, dict_position: dict):
+        """
+        新しい建玉の売買と値段
+        :param dict_position:
+        :return:
+        """
+        position = dict_position['position']
+        price = dict_position['price']
+        self.dock.setPosition(position, price)
+
+    def on_simulation_position_close(self, total: float):
+        """
+        建玉返済による合計損益の更新
+        :param total:
+        :return:
+        """
+        self.dock.setPosition('無し', 0)
+        self.dock.setTotal(total)
+
+    def on_simulation_update_profit(self, dict_profit):
+        """
+        シミュレーションの更新された含み益
+        :param dict_profit:
+        :return:
+        """
+        self.dock.setProfit(dict_profit['profit'])
+        self.dock.setProfitMax(dict_profit['profit_max'])
+
     def on_simulation_update_systemtime(self, time_str: str, progress: int):
+        """
+        シミュレーションの時刻と進捗度の更新
+        :param time_str:
+        :param progress:
+        :return:
+        """
         self.dock.setSystemTime(time_str)
         self.pbar.setValue(progress)
 
     def on_simulation_update_tickprice(self, time_str: str, price: float, trend: int):
-        self.dock.setTickPrice(time_str, price, trend)
-
-    def on_simulation_finished(self, df):
         """
-        シミュレーションのスレッド終了
-        :param df:
+        ティックデータの時刻、株価およびトレンドの更新
+        :param time_str:
+        :param price:
+        :param trend:
         :return:
         """
-        self.dock.setStatus('停止')
-        # 進捗をリセット
-        self.pbar.reset()
-
-        # プロットを更新
-        dict_plot = get_dict4plot(df, self.dict_target['title'])
-        self.canvas.plot(dict_plot)
+        self.dock.setTickPrice(time_str, price, trend)

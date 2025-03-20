@@ -6,10 +6,11 @@ class PositionManager:
     建玉管理クラス
     """
 
-    def __init__(self, unit):
+    def __init__(self, unit: int):
         self.unit = unit
         self.trend = 0
         self.price = 0
+        self.profit_max = 0  # 最大含み益
         self.total = 0
         self.order = 0  # 注文番号
 
@@ -20,6 +21,7 @@ class PositionManager:
             'Position': [],
             'Price': [],
             'Profit': [],
+            'ProfitMax': [],
             'Note': [],
         }
         df = pd.DataFrame.from_dict(dict_columns)
@@ -30,12 +32,13 @@ class PositionManager:
             'Datetime': [],
             'Price': [],
             'Profit': [],
+            'ProfitMax': [],
             'Order': [],
         }
         df = pd.DataFrame.from_dict(dict_columns)
         self.df_profit = df.astype(object)
 
-    def open(self, t, price, note=''):
+    def open(self, t, price, note='') -> dict:
         """
         建玉の取得
         :param t:
@@ -53,7 +56,7 @@ class PositionManager:
             msg = '不明'
 
         # 注文履歴
-        self.order += 1
+        self.order += 1  # 注文番号のインクリメント
         r = len(self.df_order)
         self.df_order.at[r, 'Order'] = self.order
         self.df_order.at[r, 'Datetime'] = t
@@ -61,7 +64,12 @@ class PositionManager:
         self.df_order.at[r, 'Price'] = self.price
         self.df_order.at[r, 'Note'] = note
 
-    def close(self, t, price, note=''):
+        dict_position = dict()
+        dict_position['position'] = msg
+        dict_position['price'] = price
+        return dict_position
+
+    def close(self, t, price, note='') -> float:
         """
         建玉の返却
         :param t:
@@ -86,10 +94,14 @@ class PositionManager:
         self.df_order.at[r, 'Position'] = msg
         self.df_order.at[r, 'Price'] = price
         self.df_order.at[r, 'Profit'] = profit
+        self.df_order.at[r, 'ProfitMax'] = self.profit_max
         self.df_order.at[r, 'Note'] = note
 
         self.price = 0
+        self.profit_max = 0
         self.total += profit
+
+        return self.total
 
     def has_position(self):
         """
@@ -116,12 +128,12 @@ class PositionManager:
         """
         return self.trend
 
-    def get_total(self):
+    def get_total(self) -> float:
         """
         保持している実現損益を返す
         :return:
         """
-        return int(self.total)
+        return self.total
 
     def get_order_history(self) -> pd.DataFrame:
         """
@@ -130,46 +142,46 @@ class PositionManager:
         """
         return self.df_order
 
-    def eval_profit(self, t, price):
+    def eval_profit(self, t, price) -> dict:
         """
         含み損益を評価
         :param t:
         :param price:
         :return:
         """
-        if not self.has_position():
-            return 0
-
-        if self.trend > 0:
-            profit = (price - self.price) * self.unit
-        elif self.trend < 0:
-            profit = (self.price - price) * self.unit
-        else:
-            return 0
+        profit = self.get_profit(t, price)
+        if self.profit_max < profit:
+            self.profit_max = profit
 
         r = len(self.df_profit)
         self.df_profit.at[r, 'Datetime'] = t
         self.df_profit.at[r, 'Price'] = price
         self.df_profit.at[r, 'Profit'] = profit
+        self.df_profit.at[r, 'ProfitMax'] = self.profit_max
         self.df_profit.at[r, 'Order'] = self.order
 
-        return profit
+        dict_profit = dict()
+        dict_profit['profit'] = profit
+        dict_profit['profit_max'] = self.profit_max
+
+        return dict_profit
 
     def get_profit(self, t, price):
         if not self.has_position():
-            return
+            return 0.
 
         if self.trend > 0:
             return (price - self.price) * self.unit
         elif self.trend < 0:
             return (self.price - price) * self.unit
         else:
-            return 0
+            return 0,
 
     def get_profit_history(self) -> pd.DataFrame:
         return pd.DataFrame(
             {
                 'Profit': self.df_profit['Profit'].astype(float).values,
+                'ProfitMax': self.df_profit['ProfitMax'].astype(float).values,
                 'Order': self.df_profit['Order'].astype(int).values,
             },
             index=pd.to_datetime(self.df_profit['Datetime'])

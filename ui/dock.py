@@ -6,7 +6,6 @@ from PySide6.QtCore import (
 from PySide6.QtWidgets import (
     QDockWidget,
     QGridLayout,
-    QPushButton,
     QSizePolicy,
     QVBoxLayout,
     QWidget,
@@ -34,8 +33,6 @@ class DockMain(QDockWidget):
         super().__init__()
         self.res = res
         self.dict_target = dict_target
-        # self.dict_param = dict() # シミュレータへ渡すパラメータ用
-        # self.dict_af = dict()  # AF（加速因数）用
 
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # UI
@@ -195,6 +192,7 @@ class DockMain(QDockWidget):
         layout.addWidget(labTotal, r, 0)
 
         self.objTotal = objTotal = LabelValue()
+        objTotal.setValue(0)
         layout.addWidget(objTotal, r, 1)
 
         unitTotal = LabelUnit('円')
@@ -304,9 +302,35 @@ class DockMain(QDockWidget):
         dict_param['unit'] = self.objUnit.getValue()
 
         # -----------------------------
-        # 🔆 シミュレーション開始のリクエスト
+        # 🧿 シミュレーション開始のリクエスト
         # -----------------------------
         self.requestSimulationStart.emit(dict_param)
+
+    def setPosition(self, position: str, price: float):
+        """
+        建玉のポジションと価格を設定（表示）
+        :param position:
+        :param price:
+        :return:
+        """
+        self.objPosition.setText(position)
+        self.objPositionPrice.setValue(price)
+
+    def setProfit(self, profit: float):
+        """
+        含み損益を設定（表示）
+        :param profit:
+        :return:
+        """
+        self.objProfit.setValue(profit)
+
+    def setProfitMax(self, profit_max: float):
+        """
+        最大含み損益を設定（表示）
+        :param profit_max: 
+        :return: 
+        """
+        self.objProfitMax.setValue(profit_max)
 
     def setStatus(self, status_str: str):
         """
@@ -335,3 +359,11 @@ class DockMain(QDockWidget):
         self.objTickTime.setText(time_str)
         self.objTickPrice.setValue(price)
         self.objTrend.setValue(trend, flag=False)
+
+    def setTotal(self, price:float):
+        """
+        合計損益額を設定（表示）
+        :param price:
+        :return:
+        """
+        self.objTotal.setValue(price)
