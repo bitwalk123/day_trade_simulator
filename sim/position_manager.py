@@ -16,16 +16,18 @@ class PositionManager:
 
         # 注文履歴
         dict_columns = {
-            'Order': [],
-            'Datetime': [],
-            'Position': [],
-            'Price': [],
-            'Profit': [],
-            'ProfitMax': [],
-            'Note': [],
+            'Order': [],  # int
+            'Datetime': [],  # ts
+            'Position': [],  # str
+            'Price': [],  # int
+            'Profit': [],  # int
+            'ProfitMax': [],  # int
+            'Note': [],  # str
         }
         df = pd.DataFrame.from_dict(dict_columns)
         self.df_order = df.astype(object)
+        self.column_format = ['int', 'ts', 'str', 'int', 'int', 'int', 'str']
+        self.column_name = ['#', '注文時刻', '建玉', '株価', '損益', '最大含み損益', '備考']
 
         # 含み損益
         dict_columns = {
@@ -121,6 +123,13 @@ class PositionManager:
         """
         self.trend = trend
 
+    def get_column_format_order(self) -> list:
+        """
+        注文履歴のデータフレームの列書式
+        :return:
+        """
+        return self.column_format
+
     def get_trend(self):
         """
         保持している PSAR トレンドを返す
@@ -140,7 +149,9 @@ class PositionManager:
         注文履歴を返す
         :return:
         """
-        return self.df_order
+        df: pd.DataFrame = self.df_order.copy()
+        df.columns = self.column_name
+        return df
 
     def eval_profit(self, t, price) -> dict:
         """

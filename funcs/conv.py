@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def df_to_html(df: pd.DataFrame, list_col_format: list) -> list:
+def df_to_html(df: pd.DataFrame, list_col_format: list, total_profit:float) -> list:
     """
 
     :param df:
@@ -71,6 +71,11 @@ def df_to_html(df: pd.DataFrame, list_col_format: list) -> list:
 
         list_html.append('</tr>\n')
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+
+    list_html.append('<tr>\n')
+    list_html.append('<td colspan="4" style="text-align: right;">実現損益</td>\n')
+    list_html.append('<td nowrap style="text-align: right;">{:,}</td>\n'.format(int(total_profit)))
+    list_html.append('</tr>\n')
 
     list_html.append('</tbody>\n')
 

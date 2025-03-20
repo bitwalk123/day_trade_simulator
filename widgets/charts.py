@@ -52,7 +52,7 @@ class Canvas(FigureCanvas):
         self.fig.subplots_adjust(
             left=0.07,
             right=0.99,
-            top=0.95,
+            top=0.92,
             bottom=0.06,
         )
 
@@ -93,7 +93,9 @@ class Canvas(FigureCanvas):
             )
 
         # チャート・タイトル
-        self.ax[0].set_title(dict_plot['title'])
+        # self.ax[0].set_title(dict_plot['title'])
+        self.fig.suptitle(dict_plot['title'])
+        self.ax[0].set_title(dict_plot['subtitle'], fontsize='small')
 
         # Y1軸タイトル
         self.ax[0].set_ylabel(dict_plot['ylabel_tick'])
