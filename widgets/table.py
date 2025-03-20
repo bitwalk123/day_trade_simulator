@@ -10,6 +10,8 @@ class TableView(QTableView):
         self.setStyleSheet("""
             QTableView {
                 font-family: monospace;
+                background-color: white;
+                color: black;
             }
         """)
 
