@@ -36,7 +36,7 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.size'] = 14
 
         self.ax = dict()
-        n = 1
+        n = 2
 
         if n > 1:
             gs = self.fig.add_gridspec(
@@ -50,9 +50,9 @@ class Canvas(FigureCanvas):
             self.ax[0] = self.fig.add_subplot(111)
 
         self.fig.subplots_adjust(
-            left=0.09,
+            left=0.07,
             right=0.99,
-            top=0.95,
+            top=0.92,
             bottom=0.06,
         )
 
@@ -68,8 +68,12 @@ class Canvas(FigureCanvas):
 
         # ティックデータ
         df_tick = dict_plot['tick']
+        # 含み益データ
+        df_profit = dict_plot['profit']
 
-        # Tick
+        # =============
+        #  ティックデータ
+        # =============
         self.ax[0].plot(
             df_tick['Price'],
             color='black',
@@ -77,9 +81,9 @@ class Canvas(FigureCanvas):
             alpha=0.5,
         )
 
+        # PSAR トレンド
         df_bear = df_tick[df_tick['TREND'] < 0]
         df_bull = df_tick[df_tick['TREND'] > 0]
-
         for df, color in zip([df_bear, df_bull], ['blue', 'red']):
             self.ax[0].scatter(
                 x=df.index,
@@ -89,10 +93,12 @@ class Canvas(FigureCanvas):
             )
 
         # チャート・タイトル
-        self.ax[0].set_title(dict_plot['title'])
+        # self.ax[0].set_title(dict_plot['title'])
+        self.fig.suptitle(dict_plot['title'])
+        self.ax[0].set_title(dict_plot['subtitle'], fontsize='small')
 
-        # Y軸タイトル
-        self.ax[0].set_ylabel(dict_plot['ylabel'])
+        # Y1軸タイトル
+        self.ax[0].set_ylabel(dict_plot['ylabel_tick'])
 
         # X軸の時刻刻みを調整
         tick_position, tick_labels = getMajorXTicks(df_tick)
@@ -109,6 +115,30 @@ class Canvas(FigureCanvas):
         self.ax[0].set_xlim(
             get_range_xaxis(df_tick)
         )
+
+        # 含み益トレンド
+        if len(df_profit) > 0:
+            self.ax[1].plot(
+                df_profit['Profit'],
+                color='black',
+                linewidth=0.5,
+                alpha=0.75,
+            )
+            self.ax[1].plot(
+                df_profit['ProfitMax'],
+                color='red',
+                linewidth=0.5,
+                alpha=0.75,
+            )
+        # y = 0 の横線
+        self.ax[1].axhline(
+            0,
+            linewidth=0.75,
+            color='#444',
+        )
+
+        # Y2軸タイトル
+        self.ax[1].set_ylabel(dict_plot['ylabel_profit'])
 
         # グリッド線
         drawGrid(self.fig)

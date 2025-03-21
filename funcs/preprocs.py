@@ -286,6 +286,11 @@ def read_sheet_cover_params(
     price_tick_min = df_cover.iloc[row, col]
     dict_target['price_tick_min'] = price_tick_min
 
+    # 売買単位
+    row = list(df_cover.index).index('売買単位')
+    unit = df_cover.iloc[row, col]
+    dict_target['unit'] = int(unit)
+
     # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
     # Parabolic SAR 関連
     # AF（初期値）

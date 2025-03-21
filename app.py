@@ -1,6 +1,8 @@
+import os
 import sys
 
 from PySide6.QtCore import QThreadPool
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -21,11 +23,13 @@ class TradeSimulator(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.res = AppRes()
+        self.res = res=AppRes()
         self.threadpool = QThreadPool()
 
+        icon = QIcon(os.path.join(res.dir_image, 'trading.png'))
+        self.setWindowIcon(icon)
         self.setWindowTitle(self.__app_name__)
-        self.setFixedSize(1200, 900)
+        self.setFixedSize(1500, 900)
 
         # ツールバー
         toolbar = ToolBar(self.res)

@@ -115,12 +115,14 @@ class LabelTitle2(LabelTitle):
             }
         """)
 
+
 class LabelTitleLeft(LabelTitle):
     def __init__(self, title: str):
         super().__init__(title)
         self.setAlignment(
             Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
         )
+
 
 class LabelTime(QLabel):
     def __init__(self):
@@ -139,6 +141,25 @@ class LabelTime(QLabel):
                 color: black;
             }
         """)
+
+
+class LabelFinance(QLabel):
+    def __init__(self, value: float):
+        super().__init__()
+        self.setMinimumWidth(100)
+        self.setLineWidth(1)
+        self.setAlignment(
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        )
+        self.setStyleSheet("""
+            QLabel {
+                font-family: monospace;
+                background-color: white;
+                color: black;
+                padding-right: 2px;
+            }
+        """)
+        self.setText('{:,}'.format(int(value)))
 
 
 class LabelValue(QLabel):

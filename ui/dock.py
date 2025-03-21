@@ -1,20 +1,23 @@
+import os
+
 from PySide6.QtCore import (
     QMargins,
     Qt,
     Signal,
 )
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDockWidget,
     QGridLayout,
-    QPushButton,
     QSizePolicy,
     QVBoxLayout,
-    QWidget,
+    QWidget, QHBoxLayout, QPushButton,
 )
 
 from structs.res import AppRes
 from ui.dialog import DlgAFSetting
 from widgets.buttons import EditButton, StartButton
+from widgets.frame import Frame
 from widgets.labels import (
     LabelDate,
     LabelFlat,
@@ -25,17 +28,17 @@ from widgets.labels import (
     LabelValue,
     LabelUnit,
 )
+from widgets.pads import HPad
 
 
 class DockMain(QDockWidget):
+    requestOrderHistory = Signal()
     requestSimulationStart = Signal(dict)
 
     def __init__(self, res: AppRes, dict_target: dict):
         super().__init__()
         self.res = res
         self.dict_target = dict_target
-        # self.dict_param = dict() # シミュレータへ渡すパラメータ用
-        # self.dict_af = dict()  # AF（加速因数）用
 
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # UI
@@ -122,6 +125,10 @@ class DockMain(QDockWidget):
         unitTickPriceMin = LabelUnit('円')
         layout.addWidget(unitTickPriceMin, r, 2)
 
+        self.objTickPriceMinEdit = objTickPriceMinEdit = EditButton(res)
+        objTickPriceMinEdit.clicked.connect(self.on_modify_tick_price_min)
+        layout.addWidget(objTickPriceMinEdit, r, 3)
+
         r += 1
         labTransaction = LabelFlat('【取引】')
         layout.addWidget(labTransaction, r, 0)
@@ -149,10 +156,15 @@ class DockMain(QDockWidget):
         layout.addWidget(labUnit, r, 0)
 
         self.objUnit = objUnit = LabelValue()
+        objUnit.setValue(dict_target['unit'], flag=False)
         layout.addWidget(objUnit, r, 1)
 
         unitUnit = LabelUnit('株')
         layout.addWidget(unitUnit, r, 2)
+
+        self.objUnitEdit = objUnitEdit = EditButton(res)
+        objUnitEdit.clicked.connect(self.on_modify_unit)
+        layout.addWidget(objUnitEdit, r, 3)
 
         r += 1
         labProfit = LabelTitle('含み損益')
@@ -186,6 +198,7 @@ class DockMain(QDockWidget):
         layout.addWidget(labTotal, r, 0)
 
         self.objTotal = objTotal = LabelValue()
+        objTotal.setValue(0)
         layout.addWidget(objTotal, r, 1)
 
         unitTotal = LabelUnit('円')
@@ -208,11 +221,11 @@ class DockMain(QDockWidget):
 
         self.objAFinit = objAFinit = LabelFloat()
         objAFinit.setValue(dict_target['af_init'])
-        layout.addWidget(objAFinit, r, 1)
+        layout.addWidget(objAFinit, r, 1, 1, 2)
 
         self.objAFedit = objAFedit = EditButton(res)
         objAFedit.clicked.connect(self.on_modify_af)
-        layout.addWidget(objAFedit, r, 2, 3, 1)
+        layout.addWidget(objAFedit, r, 3, 3, 1)
 
         r += 1
         labAFstep = LabelTitle('AF（ステップ）')
@@ -220,7 +233,7 @@ class DockMain(QDockWidget):
 
         self.objAFstep = objAFstep = LabelFloat()
         objAFstep.setValue(dict_target['af_step'])
-        layout.addWidget(objAFstep, r, 1)
+        layout.addWidget(objAFstep, r, 1, 1, 2)
 
         r += 1
         labAFmax = LabelTitle('AF（最大値）')
@@ -228,11 +241,11 @@ class DockMain(QDockWidget):
 
         self.objAFmax = objAFmax = LabelFloat()
         objAFmax.setValue(dict_target['af_max'])
-        layout.addWidget(objAFmax, r, 1)
+        layout.addWidget(objAFmax, r, 1, 1, 2)
 
         r += 1
         base_control = QWidget()
-        layout.addWidget(base_control, r, 0, 1, 3)
+        layout.addWidget(base_control, r, 0, 1, 4)
 
         vbox = QVBoxLayout()
         vbox.setSpacing(0)
@@ -240,10 +253,29 @@ class DockMain(QDockWidget):
         base_control.setLayout(vbox)
 
         self.btnStart = but_start = StartButton(res)
-        but_start.setFixedHeight(30)
+        but_start.setFixedHeight(40)
         but_start.setToolTip('シミュレーション開始')
         but_start.clicked.connect(self.on_simulation_start_request)
         vbox.addWidget(but_start)
+
+        hbar = Frame()
+        vbox.addWidget(hbar)
+
+        hbox = QHBoxLayout()
+        hbox.setSpacing(0)
+        hbox.setContentsMargins(QMargins(0, 0, 0, 0))
+        hbar.setLayout(hbox)
+
+        hpad = HPad()
+        hbox.addWidget(hpad)
+
+        but_order = QPushButton()
+        but_order.setIcon(
+            QIcon(os.path.join(self.res.dir_image, 'cart.png'))
+        )
+        but_order.setToolTip('売買履歴（テーブル）')
+        but_order.clicked.connect(self.on_order_history)
+        hbox.addWidget(but_order)
 
     def get_psar_af_param(self, dict_param: dict):
         """
@@ -266,25 +298,67 @@ class DockMain(QDockWidget):
         dict_param['tick'] = self.dict_target['tick']['Price']
 
     def on_modify_af(self):
+        """
+        Parabolic SAR の AF パラメータの編集ダイアログ
+        :return:
+        """
         dict_af = dict()
         self.get_psar_af_param(dict_af)
 
-        dlg = DlgAFSetting(dict_af)
+        # 設定ダイアログを表示
+        dlg = DlgAFSetting(self.res, dict_af)
         if dlg.exec():
             self.objAFinit.setValue(dict_af['af_init'])
             self.objAFstep.setValue(dict_af['af_step'])
             self.objAFmax.setValue(dict_af['af_max'])
+
+    def on_modify_tick_price_min(self):
+        pass
+
+    def on_modify_unit(self):
+        pass
+
+    def on_order_history(self):
+        self.requestOrderHistory.emit()
 
     def on_simulation_start_request(self):
         dict_param = dict()
         # シミュレータへ渡すデータ＆パラメータを準備
         self.get_tick_date_price(dict_param)
         self.get_psar_af_param(dict_param)
+        # 売買単位
+        dict_param['unit'] = self.objUnit.getValue()
 
         # -----------------------------
-        # 🔆 シミュレーション開始のリクエスト
+        # 🧿 シミュレーション開始のリクエスト
         # -----------------------------
         self.requestSimulationStart.emit(dict_param)
+
+    def setPosition(self, position: str, price: float):
+        """
+        建玉のポジションと価格を設定（表示）
+        :param position:
+        :param price:
+        :return:
+        """
+        self.objPosition.setText(position)
+        self.objPositionPrice.setValue(price)
+
+    def setProfit(self, profit: float):
+        """
+        含み損益を設定（表示）
+        :param profit:
+        :return:
+        """
+        self.objProfit.setValue(profit)
+
+    def setProfitMax(self, profit_max: float):
+        """
+        最大含み損益を設定（表示）
+        :param profit_max: 
+        :return: 
+        """
+        self.objProfitMax.setValue(profit_max)
 
     def setStatus(self, status_str: str):
         """
@@ -313,3 +387,11 @@ class DockMain(QDockWidget):
         self.objTickTime.setText(time_str)
         self.objTickPrice.setValue(price)
         self.objTrend.setValue(trend, flag=False)
+
+    def setTotal(self, price: float):
+        """
+        合計損益額を設定（表示）
+        :param price:
+        :return:
+        """
+        self.objTotal.setValue(price)
