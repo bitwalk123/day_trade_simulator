@@ -7,7 +7,7 @@ from PySide6.QtCore import (
     Signal,
 )
 
-from tech.rpsar import RealTimePSAR
+from tech.rtpsar import RealTimePSAR
 from sim.position_manager import PositionManager
 
 
