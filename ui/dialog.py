@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
 )
 
 from structs.res import AppRes
-from widgets.frame import Frame
+from widgets.container import Frame
 from widgets.labels import (
     LabelFlat,
     LabelTitleLeft,
