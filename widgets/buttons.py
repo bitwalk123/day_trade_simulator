@@ -84,6 +84,16 @@ class FolderToolButton(QToolButton):
             QIcon(os.path.join(res.dir_image, 'folder.png'))
         )
 
+class ChooseButton(Button):
+    def __init__(self, res: AppRes):
+        super().__init__()
+        self.setIcon(
+            QIcon(os.path.join(res.dir_image, 'select.png'))
+        )
+        self.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Preferred
+        )
 
 class PushButton(QPushButton):
     """

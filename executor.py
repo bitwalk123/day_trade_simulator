@@ -1,21 +1,21 @@
 import os
 import sys
-import pandas as pd
 from PySide6.QtCore import QThreadPool
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
-    QWidget,
+    QWidget, QProgressBar,
 )
 
 from structs.res import AppRes
-from widgets.buttons import FolderButton
+from widgets.buttons import ChooseButton, FolderButton
 from widgets.combo import ComboBox
 from widgets.container import ScrollAreaVertical
 from widgets.dialog import FileDialogExcel
 from widgets.entry import EntryExcelFile
 from widgets.layouts import GridLayout
+from widgets.statusbar import StatusBar
 
 
 class Executor(QMainWindow):
@@ -51,6 +51,21 @@ class Executor(QMainWindow):
         self.combo_sheet = combo_sheet = ComboBox()
         layout.addWidget(combo_sheet, r, 2)
 
+        self.but_choose = but_choose = ChooseButton(res)
+        but_choose.setDisabled(True)
+        layout.addWidget(but_choose, r, 3)
+
+        r = 1
+        panel = QWidget()
+        layout.addWidget(panel, r, 0, 1, 4)
+
+        statusbar = StatusBar()
+        self.setStatusBar(statusbar)
+
+        self.pbar = pbar = QProgressBar()
+        self.pbar.setRange(0, 100)
+        statusbar.addPermanentWidget(pbar, stretch=1)
+
     def on_file_dialog_open(self):
         """
         Excel Macro ファイルの読み込み
@@ -63,8 +78,8 @@ class Executor(QMainWindow):
 
         file_excel = dialog.selectedFiles()[0]
         self.ent_sheet.setExcelFile(file_excel)
-        #xl = pd.ExcelFile(file_excel)
         self.combo_sheet.addItems(self.ent_sheet.getSheetList())
+        self.but_choose.setEnabled(True)
 
 
 def main():
