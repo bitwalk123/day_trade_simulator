@@ -42,7 +42,7 @@ class Designer(QMainWindow):
         ent_sheet.setFixedWidth(200)
         layout.addWidget(ent_sheet, r, 1)
 
-        combo_sheet = ComboBox()
+        self.combo_sheet = combo_sheet = ComboBox()
         layout.addWidget(combo_sheet, r, 2)
 
     def on_file_dialog_open(self):
@@ -57,7 +57,7 @@ class Designer(QMainWindow):
 
         file_excel = dialog.selectedFiles()[0]
         xl = pd.ExcelFile(file_excel)
-        print(xl.sheet_names)
+        self.combo_sheet.addItems(xl.sheet_names)
 
 
 def main():
