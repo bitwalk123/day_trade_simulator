@@ -44,7 +44,7 @@ class Executor(QMainWindow):
         but_folder.clicked.connect(self.on_file_dialog_open)
         layout.addWidget(but_folder, r, 0)
 
-        ent_sheet = EntryExcelFile()
+        self.ent_sheet = ent_sheet = EntryExcelFile()
         ent_sheet.setFixedWidth(200)
         layout.addWidget(ent_sheet, r, 1)
 
@@ -62,8 +62,9 @@ class Executor(QMainWindow):
             return
 
         file_excel = dialog.selectedFiles()[0]
-        xl = pd.ExcelFile(file_excel)
-        self.combo_sheet.addItems(xl.sheet_names)
+        self.ent_sheet.setExcelFile(file_excel)
+        #xl = pd.ExcelFile(file_excel)
+        self.combo_sheet.addItems(self.ent_sheet.getSheetList())
 
 
 def main():

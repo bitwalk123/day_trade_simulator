@@ -1,3 +1,7 @@
+import os
+import re
+
+import pandas as pd
 from PySide6.QtWidgets import QLineEdit, QSizePolicy
 
 
@@ -20,7 +24,27 @@ class Entry(QLineEdit):
             }
         """)
 
+
 class EntryExcelFile(Entry):
     def __init__(self):
         super().__init__()
         self.setFixedWidth(100)
+        self.setEnabled(False)
+
+        self.filename = None
+        self.list_sheet = list()
+
+        self.pattern = re.compile(r'tick_.*')
+
+    def setExcelFile(self, filename: str):
+        self.filename = filename
+        self.setText(os.path.basename(filename))
+        obj_excel = pd.ExcelFile(filename)
+        self.list_sheet = list()
+        for sheet in obj_excel.sheet_names:
+            m = self.pattern.match(sheet)
+            if m:
+                self.list_sheet.append(sheet)
+
+    def getSheetList(self) -> list:
+        return self.list_sheet
