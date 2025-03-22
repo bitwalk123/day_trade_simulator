@@ -71,6 +71,10 @@ class FolderButton(Button):
         self.setIcon(
             QIcon(os.path.join(res.dir_image, 'folder.png'))
         )
+        self.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Preferred
+        )
 
 
 class FolderToolButton(QToolButton):

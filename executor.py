@@ -1,6 +1,8 @@
+import os
 import sys
 import pandas as pd
 from PySide6.QtCore import QThreadPool
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -16,13 +18,17 @@ from widgets.entry import EntryExcelFile
 from widgets.layouts import GridLayout
 
 
-class Designer(QMainWindow):
-    __app_name__ = 'Experiment Designer'
+class Executor(QMainWindow):
+    __app_name__ = 'Executor'
 
     def __init__(self):
         super().__init__()
         self.res = res = AppRes()
         self.threadpool = QThreadPool()
+
+        icon = QIcon(os.path.join(res.dir_image, 'start.png'))
+        self.setWindowIcon(icon)
+        self.setWindowTitle(self.__app_name__)
 
         sa = ScrollAreaVertical()
         self.setCentralWidget(sa)
@@ -62,7 +68,7 @@ class Designer(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    win = Designer()
+    win = Executor()
     win.show()
     sys.exit(app.exec())
 
