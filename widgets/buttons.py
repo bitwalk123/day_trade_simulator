@@ -133,7 +133,7 @@ class StartButton(PushButton):
         icon = QIcon(os.path.join(res.dir_image, 'start.png'))
         self.setIcon(icon)
         self.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Preferred
         )
         self.setToolTip('スタート')

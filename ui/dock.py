@@ -8,10 +8,11 @@ from PySide6.QtCore import (
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDockWidget,
-    QGridLayout,
+    QHBoxLayout,
+    QPushButton,
     QSizePolicy,
     QVBoxLayout,
-    QWidget, QHBoxLayout, QPushButton,
+    QWidget,
 )
 
 from structs.res import AppRes
@@ -28,6 +29,7 @@ from widgets.labels import (
     LabelValue,
     LabelUnit,
 )
+from widgets.layouts import GridLayout
 
 
 class DockMain(QDockWidget):
@@ -53,8 +55,7 @@ class DockMain(QDockWidget):
         )
         self.setWidget(base)
 
-        layout = QGridLayout()
-        layout.setSpacing(0)
+        layout = GridLayout()
         base.setLayout(layout)
 
         r = 0
