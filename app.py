@@ -23,7 +23,7 @@ class TradeSimulator(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.res = res=AppRes()
+        self.res = res = AppRes()
         self.threadpool = QThreadPool()
 
         icon = QIcon(os.path.join(res.dir_image, 'trading.png'))
@@ -73,7 +73,6 @@ class TradeSimulator(QMainWindow):
             self.base.addTab(tabobj, code)
         # 進捗をリセット
         self.pbar.reset()
-
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)

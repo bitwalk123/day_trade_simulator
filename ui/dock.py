@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
 )
 
 from structs.res import AppRes
-from ui.dialog import DlgAFSetting
+from widgets.dialog import DlgAFSetting
 from widgets.buttons import EditButton, StartButton
 from widgets.container import Frame, PadH
 from widgets.labels import (

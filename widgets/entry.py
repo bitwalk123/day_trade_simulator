@@ -14,3 +14,7 @@ class Entry(QLineEdit):
                 padding-left:5px;
             }
         """)
+
+class EntryExcelFile(Entry):
+    def __init__(self):
+        super().__init__()

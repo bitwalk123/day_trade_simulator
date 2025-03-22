@@ -1,13 +1,11 @@
 import os
 
 from PySide6.QtCore import Signal
-from PySide6.QtWidgets import (
-    QToolBar,
-    QFileDialog,
-)
+from PySide6.QtWidgets import QToolBar
 
 from structs.res import AppRes
 from widgets.buttons import FolderToolButton
+from widgets.dialog import FileDialogExcel
 
 
 class ToolBar(QToolBar):
@@ -31,16 +29,7 @@ class ToolBar(QToolBar):
         Excel Macro ファイルの読み込み
         :return:
         """
-        dialog = QFileDialog()
-        # 初期ディレクトリを指定
-        dialog.setDirectory(self.res.dir_excel)
-        # 拡張子のフィルターを設定
-        dialog.setNameFilters(
-            [
-                'Excel Macro (*.xlsm)',
-                'All files (*)',
-            ]
-        )
+        dialog = FileDialogExcel(self.res)
         # ファイルを選択されなければ何もしない
         if not dialog.exec():
             return

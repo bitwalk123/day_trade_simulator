@@ -1,12 +1,18 @@
 import sys
 import pandas as pd
 from PySide6.QtCore import QThreadPool
-from PySide6.QtWidgets import QMainWindow, QApplication, QWidget, QFileDialog
+from PySide6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QWidget,
+)
 
 from structs.res import AppRes
-from widgets.buttons import FolderButton, StartButton
+from widgets.buttons import FolderButton
+from widgets.combo import ComboBox
 from widgets.container import ScrollAreaVertical
-from widgets.entry import Entry
+from widgets.dialog import FileDialogExcel
+from widgets.entry import EntryExcelFile
 from widgets.layouts import GridLayout
 
 
@@ -32,28 +38,19 @@ class Designer(QMainWindow):
         but_folder.clicked.connect(self.on_file_dialog_open)
         layout.addWidget(but_folder, r, 0)
 
-        ent_folder = Entry()
-        ent_folder.setFixedWidth(200)
-        layout.addWidget(ent_folder, r, 1)
+        ent_sheet = EntryExcelFile()
+        ent_sheet.setFixedWidth(200)
+        layout.addWidget(ent_sheet, r, 1)
 
-        but_start = StartButton(res)
-        layout.addWidget(but_start, r, 2)
+        combo_sheet = ComboBox()
+        layout.addWidget(combo_sheet, r, 2)
 
     def on_file_dialog_open(self):
         """
         Excel Macro ファイルの読み込み
         :return:
         """
-        dialog = QFileDialog()
-        # 初期ディレクトリを指定
-        dialog.setDirectory(self.res.dir_excel)
-        # 拡張子のフィルターを設定
-        dialog.setNameFilters(
-            [
-                'Excel Macro (*.xlsm)',
-                'All files (*)',
-            ]
-        )
+        dialog = FileDialogExcel(self.res)
         # ファイルを選択されなければ何もしない
         if not dialog.exec():
             return
