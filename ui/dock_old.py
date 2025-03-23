@@ -26,7 +26,7 @@ from widgets.labels import (
     LabelUnit,
     LabelValue,
 )
-from widgets.pads import HPad
+from widgets.container import PadH
 
 
 class DockSimulator(QDockWidget):
@@ -220,7 +220,7 @@ class DockSimulator(QDockWidget):
         hbox.setContentsMargins(QMargins(0, 0, 0, 0))
         hbar.setLayout(hbox)
 
-        hpad = HPad()
+        hpad = PadH()
         hbox.addWidget(hpad)
 
         but_contour = QPushButton()

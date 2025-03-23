@@ -23,7 +23,7 @@ from widgets.labels import (
     LabelTitle2,
 )
 from widgets.layouts import VBoxLayout
-from widgets.pads import HPadFixed
+from widgets.container import PadHFixed
 from widgets.slider import Slider
 
 
@@ -104,7 +104,7 @@ class DockContour(QDockWidget):
         head_y.setFixedWidth(20)
         self.layout_params.addWidget(head_y, r, 4)
 
-        pad = HPadFixed()
+        pad = PadHFixed()
         self.layout_params.addWidget(pad, r, 5)
 
         r += 1
@@ -153,7 +153,7 @@ class DockContour(QDockWidget):
             group_y.addButton(but_y, r)
             self.layout_params.addWidget(but_y, r, 4)
 
-            pad = HPadFixed()
+            pad = PadHFixed()
             self.layout_params.addWidget(pad, r, 5)
             r += 1
 

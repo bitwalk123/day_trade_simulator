@@ -8,16 +8,17 @@ from PySide6.QtCore import (
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDockWidget,
-    QGridLayout,
+    QHBoxLayout,
+    QPushButton,
     QSizePolicy,
     QVBoxLayout,
-    QWidget, QHBoxLayout, QPushButton,
+    QWidget,
 )
 
 from structs.res import AppRes
-from ui.dialog import DlgAFSetting
+from widgets.dialog import DlgAFSetting
 from widgets.buttons import EditButton, StartButton
-from widgets.frame import Frame
+from widgets.container import Frame, PadH
 from widgets.labels import (
     LabelDate,
     LabelFlat,
@@ -28,7 +29,7 @@ from widgets.labels import (
     LabelValue,
     LabelUnit,
 )
-from widgets.pads import HPad
+from widgets.layouts import GridLayout
 
 
 class DockMain(QDockWidget):
@@ -54,8 +55,7 @@ class DockMain(QDockWidget):
         )
         self.setWidget(base)
 
-        layout = QGridLayout()
-        layout.setSpacing(0)
+        layout = GridLayout()
         base.setLayout(layout)
 
         r = 0
@@ -266,7 +266,7 @@ class DockMain(QDockWidget):
         hbox.setContentsMargins(QMargins(0, 0, 0, 0))
         hbar.setLayout(hbox)
 
-        hpad = HPad()
+        hpad = PadH()
         hbox.addWidget(hpad)
 
         but_order = QPushButton()

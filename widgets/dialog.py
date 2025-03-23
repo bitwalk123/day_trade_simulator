@@ -4,13 +4,14 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
+    QFileDialog,
     QGridLayout,
     QMessageBox,
     QVBoxLayout,
 )
 
 from structs.res import AppRes
-from widgets.frame import Frame
+from widgets.container import Frame
 from widgets.labels import (
     LabelFlat,
     LabelTitleLeft,
@@ -25,6 +26,20 @@ def DialogWarning(message: str):
     dlg.setStandardButtons(QMessageBox.StandardButton.Ok)
     dlg.setIcon(QMessageBox.Icon.Warning)
     dlg.exec()
+
+
+class FileDialogExcel(QFileDialog):
+    def __init__(self, res: AppRes):
+        super().__init__()
+        # 初期ディレクトリを指定
+        self.setDirectory(res.dir_excel)
+        # 拡張子のフィルターを設定
+        self.setNameFilters(
+            [
+                'Excel Macro (*.xlsm)',
+                'All files (*)',
+            ]
+        )
 
 
 class DlgAFSetting(QDialog):

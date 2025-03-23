@@ -71,6 +71,10 @@ class FolderButton(Button):
         self.setIcon(
             QIcon(os.path.join(res.dir_image, 'folder.png'))
         )
+        self.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Preferred
+        )
 
 
 class FolderToolButton(QToolButton):
@@ -80,6 +84,16 @@ class FolderToolButton(QToolButton):
             QIcon(os.path.join(res.dir_image, 'folder.png'))
         )
 
+class ChooseButton(Button):
+    def __init__(self, res: AppRes):
+        super().__init__()
+        self.setIcon(
+            QIcon(os.path.join(res.dir_image, 'select.png'))
+        )
+        self.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Preferred
+        )
 
 class PushButton(QPushButton):
     """
@@ -133,7 +147,7 @@ class StartButton(PushButton):
         icon = QIcon(os.path.join(res.dir_image, 'start.png'))
         self.setIcon(icon)
         self.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Preferred
         )
         self.setToolTip('スタート')

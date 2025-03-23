@@ -15,7 +15,7 @@ from sim.simulator_old import WorkerSimulator
 from structs.app_enum import SimulationMode
 from structs.res import AppRes
 from ui.dock_old import DockSimulator
-from ui.toolbar import ToolBar
+from ui.toolbar_main import ToolBarMain
 from ui.win_order_history import WinOrderHistory
 from ui.win_overlay import WinOverlayAnalysis
 from widgets.charts import Canvas, ChartNavigation
@@ -40,7 +40,7 @@ class TradeSimulator(QMainWindow):
         self.setWindowTitle(self.__app_name__)
         self.setFixedSize(1200, 800)
 
-        toolbar = ToolBar(self.res)
+        toolbar = ToolBarMain(self.res)
         toolbar.readyDataset.connect(self.on_show_target)
         self.addToolBar(toolbar)
 

@@ -6,14 +6,14 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
-    QProgressBar,
     QTabWidget,
 )
 
 from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
-from ui.toolbar import ToolBar
+from ui.toolbar_main import ToolBarMain
 from ui.win_main import WinMain
+from widgets.progress import ProgressBar
 from widgets.statusbar import StatusBar
 from widgets.tabwidget import TabWidget
 
@@ -23,7 +23,7 @@ class TradeSimulator(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.res = res=AppRes()
+        self.res = res = AppRes()
         self.threadpool = QThreadPool()
 
         icon = QIcon(os.path.join(res.dir_image, 'trading.png'))
@@ -32,7 +32,7 @@ class TradeSimulator(QMainWindow):
         self.setFixedSize(1500, 900)
 
         # ツールバー
-        toolbar = ToolBar(self.res)
+        toolbar = ToolBarMain(self.res)
         toolbar.fileSelected.connect(self.on_file_selected)
         self.addToolBar(toolbar)
 
@@ -43,7 +43,7 @@ class TradeSimulator(QMainWindow):
         statusbar = StatusBar()
         self.setStatusBar(statusbar)
 
-        self.pbar = pbar = QProgressBar()
+        self.pbar = pbar = ProgressBar()
         self.pbar.setRange(0, 100)
         statusbar.addPermanentWidget(pbar, stretch=1)
 
@@ -73,7 +73,6 @@ class TradeSimulator(QMainWindow):
             self.base.addTab(tabobj, code)
         # 進捗をリセット
         self.pbar.reset()
-
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)
