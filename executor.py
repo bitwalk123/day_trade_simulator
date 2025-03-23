@@ -5,25 +5,31 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
-    QWidget,
     QProgressBar,
+    QSizePolicy,
+    QWidget,
 )
 
 from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
-from widgets.buttons import ChooseButton, FolderButton
+from widgets.buttons import (
+    ChooseButton,
+    FolderButton,
+    StartButton,
+)
 from widgets.combo import ComboBox
-from widgets.container import ScrollAreaVertical
-from widgets.dialog import FileDialogExcel
-from widgets.entry import EntryExcelFile
+from widgets.container import PadH, ScrollAreaVertical
+from widgets.dialog import DirDialog, FileDialogExcel
+from widgets.entry import EntryDir, EntryExcelFile
 from widgets.labels import (
+    LabelDate,
     LabelFlat,
     LabelFloat,
     LabelTitle,
     LabelTitleRaised,
     LabelValue,
 )
-from widgets.layouts import GridLayout
+from widgets.layouts import GridLayout, HBoxLayout
 from widgets.statusbar import StatusBar
 from widgets.toolbar import ToolBar
 
@@ -35,6 +41,7 @@ class Executor(QMainWindow):
         super().__init__()
         self.res = res = AppRes()
         self.threadpool = QThreadPool()
+        self.dict_dict_target = dict()
 
         icon = QIcon(os.path.join(res.dir_image, 'start.png'))
         self.setWindowIcon(icon)
@@ -50,11 +57,6 @@ class Executor(QMainWindow):
         self.ent_sheet = ent_sheet = EntryExcelFile()
         ent_sheet.setFixedWidth(200)
         toolbar.addWidget(ent_sheet)
-
-        """
-        self.combo_sheet = combo_sheet = ComboBox()
-        toolbar.addWidget(combo_sheet)
-        """
 
         self.but_choose = but_choose = ChooseButton(res)
         but_choose.setDisabled(True)
@@ -78,7 +80,14 @@ class Executor(QMainWindow):
         layout.addWidget(comboCode, r, 1)
 
         r += 1
-        labTargetCode = LabelFlat('【実験条件】')
+        labDate = LabelTitle('現在日付')
+        layout.addWidget(labDate, r, 0)
+
+        self.objDate = objDate = LabelDate()
+        layout.addWidget(objDate, r, 1)
+
+        r += 1
+        labTargetCode = LabelFlat('【水準】')
         layout.addWidget(labTargetCode, r, 0)
 
         r += 1
@@ -123,6 +132,30 @@ class Executor(QMainWindow):
             self.af_max.append(objAFmax)
             self.total.append(objTotal)
 
+        r += 1
+        base_output = QWidget()
+        base_output.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Expanding,
+        )
+        layout.addWidget(base_output, r, 0, 1, 5)
+
+        layout_output = HBoxLayout()
+        base_output.setLayout(layout_output)
+
+        labOutput = LabelTitle('出力先')
+        layout_output.addWidget(labOutput)
+
+        self.entOutput = entOutput = EntryDir()
+        layout_output.addWidget(entOutput)
+
+        but_dir = FolderButton(res)
+        but_dir.clicked.connect(self.on_dir_dialog_select)
+        layout_output.addWidget(but_dir)
+
+        padh = PadH()
+        layout_output.addWidget(padh)
+
         # ステータス・バー
         statusbar = StatusBar()
         self.setStatusBar(statusbar)
@@ -130,6 +163,13 @@ class Executor(QMainWindow):
         self.pbar = pbar = QProgressBar()
         self.pbar.setRange(0, 100)
         statusbar.addPermanentWidget(pbar, stretch=1)
+
+        r += 1
+        self.btnStart = but_start = StartButton(res)
+        but_start.setFixedHeight(40)
+        but_start.setToolTip('シミュレーション開始')
+        # but_start.clicked.connect(self.on_simulation_start_request)
+        layout.addWidget(but_start, r, 0, 1, 5)
 
     def on_file_selected(self):
         """
@@ -149,7 +189,13 @@ class Executor(QMainWindow):
         :param list_target:
         :return:
         """
-        print(list_target)
+        for dict_target in list_target:
+            code = dict_target['code']
+            self.comboCode.addItem(code)
+            self.dict_dict_target[code] = dict_target
+
+        self.objDate.setText(list_target[0]['date'])
+
         """
         # 現在のタブをすべて削除
         self.base.deleteAllTabs()
@@ -161,6 +207,16 @@ class Executor(QMainWindow):
         """
         # 進捗をリセット
         self.pbar.reset()
+
+    def on_dir_dialog_select(self):
+        dialog = DirDialog()
+        if not dialog.exec():
+            return
+
+        basedir = dialog.selectedFiles()[0]
+        dateStr = self.objDate.text()
+        if dateStr is not None:
+            self.entOutput.setText(os.path.join(basedir, dateStr))
 
     def on_file_dialog_open(self):
         """
@@ -174,7 +230,6 @@ class Executor(QMainWindow):
 
         file_excel = dialog.selectedFiles()[0]
         self.ent_sheet.setExcelFile(file_excel)
-        # self.combo_sheet.addItems(self.ent_sheet.getSheetList())
         self.but_choose.setEnabled(True)
 
     def on_status_update(self, progress: int):
