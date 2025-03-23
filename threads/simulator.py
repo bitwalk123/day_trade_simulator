@@ -14,6 +14,7 @@ from sim.position_manager import PositionManager
 class SimulatorSignal(QObject):
     positionOpen = Signal(dict)
     positionClose = Signal(float)
+    simulationCompleted = Signal(dict) # auto-simulation 用
     threadFinished = Signal(dict)
     updateProfit = Signal(dict)
     updateSystemTime = Signal(str, int)
@@ -154,6 +155,8 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # ---------------------------------------------------------------------
         # 🧿 スレッド処理の終了を通知
         self.threadFinished.emit(dict_result)
+        # 🧿 シミュレーション処理の終了を通知（auto-simulation 用シグナル）
+        self.simulationCompleted.emit(dict_result)
         # ---------------------------------------------------------------------
 
     def position_close(self, t_current, p_current, note: str = ''):

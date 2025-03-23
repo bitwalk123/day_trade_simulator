@@ -1,7 +1,7 @@
 import os
 
 import pandas as pd
-from PySide6.QtCore import Qt, QThreadPool
+from PySide6.QtCore import Qt, QThreadPool, Signal
 from PySide6.QtWidgets import QMainWindow, QProgressBar
 
 from funcs.conv import df_to_html
@@ -13,6 +13,8 @@ from widgets.charts import Canvas, ChartNavigation
 
 
 class WinMain(QMainWindow):
+    simulationCompleted = Signal(dict)
+
     def __init__(
             self,
             res: AppRes,
@@ -156,6 +158,7 @@ class WinMain(QMainWindow):
         sim.updateSystemTime.connect(self.on_simulation_update_systemtime)
         sim.updateTickPrice.connect(self.on_simulation_update_tickprice)
         sim.threadFinished.connect(self.on_simulation_finished)
+        sim.simulationCompleted.connect(self.auto_simulation_completed)
         self.threadpool.start(sim)
 
     def on_simulation_position_open(self, dict_position: dict):
@@ -205,3 +208,12 @@ class WinMain(QMainWindow):
         :return:
         """
         self.dock.setTickPrice(time_str, price, trend)
+
+    # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+    #  Executor 用処理
+    # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+    def autoSimulationStart(self):
+        self.dock.on_simulation_start_request()
+
+    def auto_simulation_completed(self, dict_result: dict):
+        self.simulationCompleted.emit(dict_result)

@@ -12,6 +12,8 @@ from PySide6.QtWidgets import (
 
 from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
+from ui.panel_output import PanelOutput
+from ui.panel_param import PanelParam
 from ui.win_main import WinMain
 from widgets.buttons import (
     ChooseButton,
@@ -43,6 +45,8 @@ class Executor(QMainWindow):
         self.res = res = AppRes()
         self.threadpool = QThreadPool()
         self.dict_dict_target = dict()
+
+        self.code_target = None
         self.winmain: None | WinMain = None
 
         icon = QIcon(os.path.join(res.dir_image, 'start.png'))
@@ -57,7 +61,6 @@ class Executor(QMainWindow):
         toolbar.addWidget(but_folder)
 
         self.ent_sheet = ent_sheet = EntryExcelFile()
-        ent_sheet.setFixedWidth(200)
         toolbar.addWidget(ent_sheet)
 
         self.but_choose = but_choose = ChooseButton(res)
@@ -93,70 +96,20 @@ class Executor(QMainWindow):
         layout.addWidget(labTargetCode, r, 0)
 
         r += 1
-        labAFinit = LabelTitleRaised('AF init')
-        layout.addWidget(labAFinit, r, 0)
-
-        labAFstep = LabelTitleRaised('AF step')
-        layout.addWidget(labAFstep, r, 1)
-
-        labAFmax = LabelTitleRaised('AF max')
-        layout.addWidget(labAFmax, r, 2)
-
-        labTotal = LabelTitleRaised('合計損益')
-        layout.addWidget(labTotal, r, 3)
-
-        self.af_init = list()
-        self.af_step = list()
-        self.af_max = list()
-        self.total = list()
-
-        for i in range(1):
-            r += 1
-
-            objAFinit = LabelFloat()
-            objAFinit.setValue(0)
-            layout.addWidget(objAFinit, r, 0)
-
-            objAFstep = LabelFloat()
-            objAFstep.setValue(0)
-            layout.addWidget(objAFstep, r, 1)
-
-            objAFmax = LabelFloat()
-            objAFmax.setValue(0)
-            layout.addWidget(objAFmax, r, 2)
-
-            objTotal = LabelValue()
-            objTotal.setValue(0)
-            layout.addWidget(objTotal, r, 3)
-
-            self.af_init.append(objAFinit)
-            self.af_step.append(objAFstep)
-            self.af_max.append(objAFmax)
-            self.total.append(objTotal)
+        self.panelParam = panel_param = PanelParam(res)
+        layout.addWidget(panel_param, r, 0, 1, 3)
 
         r += 1
-        base_output = QWidget()
-        base_output.setSizePolicy(
-            QSizePolicy.Policy.Preferred,
-            QSizePolicy.Policy.Expanding,
-        )
-        layout.addWidget(base_output, r, 0, 1, 5)
+        self.panelOutput = panel_output = PanelOutput(res)
+        panel_output.selectDir.connect(self.on_dir_dialog_select)
+        layout.addWidget(panel_output, r, 0, 1, 3)
 
-        layout_output = HBoxLayout()
-        base_output.setLayout(layout_output)
-
-        labOutput = LabelTitle('出力先')
-        layout_output.addWidget(labOutput)
-
-        self.entOutput = entOutput = EntryDir()
-        layout_output.addWidget(entOutput)
-
-        but_dir = FolderButton(res)
-        but_dir.clicked.connect(self.on_dir_dialog_select)
-        layout_output.addWidget(but_dir)
-
-        padh = PadH()
-        layout_output.addWidget(padh)
+        r += 1
+        self.btnStart = but_start = StartButton(res)
+        but_start.setFixedHeight(40)
+        but_start.setToolTip('シミュレーション開始')
+        but_start.clicked.connect(self.on_simulation_start)
+        layout.addWidget(but_start, r, 0, 1, 3)
 
         # ステータス・バー
         statusbar = StatusBar()
@@ -166,12 +119,11 @@ class Executor(QMainWindow):
         self.pbar.setRange(0, 100)
         statusbar.addPermanentWidget(pbar, stretch=1)
 
-        r += 1
-        self.btnStart = but_start = StartButton(res)
-        but_start.setFixedHeight(40)
-        but_start.setToolTip('シミュレーション開始')
-        but_start.clicked.connect(self.on_simulation_start)
-        layout.addWidget(but_start, r, 0, 1, 5)
+    def closeEvent(self, event):
+        print('アプリケーションを終了します。')
+        if self.winmain is not None:
+            self.winmain.deleteLater()
+        event.accept()  # let the window close
 
     def on_file_selected(self):
         """
@@ -218,7 +170,8 @@ class Executor(QMainWindow):
         basedir = dialog.selectedFiles()[0]
         dateStr = self.objDate.text()
         if dateStr is not None:
-            self.entOutput.setText(os.path.join(basedir, dateStr))
+            path = os.path.join(basedir, dateStr)
+            self.panelOutput.setOutput(path)
 
     def on_file_dialog_open(self):
         """
@@ -235,11 +188,27 @@ class Executor(QMainWindow):
         self.but_choose.setEnabled(True)
 
     def on_simulation_start(self):
-        code = self.comboCode.currentText()
-        dict_target = self.dict_dict_target[code]
-        if self.winmain is None:
-            self.winmain = WinMain(self.res, dict_target, self.threadpool, self.pbar)
+        self.code_target = self.comboCode.currentText()
+        self.loop_simulation()
+
+    def loop_simulation(self):
+        dict_target = self.dict_dict_target[self.code_target]
+
+        if self.winmain is not None:
+            self.winmain.hide()
+            self.winmain.deleteLater()
+        # ---------------
+        #  Simulator 起動
+        # ---------------
+        self.winmain = WinMain(self.res, dict_target, self.threadpool, self.pbar)
+        self.winmain.simulationCompleted.connect(self.next_simulation)
+        self.winmain.setFixedSize(1600, 800)
         self.winmain.show()
+        self.winmain.autoSimulationStart()
+
+    def next_simulation(self, dict_result: dict):
+        print(dict_result['total'])
+        print('Completed!')
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)
