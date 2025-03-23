@@ -35,6 +35,7 @@ class Executor(QMainWindow):
         super().__init__()
         self.res = res = AppRes()
         self.threadpool = QThreadPool()
+        self.dict_dict_target = dict()
 
         icon = QIcon(os.path.join(res.dir_image, 'start.png'))
         self.setWindowIcon(icon)
@@ -50,11 +51,6 @@ class Executor(QMainWindow):
         self.ent_sheet = ent_sheet = EntryExcelFile()
         ent_sheet.setFixedWidth(200)
         toolbar.addWidget(ent_sheet)
-
-        """
-        self.combo_sheet = combo_sheet = ComboBox()
-        toolbar.addWidget(combo_sheet)
-        """
 
         self.but_choose = but_choose = ChooseButton(res)
         but_choose.setDisabled(True)
@@ -149,7 +145,11 @@ class Executor(QMainWindow):
         :param list_target:
         :return:
         """
-        print(list_target)
+        for dict_target in list_target:
+            code = dict_target['code']
+            self.comboCode.addItem(code)
+            self.dict_dict_target[code] = dict_target
+
         """
         # 現在のタブをすべて削除
         self.base.deleteAllTabs()
