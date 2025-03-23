@@ -11,10 +11,12 @@ class Entry(QLineEdit):
         self.setFrame(True)
         self.setContentsMargins(0, 0, 0, 0)
         self.setFixedWidth(75)
+        """
         self.setSizePolicy(
             QSizePolicy.Policy.Preferred,
             QSizePolicy.Policy.Preferred
         )
+        """
         self.setStyleSheet("""
             QLineEdit {
                 font-family: monospace;
@@ -25,10 +27,23 @@ class Entry(QLineEdit):
         """)
 
 
+class EntryDir(Entry):
+    def __init__(self):
+        super().__init__()
+        # self.setFixedWidth(300)
+        self.setMinimumWidth(300)
+        self.setEnabled(False)
+
+        self.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Expanding,
+        )
+
+
 class EntryExcelFile(Entry):
     def __init__(self):
         super().__init__()
-        self.setFixedWidth(100)
+        self.setFixedWidth(200)
         self.setEnabled(False)
 
         self.filename = None

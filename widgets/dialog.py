@@ -28,6 +28,13 @@ def DialogWarning(message: str):
     dlg.exec()
 
 
+class DirDialog(QFileDialog):
+    def __init__(self):
+        super().__init__()
+        self.setFileMode(QFileDialog.FileMode.Directory)
+        self.setOption(QFileDialog.Option.ShowDirsOnly)
+
+
 class FileDialogExcel(QFileDialog):
     def __init__(self, res: AppRes):
         super().__init__()
