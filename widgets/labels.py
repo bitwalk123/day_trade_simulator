@@ -224,7 +224,6 @@ class LabelValue2(LabelValue):
 class LabelInt(QLabel):
     def __init__(self):
         super().__init__()
-        self.flag = True
         self.setFrameStyle(
             QFrame.Shape.Panel | QFrame.Shadow.Sunken
         )
@@ -247,6 +246,14 @@ class LabelInt(QLabel):
 
     def setValue(self, value: int):
         self.setText('%d' % int(value))
+
+
+class LabelIntRaised(LabelInt):
+    def __init__(self):
+        super().__init__()
+        self.setFrameStyle(
+            QFrame.Shape.Panel | QFrame.Shadow.Raised
+        )
 
 
 class LabelFloat(QLabel):

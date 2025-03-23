@@ -4,6 +4,7 @@ from structs.res import AppRes
 from widgets.container import Widget
 from widgets.labels import (
     LabelFloat,
+    LabelIntRaised,
     LabelTitleRaised,
     LabelValue,
 )
@@ -23,45 +24,40 @@ class PanelParam(Widget):
         self.setLayout(layout)
 
         r = 0
+        labNo = LabelTitleRaised('#')
+        layout.addWidget(labNo, r, 0)
+
         labAFinit = LabelTitleRaised('AF init')
-        layout.addWidget(labAFinit, r, 0)
+        layout.addWidget(labAFinit, r, 1)
 
         labAFstep = LabelTitleRaised('AF step')
-        layout.addWidget(labAFstep, r, 1)
+        layout.addWidget(labAFstep, r, 2)
 
         labAFmax = LabelTitleRaised('AF max')
-        layout.addWidget(labAFmax, r, 2)
+        layout.addWidget(labAFmax, r, 3)
 
         labTotal = LabelTitleRaised('合計損益')
-        layout.addWidget(labTotal, r, 3)
-
-        self.af_init = list()
-        self.af_step = list()
-        self.af_max = list()
-        self.total = list()
+        layout.addWidget(labTotal, r, 4)
 
         for i in range(1):
             r += 1
 
+            objNo = LabelIntRaised()
+            objNo.setValue(r)
+            layout.addWidget(objNo, r, 0)
+
             objAFinit = LabelFloat()
             objAFinit.setValue(0)
-            layout.addWidget(objAFinit, r, 0)
+            layout.addWidget(objAFinit, r, 1)
 
             objAFstep = LabelFloat()
             objAFstep.setValue(0)
-            layout.addWidget(objAFstep, r, 1)
+            layout.addWidget(objAFstep, r, 2)
 
             objAFmax = LabelFloat()
             objAFmax.setValue(0)
-            layout.addWidget(objAFmax, r, 2)
+            layout.addWidget(objAFmax, r, 3)
 
             objTotal = LabelValue()
             objTotal.setValue(0)
-            layout.addWidget(objTotal, r, 3)
-
-            """
-            self.af_init.append(objAFinit)
-            self.af_step.append(objAFstep)
-            self.af_max.append(objAFmax)
-            self.total.append(objTotal)
-            """
+            layout.addWidget(objTotal, r, 4)

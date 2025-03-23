@@ -84,6 +84,9 @@ class Executor(QMainWindow):
         self.comboCode = comboCode = ComboBox()
         layout.addWidget(comboCode, r, 1)
 
+        hpad = PadH()
+        layout.addWidget(hpad, r, 2)
+
         r += 1
         labDate = LabelTitle('現在日付')
         layout.addWidget(labDate, r, 0)
@@ -150,15 +153,6 @@ class Executor(QMainWindow):
 
         self.objDate.setText(list_target[0]['date'])
 
-        """
-        # 現在のタブをすべて削除
-        self.base.deleteAllTabs()
-        # 新しいタブを追加
-        for dict_target in list_target:
-            code = dict_target['code']
-            tabobj = WinMain(self.res, dict_target, self.threadpool, self.pbar)
-            self.base.addTab(tabobj, code)
-        """
         # 進捗をリセット
         self.pbar.reset()
 
