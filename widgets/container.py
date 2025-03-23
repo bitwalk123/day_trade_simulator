@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QMargins
 from PySide6.QtWidgets import (
     QFrame,
     QSizePolicy,
@@ -58,3 +58,9 @@ class ScrollAreaVertical(QScrollArea):
         self.setVerticalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAlwaysOn
         )
+
+
+class Widget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setContentsMargins(QMargins(0, 0, 0, 0))
