@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 
 from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
+from ui.win_main import WinMain
 from widgets.buttons import (
     ChooseButton,
     FolderButton,
@@ -42,6 +43,7 @@ class Executor(QMainWindow):
         self.res = res = AppRes()
         self.threadpool = QThreadPool()
         self.dict_dict_target = dict()
+        self.winmain: None | WinMain = None
 
         icon = QIcon(os.path.join(res.dir_image, 'start.png'))
         self.setWindowIcon(icon)
@@ -168,7 +170,7 @@ class Executor(QMainWindow):
         self.btnStart = but_start = StartButton(res)
         but_start.setFixedHeight(40)
         but_start.setToolTip('シミュレーション開始')
-        # but_start.clicked.connect(self.on_simulation_start_request)
+        but_start.clicked.connect(self.on_simulation_start)
         layout.addWidget(but_start, r, 0, 1, 5)
 
     def on_file_selected(self):
@@ -231,6 +233,13 @@ class Executor(QMainWindow):
         file_excel = dialog.selectedFiles()[0]
         self.ent_sheet.setExcelFile(file_excel)
         self.but_choose.setEnabled(True)
+
+    def on_simulation_start(self):
+        code = self.comboCode.currentText()
+        dict_target = self.dict_dict_target[code]
+        if self.winmain is None:
+            self.winmain = WinMain(self.res, dict_target, self.threadpool, self.pbar)
+        self.winmain.show()
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)
