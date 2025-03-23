@@ -41,10 +41,13 @@ class EntryExcelFile(Entry):
         self.setText(os.path.basename(filename))
         obj_excel = pd.ExcelFile(filename)
         self.list_sheet = list()
-        for sheet in obj_excel.sheet_names:
+        for sheet in list(obj_excel.sheet_names):
             m = self.pattern.match(sheet)
             if m:
                 self.list_sheet.append(sheet)
 
     def getSheetList(self) -> list:
         return self.list_sheet
+
+    def get_ExcelFile(self) -> str:
+        return self.filename

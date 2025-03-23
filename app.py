@@ -6,7 +6,6 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
-    QProgressBar,
     QTabWidget,
 )
 
@@ -14,6 +13,7 @@ from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
 from ui.toolbar_main import ToolBarMain
 from ui.win_main import WinMain
+from widgets.progress import ProgressBar
 from widgets.statusbar import StatusBar
 from widgets.tabwidget import TabWidget
 
@@ -43,7 +43,7 @@ class TradeSimulator(QMainWindow):
         statusbar = StatusBar()
         self.setStatusBar(statusbar)
 
-        self.pbar = pbar = QProgressBar()
+        self.pbar = pbar = ProgressBar()
         self.pbar.setRange(0, 100)
         statusbar.addPermanentWidget(pbar, stretch=1)
 

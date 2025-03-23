@@ -76,7 +76,7 @@ class LabelTitle(QLabel):
     def __init__(self, title: str):
         super().__init__(title)
         self.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Preferred,
             QSizePolicy.Policy.Preferred,
         )
         self.setFrameStyle(
@@ -121,6 +121,18 @@ class LabelTitleLeft(LabelTitle):
         super().__init__(title)
         self.setAlignment(
             Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+        )
+
+
+class LabelTitleRaised(LabelTitle):
+    def __init__(self, title: str):
+        super().__init__(title)
+        self.setLineWidth(1)
+        self.setFrameStyle(
+            QFrame.Shape.Panel | QFrame.Shadow.Raised
+        )
+        self.setAlignment(
+            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter
         )
 
 
