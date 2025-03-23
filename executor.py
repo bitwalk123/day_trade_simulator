@@ -16,6 +16,7 @@ from widgets.dialog import FileDialogExcel
 from widgets.entry import EntryExcelFile
 from widgets.layouts import GridLayout
 from widgets.statusbar import StatusBar
+from widgets.toolbar import ToolBar
 
 
 class Executor(QMainWindow):
@@ -30,6 +31,24 @@ class Executor(QMainWindow):
         self.setWindowIcon(icon)
         self.setWindowTitle(self.__app_name__)
 
+        toolbar = ToolBar()
+        self.addToolBar(toolbar)
+
+        but_folder = FolderButton(res)
+        but_folder.clicked.connect(self.on_file_dialog_open)
+        toolbar.addWidget(but_folder)
+
+        self.ent_sheet = ent_sheet = EntryExcelFile()
+        ent_sheet.setFixedWidth(200)
+        toolbar.addWidget(ent_sheet)
+
+        self.combo_sheet = combo_sheet = ComboBox()
+        toolbar.addWidget(combo_sheet)
+
+        self.but_choose = but_choose = ChooseButton(res)
+        but_choose.setDisabled(True)
+        toolbar.addWidget(but_choose)
+
         sa = ScrollAreaVertical()
         self.setCentralWidget(sa)
 
@@ -38,26 +57,6 @@ class Executor(QMainWindow):
 
         layout = GridLayout()
         base.setLayout(layout)
-
-        r = 0
-        but_folder = FolderButton(res)
-        but_folder.clicked.connect(self.on_file_dialog_open)
-        layout.addWidget(but_folder, r, 0)
-
-        self.ent_sheet = ent_sheet = EntryExcelFile()
-        ent_sheet.setFixedWidth(200)
-        layout.addWidget(ent_sheet, r, 1)
-
-        self.combo_sheet = combo_sheet = ComboBox()
-        layout.addWidget(combo_sheet, r, 2)
-
-        self.but_choose = but_choose = ChooseButton(res)
-        but_choose.setDisabled(True)
-        layout.addWidget(but_choose, r, 3)
-
-        r = 1
-        panel = QWidget()
-        layout.addWidget(panel, r, 0, 1, 4)
 
         statusbar = StatusBar()
         self.setStatusBar(statusbar)

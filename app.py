@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
 
 from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
-from ui.toolbar import ToolBar
+from ui.toolbar_main import ToolBarMain
 from ui.win_main import WinMain
 from widgets.statusbar import StatusBar
 from widgets.tabwidget import TabWidget
@@ -32,7 +32,7 @@ class TradeSimulator(QMainWindow):
         self.setFixedSize(1500, 900)
 
         # ツールバー
-        toolbar = ToolBar(self.res)
+        toolbar = ToolBarMain(self.res)
         toolbar.fileSelected.connect(self.on_file_selected)
         self.addToolBar(toolbar)
 

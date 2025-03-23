@@ -8,7 +8,7 @@ from widgets.buttons import FolderToolButton
 from widgets.dialog import FileDialogExcel
 
 
-class ToolBar(QToolBar):
+class ToolBarMain(QToolBar):
     fileSelected = Signal(str)
 
     def __init__(self, res: AppRes):
