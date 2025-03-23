@@ -5,17 +5,22 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
+    QProgressBar,
+    QSizePolicy,
     QWidget,
-    QProgressBar, QSizePolicy,
 )
 
 from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
-from widgets.buttons import ChooseButton, FolderButton, StartButton
+from widgets.buttons import (
+    ChooseButton,
+    FolderButton,
+    StartButton,
+)
 from widgets.combo import ComboBox
-from widgets.container import ScrollAreaVertical, PadH
-from widgets.dialog import FileDialogExcel, DirDialog
-from widgets.entry import EntryExcelFile, EntryDir
+from widgets.container import PadH, ScrollAreaVertical
+from widgets.dialog import DirDialog, FileDialogExcel
+from widgets.entry import EntryDir, EntryExcelFile
 from widgets.labels import (
     LabelDate,
     LabelFlat,
@@ -209,7 +214,9 @@ class Executor(QMainWindow):
             return
 
         basedir = dialog.selectedFiles()[0]
-        self.entOutput.setText(os.path.join(basedir, self.objDate.text()))
+        dateStr = self.objDate.text()
+        if dateStr is not None:
+            self.entOutput.setText(os.path.join(basedir, dateStr))
 
     def on_file_dialog_open(self):
         """
