@@ -196,6 +196,7 @@ class Executor(QMainWindow):
         self.code_target = self.comboCode.currentText()
         self.counter_max = self.panelParam.getLevelMax()
         self.counter = 0
+        # シミュレーション・ループ開始
         self.loop_simulation()
 
     def loop_simulation(self):
@@ -203,6 +204,8 @@ class Executor(QMainWindow):
         dict_target['af_init'] = self.panelParam.getAFinit(self.counter)
         dict_target['af_step'] = self.panelParam.getAFstep(self.counter)
         dict_target['af_max'] = self.panelParam.getAFmax(self.counter)
+        # カウンターのインクリメント
+        self.counter += 1
 
         self.delete_winmain()
         # ---------------
@@ -213,9 +216,6 @@ class Executor(QMainWindow):
         self.winmain.setFixedSize(1600, 800)
         self.winmain.show()
         self.winmain.autoSimulationStart()
-        # カウンターのインクリメント
-        self.counter += 1
-
 
     def next_simulation(self, dict_result: dict):
         print(self.code_target, self.counter, dict_result['total'])
