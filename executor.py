@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QProgressBar,
     QSizePolicy,
-    QWidget,
+    QWidget, QToolButton,
 )
 
 from structs.res import AppRes
@@ -23,16 +23,13 @@ from widgets.buttons import (
 from widgets.combo import ComboBox
 from widgets.container import PadH, ScrollAreaVertical
 from widgets.dialog import DirDialog, FileDialogExcel
-from widgets.entry import EntryDir, EntryExcelFile
+from widgets.entry import EntryExcelFile
 from widgets.labels import (
     LabelDate,
     LabelFlat,
-    LabelFloat,
     LabelTitle,
-    LabelTitleRaised,
-    LabelValue,
 )
-from widgets.layouts import GridLayout, HBoxLayout
+from widgets.layouts import GridLayout
 from widgets.statusbar import StatusBar
 from widgets.toolbar import ToolBar
 
@@ -46,13 +43,22 @@ class Executor(QMainWindow):
         self.threadpool = QThreadPool()
         self.dict_dict_target = dict()
 
+        # シミュレーション・ループ用オブジェクト＆カウンタ
         self.code_target = None
         self.winmain: None | WinMain = None
+        self.counter: int = 0
+        self.counter_max: int = 0
+        self.path_output = None
 
+        # ウィンドウ・アイコンとタイトル
         icon = QIcon(os.path.join(res.dir_image, 'start.png'))
         self.setWindowIcon(icon)
         self.setWindowTitle(self.__app_name__)
 
+        # =====================================================================
+        #  UI
+        # =====================================================================
+        # ツールバー
         toolbar = ToolBar()
         self.addToolBar(toolbar)
 
@@ -68,6 +74,14 @@ class Executor(QMainWindow):
         but_choose.clicked.connect(self.on_file_selected)
         toolbar.addWidget(but_choose)
 
+        """
+        but_test = QToolButton()
+        but_test.setText('テスト')
+        but_test.clicked.connect(self.function_test)
+        toolbar.addWidget(but_test)
+        """
+
+        # メイン
         sa = ScrollAreaVertical()
         self.setCentralWidget(sa)
 
@@ -83,6 +97,9 @@ class Executor(QMainWindow):
 
         self.comboCode = comboCode = ComboBox()
         layout.addWidget(comboCode, r, 1)
+
+        hpad = PadH()
+        layout.addWidget(hpad, r, 2)
 
         r += 1
         labDate = LabelTitle('現在日付')
@@ -121,9 +138,14 @@ class Executor(QMainWindow):
 
     def closeEvent(self, event):
         print('アプリケーションを終了します。')
-        if self.winmain is not None:
-            self.winmain.deleteLater()
+        self.delete_winmain()
         event.accept()  # let the window close
+
+    def delete_winmain(self):
+        if self.winmain is not None:
+            self.winmain.hide()
+            self.winmain.deleteLater()
+            self.winmain = None
 
     def on_file_selected(self):
         """
@@ -150,15 +172,6 @@ class Executor(QMainWindow):
 
         self.objDate.setText(list_target[0]['date'])
 
-        """
-        # 現在のタブをすべて削除
-        self.base.deleteAllTabs()
-        # 新しいタブを追加
-        for dict_target in list_target:
-            code = dict_target['code']
-            tabobj = WinMain(self.res, dict_target, self.threadpool, self.pbar)
-            self.base.addTab(tabobj, code)
-        """
         # 進捗をリセット
         self.pbar.reset()
 
@@ -170,7 +183,7 @@ class Executor(QMainWindow):
         basedir = dialog.selectedFiles()[0]
         dateStr = self.objDate.text()
         if dateStr is not None:
-            path = os.path.join(basedir, dateStr)
+            self.path_output = path = os.path.join(basedir, dateStr)
             self.panelOutput.setOutput(path)
 
     def on_file_dialog_open(self):
@@ -188,15 +201,28 @@ class Executor(QMainWindow):
         self.but_choose.setEnabled(True)
 
     def on_simulation_start(self):
+        if self.path_output is None:
+            print('結果の出力先が指定されていないので開始できません。')
+            return
+        elif not os.path.isdir(self.path_output):
+            os.mkdir(self.path_output)
+
         self.code_target = self.comboCode.currentText()
+        self.counter_max = self.panelParam.getLevelMax()
+        self.counter = 0
+
+        # シミュレーション・ループ開始
         self.loop_simulation()
 
     def loop_simulation(self):
         dict_target = self.dict_dict_target[self.code_target]
+        dict_target['af_init'] = self.panelParam.getAFinit(self.counter)
+        dict_target['af_step'] = self.panelParam.getAFstep(self.counter)
+        dict_target['af_max'] = self.panelParam.getAFmax(self.counter)
+        # カウンターのインクリメント
+        self.counter += 1
 
-        if self.winmain is not None:
-            self.winmain.hide()
-            self.winmain.deleteLater()
+        self.delete_winmain()
         # ---------------
         #  Simulator 起動
         # ---------------
@@ -207,11 +233,31 @@ class Executor(QMainWindow):
         self.winmain.autoSimulationStart()
 
     def next_simulation(self, dict_result: dict):
-        print(dict_result['total'])
-        print('Completed!')
+        name_chart = os.path.join(
+            self.path_output,
+            'chart_%s_%d.png' % (self.code_target, self.counter)
+        )
+        self.winmain.saveChart(name_chart)
+        print(self.code_target, self.counter, dict_result['total'])
+
+        # 結果の処理
+        self.panelParam.setTotal(self.counter, dict_result['total'])
+        if self.counter < self.counter_max:
+            self.loop_simulation()
+        else:
+            self.delete_winmain()
+            name_html = os.path.join(
+                self.path_output,
+                'summary_%s_%d.html' % (self.code_target, self.counter)
+            )
+            self.panelParam.getResult(name_html)
+            print('Completed!')
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)
+
+    def function_test(self):
+        self.panelParam.getResult('test.html')
 
 
 def main():

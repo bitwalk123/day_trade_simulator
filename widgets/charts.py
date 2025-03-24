@@ -146,6 +146,9 @@ class Canvas(FigureCanvas):
         # 再描画
         refreshDraw(self.fig)
 
+    def save(self, filename):
+        self.fig.savefig(filename)
+
 
 class ChartOverlay(FigureCanvas):
     def __init__(self, res: AppRes):
