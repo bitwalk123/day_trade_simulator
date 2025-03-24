@@ -49,10 +49,18 @@ class Executor(QMainWindow):
         self.code_target = None
         self.winmain: None | WinMain = None
 
+        # ループ用カウンタ
+        self.counter: int = 0
+        self.counter_max: int = 0
+
+        # ウィンドウ・アイコンとタイトル
         icon = QIcon(os.path.join(res.dir_image, 'start.png'))
         self.setWindowIcon(icon)
         self.setWindowTitle(self.__app_name__)
 
+        # =====================================================================
+        #  UI
+        # =====================================================================
         toolbar = ToolBar()
         self.addToolBar(toolbar)
 
@@ -183,6 +191,8 @@ class Executor(QMainWindow):
 
     def on_simulation_start(self):
         self.code_target = self.comboCode.currentText()
+        self.counter_max = self.panelParam.getLevelMax()
+        self.counter = 0
         self.loop_simulation()
 
     def loop_simulation(self):
@@ -199,10 +209,15 @@ class Executor(QMainWindow):
         self.winmain.setFixedSize(1600, 800)
         self.winmain.show()
         self.winmain.autoSimulationStart()
+        # カウンターのインクリメント
+        self.counter += 1
 
     def next_simulation(self, dict_result: dict):
         print(dict_result['total'])
-        print('Completed!')
+        if self.counter < self.counter_max:
+            self.loop_simulation()
+        else:
+            print('Completed!')
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)
