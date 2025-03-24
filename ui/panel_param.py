@@ -26,7 +26,8 @@ class PanelParam(Widget):
         #  パラメータ AF（加速因数）水準の読み込み
         # ----------------------------------
         file_json = 'af_params.json'
-        df = pd.read_json(os.path.join(res.dir_config, file_json))
+        self.df = df = pd.read_json(os.path.join(res.dir_config, file_json))
+        df['Total'] = 0
 
         # 水準テーブル用オブジェクト
         self.dict_obj = dict_obj = dict()
@@ -109,4 +110,57 @@ class PanelParam(Widget):
         :return:
         """
         obj: LabelValue = self.dict_obj[i]['total']
-        return obj.setValue(total)
+        obj.setValue(total)
+        self.df.at[i, 'Total'] = total
+
+    def getResult(self, name_html: str):
+        list_html = list()
+
+        # style
+        list_html.append('<style>\n')
+        list_html.append(
+            'table {border-collapse: collapse; border: solid 1px #aaa; font-family: monospace; font-size: x-small;}\n')
+        list_html.append('th,td {border-bottom: solid 1px #aaa; padding: 0 5px;}\n')
+        list_html.append('</style>\n')
+
+        # table
+        list_html.append('<table>\n')
+
+        # header
+        list_html.append('<thead>\n')
+        list_html.append('<tr>\n')
+        for colname in ['#', 'AF init', 'AF step', 'AF max', 'Total']:
+            list_html.append('<th nowrap>%s</th>\n' % colname)
+
+        list_html.append('</tr>\n')
+        list_html.append('</thead>\n')
+        # body
+        list_html.append('<tbody>\n')
+        rows = len(self.df)
+        for r in range(rows):
+            list_html.append('<tr>\n')
+            # Run
+            list_html.append('<td nowrap style="text-align: right;">%d</td>\n' % (r + 1))
+            # AF init
+            af_init = self.df.at[r + 1, 'af_init']
+            list_html.append('<td nowrap style="text-align: right;">%.5f</td>\n' % af_init)
+            # AF step
+            af_step = self.df.at[r + 1, 'af_step']
+            list_html.append('<td nowrap style="text-align: right;">%.5f</td>\n' % af_step)
+            # AF max
+            af_max = self.df.at[r + 1, 'af_max']
+            list_html.append('<td nowrap style="text-align: right;">%.5f</td>\n' % af_max)
+            # Total
+            total = self.df.at[r + 1, 'Total']
+            list_html.append('<td nowrap style="text-align: right;">{:,}</td>\n'.format(int(total)))
+
+            list_html.append('</tr>\n')
+
+        list_html.append('</tbody>\n')
+
+        # end of table
+        list_html.append('</table>\n')
+
+        with open(name_html, mode='w') as f:
+            f.writelines(list_html)
+

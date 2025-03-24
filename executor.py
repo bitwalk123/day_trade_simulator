@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QMainWindow,
     QProgressBar,
     QSizePolicy,
-    QWidget,
+    QWidget, QToolButton,
 )
 
 from structs.res import AppRes
@@ -61,6 +61,7 @@ class Executor(QMainWindow):
         # =====================================================================
         #  UI
         # =====================================================================
+        # ツールバー
         toolbar = ToolBar()
         self.addToolBar(toolbar)
 
@@ -76,6 +77,12 @@ class Executor(QMainWindow):
         but_choose.clicked.connect(self.on_file_selected)
         toolbar.addWidget(but_choose)
 
+        but_test = QToolButton()
+        but_test.setText('テスト')
+        but_test.clicked.connect(self.function_test)
+        toolbar.addWidget(but_test)
+
+        # メイン
         sa = ScrollAreaVertical()
         self.setCentralWidget(sa)
 
@@ -240,10 +247,18 @@ class Executor(QMainWindow):
             self.loop_simulation()
         else:
             self.delete_winmain()
+            name_html = os.path.join(
+                self.path_output,
+                'summary_%s_%d.html' % (self.code_target, self.counter)
+            )
+            self.panelParam.getResult(name_html)
             print('Completed!')
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)
+
+    def function_test(self):
+        self.panelParam.getResult('test.html')
 
 
 def main():
