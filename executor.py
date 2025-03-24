@@ -23,16 +23,13 @@ from widgets.buttons import (
 from widgets.combo import ComboBox
 from widgets.container import PadH, ScrollAreaVertical
 from widgets.dialog import DirDialog, FileDialogExcel
-from widgets.entry import EntryDir, EntryExcelFile
+from widgets.entry import EntryExcelFile
 from widgets.labels import (
     LabelDate,
     LabelFlat,
-    LabelFloat,
     LabelTitle,
-    LabelTitleRaised,
-    LabelValue,
 )
-from widgets.layouts import GridLayout, HBoxLayout
+from widgets.layouts import GridLayout
 from widgets.statusbar import StatusBar
 from widgets.toolbar import ToolBar
 
@@ -77,10 +74,12 @@ class Executor(QMainWindow):
         but_choose.clicked.connect(self.on_file_selected)
         toolbar.addWidget(but_choose)
 
+        """
         but_test = QToolButton()
         but_test.setText('テスト')
         but_test.clicked.connect(self.function_test)
         toolbar.addWidget(but_test)
+        """
 
         # メイン
         sa = ScrollAreaVertical()
