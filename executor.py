@@ -138,6 +138,7 @@ class Executor(QMainWindow):
         if self.winmain is not None:
             self.winmain.hide()
             self.winmain.deleteLater()
+            self.winmain = None
 
     def on_file_selected(self):
         """
