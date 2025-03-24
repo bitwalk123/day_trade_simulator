@@ -46,11 +46,12 @@ class Executor(QMainWindow):
         self.threadpool = QThreadPool()
         self.dict_dict_target = dict()
 
-        # ループ用オブジェクト＆カウンタ
+        # シミュレーション・ループ用オブジェクト＆カウンタ
         self.code_target = None
         self.winmain: None | WinMain = None
         self.counter: int = 0
         self.counter_max: int = 0
+        self.path_output = None
 
         # ウィンドウ・アイコンとタイトル
         icon = QIcon(os.path.join(res.dir_image, 'start.png'))
@@ -176,7 +177,7 @@ class Executor(QMainWindow):
         basedir = dialog.selectedFiles()[0]
         dateStr = self.objDate.text()
         if dateStr is not None:
-            path = os.path.join(basedir, dateStr)
+            self.path_output = path = os.path.join(basedir, dateStr)
             self.panelOutput.setOutput(path)
 
     def on_file_dialog_open(self):
@@ -194,9 +195,16 @@ class Executor(QMainWindow):
         self.but_choose.setEnabled(True)
 
     def on_simulation_start(self):
+        if self.path_output is None:
+            print('結果の出力先が指定されていないので開始できません。')
+            return
+        elif not os.path.isdir(self.path_output):
+            os.mkdir(self.path_output)
+
         self.code_target = self.comboCode.currentText()
         self.counter_max = self.panelParam.getLevelMax()
         self.counter = 0
+
         # シミュレーション・ループ開始
         self.loop_simulation()
 
@@ -219,7 +227,13 @@ class Executor(QMainWindow):
         self.winmain.autoSimulationStart()
 
     def next_simulation(self, dict_result: dict):
+        name_chart = os.path.join(
+            self.path_output,
+            'chart_%s_%d.png' % (self.code_target, self.counter)
+        )
+        self.winmain.saveChart(name_chart)
         print(self.code_target, self.counter, dict_result['total'])
+
         # 結果の処理
         self.panelParam.setTotal(self.counter, dict_result['total'])
         if self.counter < self.counter_max:
