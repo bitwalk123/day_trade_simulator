@@ -131,9 +131,13 @@ class Executor(QMainWindow):
 
     def closeEvent(self, event):
         print('アプリケーションを終了します。')
-        if self.winmain is not None:
-            self.winmain.deleteLater()
+        self.delete_winmain()
         event.accept()  # let the window close
+
+    def delete_winmain(self):
+        if self.winmain is not None:
+            self.winmain.hide()
+            self.winmain.deleteLater()
 
     def on_file_selected(self):
         """
@@ -200,9 +204,7 @@ class Executor(QMainWindow):
         dict_target['af_step'] = self.panelParam.getAFstep(self.counter)
         dict_target['af_max'] = self.panelParam.getAFmax(self.counter)
 
-        if self.winmain is not None:
-            self.winmain.hide()
-            self.winmain.deleteLater()
+        self.delete_winmain()
         # ---------------
         #  Simulator 起動
         # ---------------
@@ -214,6 +216,7 @@ class Executor(QMainWindow):
         # カウンターのインクリメント
         self.counter += 1
 
+
     def next_simulation(self, dict_result: dict):
         print(self.code_target, self.counter, dict_result['total'])
         # 結果の処理
@@ -221,6 +224,7 @@ class Executor(QMainWindow):
         if self.counter < self.counter_max:
             self.loop_simulation()
         else:
+            self.delete_winmain()
             print('Completed!')
 
     def on_status_update(self, progress: int):
