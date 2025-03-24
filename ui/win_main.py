@@ -217,3 +217,6 @@ class WinMain(QMainWindow):
 
     def auto_simulation_completed(self, dict_result: dict):
         self.simulationCompleted.emit(dict_result)
+
+    def saveChart(self, filename: str):
+        self.canvas.save(filename)
