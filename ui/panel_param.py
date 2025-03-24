@@ -102,5 +102,11 @@ class PanelParam(Widget):
         return obj.getValue()
 
     def setTotal(self, i: int, total: float):
-        obj: LabelValue = self.dict_obj[i + 1]['total']
+        """setTotal - 合計損益を対象ウィジェットに設定
+
+        :param i:     カウンタは既にインクリメントされている（1 から始まる）。
+        :param total: 合計損益
+        :return:
+        """
+        obj: LabelValue = self.dict_obj[i]['total']
         return obj.setValue(total)

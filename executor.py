@@ -46,10 +46,9 @@ class Executor(QMainWindow):
         self.threadpool = QThreadPool()
         self.dict_dict_target = dict()
 
+        # ループ用オブジェクト＆カウンタ
         self.code_target = None
         self.winmain: None | WinMain = None
-
-        # ループ用カウンタ
         self.counter: int = 0
         self.counter_max: int = 0
 
@@ -216,7 +215,9 @@ class Executor(QMainWindow):
         self.counter += 1
 
     def next_simulation(self, dict_result: dict):
-        print(self.counter, dict_result['total'])
+        print(self.code_target, self.counter, dict_result['total'])
+        # 結果の処理
+        self.panelParam.setTotal(self.counter, dict_result['total'])
         if self.counter < self.counter_max:
             self.loop_simulation()
         else:
