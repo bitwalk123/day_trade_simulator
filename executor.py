@@ -197,6 +197,9 @@ class Executor(QMainWindow):
 
     def loop_simulation(self):
         dict_target = self.dict_dict_target[self.code_target]
+        dict_target['af_init'] = self.panelParam.getAFinit(self.counter)
+        dict_target['af_step'] = self.panelParam.getAFstep(self.counter)
+        dict_target['af_max'] = self.panelParam.getAFmax(self.counter)
 
         if self.winmain is not None:
             self.winmain.hide()
@@ -213,7 +216,7 @@ class Executor(QMainWindow):
         self.counter += 1
 
     def next_simulation(self, dict_result: dict):
-        print(dict_result['total'])
+        print(self.counter, dict_result['total'])
         if self.counter < self.counter_max:
             self.loop_simulation()
         else:
