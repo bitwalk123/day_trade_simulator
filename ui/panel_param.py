@@ -116,15 +116,8 @@ class PanelParam(Widget):
     def getResult(self, name_html: str):
         list_html = list()
 
-        # style
-        list_html.append('<style>\n')
-        list_html.append(
-            'table {border-collapse: collapse; border: solid 1px #aaa; font-family: monospace; font-size: x-small;}\n')
-        list_html.append('th,td {border-bottom: solid 1px #aaa; padding: 0 5px;}\n')
-        list_html.append('</style>\n')
-
         # table
-        list_html.append('<table>\n')
+        list_html.append('<table class="simple">\n')
 
         # header
         list_html.append('<thead>\n')
