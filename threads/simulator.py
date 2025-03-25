@@ -14,7 +14,7 @@ from sim.position_manager import PositionManager
 class SimulatorSignal(QObject):
     positionOpen = Signal(dict)
     positionClose = Signal(float)
-    simulationCompleted = Signal(dict) # auto-simulation 用
+    simulationCompleted = Signal(dict)  # auto-simulation 用
     threadFinished = Signal(dict)
     updateProfit = Signal(dict)
     updateSystemTime = Signal(str, int)
@@ -36,6 +36,13 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
         # 売買単位
         unit = dict_param['unit']
+
+        # 呼び値
+        tick_price_min = dict_param['tick_price_min']
+
+        # 損切（ロスカット）因数
+        factor_losscut = dict_param['factor_losscut']
+        self.losscut = -1 * unit * tick_price_min * factor_losscut
 
         # Parabolic SAR 関連パラメータ（加速度因数）
         af_init = dict_param['af_init']
