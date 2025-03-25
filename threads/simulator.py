@@ -40,6 +40,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # 呼び値
         tick_price_min = dict_param['tick_price_min']
 
+        # 損切（ロスカット）機能が有効か否か
+        self.flag_losscut = dict_param['flag_losscut']
+
         # 損切（ロスカット）因数
         factor_losscut = dict_param['factor_losscut']
         self.losscut = -1 * unit * tick_price_min * factor_losscut
