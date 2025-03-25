@@ -1,13 +1,16 @@
 backports.tarfile
 fqdn
+html5lib
 importlib-metadata
 inflect
 isoduration
 jaraco.collections
 jsonpointer
 jupyterlab
+lxml
 mouseinfo
 mplfinance
+odfpy
 openpyxl
 pip-chill
 pip-review
@@ -18,6 +21,7 @@ pyside6
 pytweening
 tinycss2
 tomli
+typer
 uri-template
 webcolors
 xlrd
