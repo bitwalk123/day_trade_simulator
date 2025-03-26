@@ -28,7 +28,7 @@ from widgets.labels import (
     LabelTime,
     LabelTitle,
     LabelValue,
-    LabelUnit, LabelFlatRight,
+    LabelUnit, LabelFlatRight, LabelInt,
 )
 from widgets.layouts import GridLayout
 
@@ -246,7 +246,22 @@ class DockMain(QDockWidget):
         layout.addWidget(labLossCut, r, 0)
 
         self.objLossCut = objLossCut = CheckBoxLossCut()
+        if 'flag_losscut' in dict_target:
+            objLossCut.setChecked(dict_target['flag_losscut'])
+        else:
+            objLossCut.setChecked(False)
         layout.addWidget(objLossCut, r, 1)
+
+        r += 1
+        labFactorLosscut = LabelTitle('損切因数')
+        layout.addWidget(labFactorLosscut, r, 0)
+
+        self.objFactorLosscut = objFactorLosscut = LabelInt()
+        if 'factor_losscut' in dict_target:
+            objFactorLosscut.setValue(dict_target['factor_losscut'])
+        else:
+            objFactorLosscut.setValue(0)
+        layout.addWidget(objFactorLosscut, r, 1)
 
         r += 1
         base_control = QWidget()
@@ -291,7 +306,7 @@ class DockMain(QDockWidget):
         # 損切（ロスカット）機能が有効になっているか？
         dict_param['flag_losscut'] = self.isLossCutEnabled()
         # 損切（ロスカット）因数 ⇨ 呼び値と株数を乗じて損切価格を決める
-        dict_param['factor_losscut'] = 10
+        dict_param['factor_losscut'] = self.objFactorLosscut.getValue()
 
     def get_psar_af_param(self, dict_param: dict):
         """

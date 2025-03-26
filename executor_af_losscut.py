@@ -6,14 +6,13 @@ from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
     QProgressBar,
-    QSizePolicy,
-    QWidget, QToolButton,
+    QWidget,
 )
 
 from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
 from ui.panel_output import PanelOutput
-from ui.panel_param_af import PanelParam
+from ui.panel_param_af_losscut import PanelParam
 from ui.win_main import WinMain
 from widgets.buttons import (
     ChooseButton,
@@ -216,6 +215,9 @@ class Executor(QMainWindow):
 
     def loop_simulation(self):
         dict_target = self.dict_dict_target[self.code_target]
+        dict_target['flag_losscut'] = True
+        dict_target['factor_losscut'] = self.panelParam.getLosscut(self.counter)
+        #print(dict_target['factor_losscut'])
         dict_target['af_init'] = self.panelParam.getAFinit(self.counter)
         dict_target['af_step'] = self.panelParam.getAFstep(self.counter)
         dict_target['af_max'] = self.panelParam.getAFmax(self.counter)
