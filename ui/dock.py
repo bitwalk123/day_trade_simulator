@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
 )
 
 from structs.res import AppRes
+from widgets.checks import CheckBoxLossCut
 from widgets.dialog import DlgAFSetting
 from widgets.buttons import EditButton, StartButton
 from widgets.container import Frame, PadH
@@ -27,7 +28,7 @@ from widgets.labels import (
     LabelTime,
     LabelTitle,
     LabelValue,
-    LabelUnit,
+    LabelUnit, LabelFlatRight, LabelInt,
 )
 from widgets.layouts import GridLayout
 
@@ -209,11 +210,8 @@ class DockMain(QDockWidget):
         layout.addWidget(labParameter, r, 0)
 
         r += 1
-        labParameter = LabelFlat('Parabolic SAR')
-        labParameter.setAlignment(
-            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
-        )
-        layout.addWidget(labParameter, r, 0)
+        labPSAR = LabelFlatRight('Parabolic SAR')
+        layout.addWidget(labPSAR, r, 0)
 
         r += 1
         labAFinit = LabelTitle('AF（初期値）')
@@ -242,6 +240,28 @@ class DockMain(QDockWidget):
         self.objAFmax = objAFmax = LabelFloat()
         objAFmax.setValue(dict_target['af_max'])
         layout.addWidget(objAFmax, r, 1, 1, 2)
+
+        r += 1
+        labLossCut = LabelFlatRight('損切')
+        layout.addWidget(labLossCut, r, 0)
+
+        self.objLossCut = objLossCut = CheckBoxLossCut()
+        if 'flag_losscut' in dict_target:
+            objLossCut.setChecked(dict_target['flag_losscut'])
+        else:
+            objLossCut.setChecked(False)
+        layout.addWidget(objLossCut, r, 1)
+
+        r += 1
+        labFactorLosscut = LabelTitle('損切因数')
+        layout.addWidget(labFactorLosscut, r, 0)
+
+        self.objFactorLosscut = objFactorLosscut = LabelInt()
+        if 'factor_losscut' in dict_target:
+            objFactorLosscut.setValue(dict_target['factor_losscut'])
+        else:
+            objFactorLosscut.setValue(0)
+        layout.addWidget(objFactorLosscut, r, 1)
 
         r += 1
         base_control = QWidget()
@@ -277,10 +297,21 @@ class DockMain(QDockWidget):
         but_order.clicked.connect(self.on_order_history)
         hbox.addWidget(but_order)
 
+    def get_losscut_param(self, dict_param: dict):
+        """
+        ロスカット関連パラメータ
+        :param dict_param: パラメータを保持する辞書
+        :return:
+        """
+        # 損切（ロスカット）機能が有効になっているか？
+        dict_param['flag_losscut'] = self.isLossCutEnabled()
+        # 損切（ロスカット）因数 ⇨ 呼び値と株数を乗じて損切価格を決める
+        dict_param['factor_losscut'] = self.objFactorLosscut.getValue()
+
     def get_psar_af_param(self, dict_param: dict):
         """
         Parabolic SAR の AF（加速因数）パラメータの取得
-        :param dict_param:
+        :param dict_param: パラメータを保持する辞書
         :return:
         """
         dict_param['af_init'] = self.objAFinit.getValue()
@@ -296,6 +327,9 @@ class DockMain(QDockWidget):
         """
         dict_param['date'] = self.dict_target['date']
         dict_param['tick'] = self.dict_target['tick']['Price']
+
+    def isLossCutEnabled(self) -> bool:
+        return self.objLossCut.isChecked()
 
     def on_modify_af(self):
         """
@@ -322,17 +356,33 @@ class DockMain(QDockWidget):
         self.requestOrderHistory.emit()
 
     def on_simulation_start_request(self):
+        """
+        シミュレーション開始リクエストの通知
+        :return:
+        """
         dict_param = dict()
         # シミュレータへ渡すデータ＆パラメータを準備
-        self.get_tick_date_price(dict_param)
-        self.get_psar_af_param(dict_param)
+        self.get_losscut_param(dict_param)  # 損切パラメータ
+        self.get_tick_date_price(dict_param)  # ティックデータ
+        self.get_psar_af_param(dict_param)  # PSAR パラメータ
+
         # 売買単位
         dict_param['unit'] = self.objUnit.getValue()
+        # 呼び値
+        dict_param['tick_price_min'] = self.objTickPriceMin.getValue()
 
-        # -----------------------------
-        # 🧿 シミュレーション開始のリクエスト
-        # -----------------------------
+        # ---------------------------------
+        # 🧿 シミュレーション開始リクエストの通知
+        # ---------------------------------
         self.requestSimulationStart.emit(dict_param)
+
+    def setLossCutEnabled(self, flag: bool):
+        """
+        損切（ロスカット）機能を有効にするか否か設定
+        :param flag: True あるいは False
+        :return:
+        """
+        self.objLossCut.setChecked(flag)
 
     def setPosition(self, position: str, price: float):
         """

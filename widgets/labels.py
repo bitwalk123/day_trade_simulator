@@ -32,6 +32,14 @@ class LabelFlat(QLabel):
         self.setStyleSheet('QLabel {font-family: monospace;}')
 
 
+class LabelFlatRight(LabelFlat):
+    def __init__(self, title: str):
+        super().__init__(title)
+        self.setAlignment(
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        )
+
+
 class LabelUnit(LabelFlat):
     def __init__(self, title: str):
         super().__init__(title)

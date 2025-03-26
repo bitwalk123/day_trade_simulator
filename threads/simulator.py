@@ -14,7 +14,7 @@ from sim.position_manager import PositionManager
 class SimulatorSignal(QObject):
     positionOpen = Signal(dict)
     positionClose = Signal(float)
-    simulationCompleted = Signal(dict) # auto-simulation 用
+    simulationCompleted = Signal(dict)  # auto-simulation 用
     threadFinished = Signal(dict)
     updateProfit = Signal(dict)
     updateSystemTime = Signal(str, int)
@@ -36,6 +36,21 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
         # 売買単位
         unit = dict_param['unit']
+
+        # 呼び値
+        tick_price_min = dict_param['tick_price_min']
+
+        # 損切（ロスカット）機能が有効か否か
+        self.flag_losscut = dict_param['flag_losscut']
+
+        if self.flag_losscut:
+            # 損切（ロスカット）因数
+            factor_losscut = dict_param['factor_losscut']
+            self.losscut = -1 * unit * tick_price_min * factor_losscut
+        else:
+            self.losscut = -100000.0 # バカヨケ
+
+        # print('損切機能', self.flag_losscut, '損切（ロスカット）', self.losscut)
 
         # Parabolic SAR 関連パラメータ（加速度因数）
         af_init = dict_param['af_init']
@@ -199,3 +214,10 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # 🧿 更新された含み益を通知
         self.updateProfit.emit(dict_profit)
         # ---------------------------------------------------------------------
+
+        # 損切（ロスカット）
+        self.test_losscut(t_current, p_current, dict_profit)
+
+    def test_losscut(self, t_current, p_current, dict_profit):
+        if dict_profit['profit'] < self.losscut:
+            self.position_close(t_current, p_current, '損切')
