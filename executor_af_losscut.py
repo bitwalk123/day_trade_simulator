@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (
 from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
 from ui.panel_output import PanelOutput
-from ui.panel_param import PanelParam
+from ui.panel_param_af import PanelParam
 from ui.win_main import WinMain
 from widgets.buttons import (
     ChooseButton,

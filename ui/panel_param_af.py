@@ -25,7 +25,7 @@ class PanelParam(Widget):
         # ----------------------------------
         #  パラメータ AF（加速因数）水準の読み込み
         # ----------------------------------
-        file_json = 'af_params.json'
+        file_json = 'doe_af.json'
         self.df = df = pd.read_json(os.path.join(res.dir_config, file_json))
         df['Total'] = 0
 
