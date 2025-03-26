@@ -81,11 +81,8 @@ class Executor(QMainWindow):
         """
 
         # メイン
-        sa = ScrollAreaVertical()
-        self.setCentralWidget(sa)
-
         base = QWidget()
-        sa.setWidget(base)
+        self.setCentralWidget(base)
 
         layout = GridLayout()
         base.setLayout(layout)
@@ -217,7 +214,6 @@ class Executor(QMainWindow):
         dict_target = self.dict_dict_target[self.code_target]
         dict_target['flag_losscut'] = True
         dict_target['factor_losscut'] = self.panelParam.getLosscut(self.counter)
-        #print(dict_target['factor_losscut'])
         dict_target['af_init'] = self.panelParam.getAFinit(self.counter)
         dict_target['af_step'] = self.panelParam.getAFstep(self.counter)
         dict_target['af_max'] = self.panelParam.getAFmax(self.counter)
