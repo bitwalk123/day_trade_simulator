@@ -4,7 +4,7 @@ import pandas as pd
 from PySide6.QtWidgets import QSizePolicy
 
 from structs.res import AppRes
-from widgets.container import Widget
+from widgets.container import Widget, ScrollAreaVertical
 from widgets.labels import (
     LabelFloat,
     LabelIntRaised,
@@ -14,7 +14,7 @@ from widgets.labels import (
 from widgets.layouts import GridLayout
 
 
-class PanelParam(Widget):
+class PanelParam(ScrollAreaVertical):
     def __init__(self, res: AppRes):
         super().__init__()
         self.setSizePolicy(
@@ -25,7 +25,7 @@ class PanelParam(Widget):
         # ----------------------------------
         #  パラメータ AF（加速因数）水準の読み込み
         # ----------------------------------
-        file_json = 'af_params.json'
+        file_json = 'doe_af.json'
         self.df = df = pd.read_json(os.path.join(res.dir_config, file_json))
         df['Total'] = 0
 
@@ -36,8 +36,10 @@ class PanelParam(Widget):
         # =====================================================================
         #  水準テーブル
         # =====================================================================
+        base = Widget()
+        self.setWidget(base)
         layout = GridLayout()
-        self.setLayout(layout)
+        base.setLayout(layout)
 
         r = 0
         labNo = LabelTitleRaised('#')

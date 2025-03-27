@@ -28,7 +28,7 @@ from widgets.labels import (
     LabelTime,
     LabelTitle,
     LabelValue,
-    LabelUnit, LabelFlatRight,
+    LabelUnit, LabelFlatRight, LabelInt,
 )
 from widgets.layouts import GridLayout
 
@@ -246,8 +246,22 @@ class DockMain(QDockWidget):
         layout.addWidget(labLossCut, r, 0)
 
         self.objLossCut = objLossCut = CheckBoxLossCut()
+        if 'flag_losscut' in dict_target:
+            objLossCut.setChecked(dict_target['flag_losscut'])
+        else:
+            objLossCut.setChecked(False)
         layout.addWidget(objLossCut, r, 1)
 
+        r += 1
+        labFactorLosscut = LabelTitle('損切因数')
+        layout.addWidget(labFactorLosscut, r, 0)
+
+        self.objFactorLosscut = objFactorLosscut = LabelInt()
+        if 'factor_losscut' in dict_target:
+            objFactorLosscut.setValue(dict_target['factor_losscut'])
+        else:
+            objFactorLosscut.setValue(0)
+        layout.addWidget(objFactorLosscut, r, 1)
 
         r += 1
         base_control = QWidget()
@@ -283,13 +297,16 @@ class DockMain(QDockWidget):
         but_order.clicked.connect(self.on_order_history)
         hbox.addWidget(but_order)
 
-    def get_factor_losscut(self, dict_param: dict):
+    def get_losscut_param(self, dict_param: dict):
         """
-        損切（ロスカット）因数 ⇨ 呼び値と株数を乗じて損切価格を決める
+        ロスカット関連パラメータ
         :param dict_param: パラメータを保持する辞書
         :return:
         """
-        dict_param['factor_losscut'] = 10
+        # 損切（ロスカット）機能が有効になっているか？
+        dict_param['flag_losscut'] = self.isLossCutEnabled()
+        # 損切（ロスカット）因数 ⇨ 呼び値と株数を乗じて損切価格を決める
+        dict_param['factor_losscut'] = self.objFactorLosscut.getValue()
 
     def get_psar_af_param(self, dict_param: dict):
         """
@@ -310,6 +327,9 @@ class DockMain(QDockWidget):
         """
         dict_param['date'] = self.dict_target['date']
         dict_param['tick'] = self.dict_target['tick']['Price']
+
+    def isLossCutEnabled(self) -> bool:
+        return self.objLossCut.isChecked()
 
     def on_modify_af(self):
         """
@@ -342,9 +362,9 @@ class DockMain(QDockWidget):
         """
         dict_param = dict()
         # シミュレータへ渡すデータ＆パラメータを準備
-        self.get_factor_losscut(dict_param) # ロスカット因数
-        self.get_tick_date_price(dict_param) # ティックデータ
-        self.get_psar_af_param(dict_param) # PSAR パラメータ
+        self.get_losscut_param(dict_param)  # 損切パラメータ
+        self.get_tick_date_price(dict_param)  # ティックデータ
+        self.get_psar_af_param(dict_param)  # PSAR パラメータ
 
         # 売買単位
         dict_param['unit'] = self.objUnit.getValue()
@@ -355,6 +375,14 @@ class DockMain(QDockWidget):
         # 🧿 シミュレーション開始リクエストの通知
         # ---------------------------------
         self.requestSimulationStart.emit(dict_param)
+
+    def setLossCutEnabled(self, flag: bool):
+        """
+        損切（ロスカット）機能を有効にするか否か設定
+        :param flag: True あるいは False
+        :return:
+        """
+        self.objLossCut.setChecked(flag)
 
     def setPosition(self, position: str, price: float):
         """

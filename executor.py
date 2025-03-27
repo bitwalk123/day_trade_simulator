@@ -6,8 +6,7 @@ from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
     QProgressBar,
-    QSizePolicy,
-    QWidget, QToolButton,
+    QWidget,
 )
 
 from structs.res import AppRes
@@ -82,11 +81,8 @@ class Executor(QMainWindow):
         """
 
         # メイン
-        sa = ScrollAreaVertical()
-        self.setCentralWidget(sa)
-
         base = QWidget()
-        sa.setWidget(base)
+        self.setCentralWidget(base)
 
         layout = GridLayout()
         base.setLayout(layout)
@@ -216,6 +212,7 @@ class Executor(QMainWindow):
 
     def loop_simulation(self):
         dict_target = self.dict_dict_target[self.code_target]
+        dict_target['flag_losscut'] = False
         dict_target['af_init'] = self.panelParam.getAFinit(self.counter)
         dict_target['af_step'] = self.panelParam.getAFstep(self.counter)
         dict_target['af_max'] = self.panelParam.getAFmax(self.counter)
