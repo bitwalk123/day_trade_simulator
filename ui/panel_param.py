@@ -27,7 +27,8 @@ class PanelParam(ScrollAreaVertical):
         # ----------------------------------
         file_json = 'doe_af.json'
         self.df = df = pd.read_json(os.path.join(res.dir_config, file_json))
-        df['Total'] = 0
+        self.coltotal = coltotal = 'total'
+        df[coltotal] = 0
 
         # 水準テーブル用オブジェクト
         self.dict_obj = dict_obj = dict()
@@ -45,19 +46,11 @@ class PanelParam(ScrollAreaVertical):
         labNo = LabelTitleRaised('#')
         layout.addWidget(labNo, r, 0)
 
-        labAFinit = LabelTitleRaised('AF init')
-        layout.addWidget(labAFinit, r, 1)
+        for c, colname in enumerate(self.df.columns):
+            labAFinit = LabelTitleRaised(colname)
+            layout.addWidget(labAFinit, r, c + 1)
 
-        labAFstep = LabelTitleRaised('AF step')
-        layout.addWidget(labAFstep, r, 2)
-
-        labAFmax = LabelTitleRaised('AF max')
-        layout.addWidget(labAFmax, r, 3)
-
-        labTotal = LabelTitleRaised('合計損益')
-        layout.addWidget(labTotal, r, 4)
-
-        for i in range(len(df)):
+        for i in range(len(self.df)):
             r += 1
 
             objNo = LabelIntRaised()
@@ -65,44 +58,38 @@ class PanelParam(ScrollAreaVertical):
             dict_obj[r] = dict()
             layout.addWidget(objNo, r, 0)
 
-            objAFinit = LabelFloat()
-            objAFinit.setValue(df.at[r, 'af_init'])
-            dict_obj[r]['af_init'] = objAFinit
-            layout.addWidget(objAFinit, r, 1)
+            for c, colname in enumerate(self.df.columns):
+                if colname == self.coltotal:
+                    obj = LabelValue()
+                else:
+                    obj = LabelFloat()
+                obj.setValue(df.at[r, colname])
+                dict_obj[r][colname] = obj
+                layout.addWidget(obj, r, c + 1)
 
-            objAFstep = LabelFloat()
-            objAFstep.setValue(df.at[r, 'af_step'])
-            dict_obj[r]['af_step'] = objAFstep
-            layout.addWidget(objAFstep, r, 2)
-
-            objAFmax = LabelFloat()
-            objAFmax.setValue(df.at[r, 'af_max'])
-            dict_obj[r]['af_max'] = objAFmax
-            layout.addWidget(objAFmax, r, 3)
-
-            objTotal = LabelValue()
-            objTotal.setValue(0)
-            dict_obj[r]['total'] = objTotal
-            layout.addWidget(objTotal, r, 4)
+    def clearTotal(self):
+        for r in range(len(self.df)):
+            self.setTotal(r + 1, 0.0)
 
     def getLevelMax(self) -> int:
         return self.counter_max
 
     def getAFinit(self, i: int) -> float:
-        obj: LabelFloat = self.dict_obj[i + 1]['af_init']
+        obj: LabelFloat = self.dict_obj[i]['af_init']
         return obj.getValue()
 
     def getAFstep(self, i: int) -> float:
-        obj: LabelFloat = self.dict_obj[i + 1]['af_step']
+        obj: LabelFloat = self.dict_obj[i]['af_step']
         return obj.getValue()
 
     def getAFmax(self, i: int) -> float:
-        obj: LabelFloat = self.dict_obj[i + 1]['af_max']
+        obj: LabelFloat = self.dict_obj[i]['af_max']
         return obj.getValue()
 
     def getTotal(self, i: int) -> float:
-        obj: LabelValue = self.dict_obj[i + 1]['total']
+        obj: LabelValue = self.dict_obj[i][self.coltotal]
         return obj.getValue()
+
 
     def setTotal(self, i: int, total: float):
         """setTotal - 合計損益を対象ウィジェットに設定
@@ -111,9 +98,9 @@ class PanelParam(ScrollAreaVertical):
         :param total: 合計損益
         :return:
         """
-        obj: LabelValue = self.dict_obj[i]['total']
+        obj: LabelValue = self.dict_obj[i][self.coltotal]
         obj.setValue(total)
-        self.df.at[i, 'Total'] = total
+        self.df.at[i, self.coltotal] = total
 
     def getResult(self, name_html: str):
         list_html = list()
@@ -124,11 +111,14 @@ class PanelParam(ScrollAreaVertical):
         # header
         list_html.append('<thead>\n')
         list_html.append('<tr>\n')
-        for colname in ['#', 'AF init', 'AF step', 'AF max', 'Total']:
+
+        list_html.append('<th nowrap>#</th>\n')
+        for colname in self.df.columns:
             list_html.append('<th nowrap>%s</th>\n' % colname)
 
         list_html.append('</tr>\n')
         list_html.append('</thead>\n')
+
         # body
         list_html.append('<tbody>\n')
         rows = len(self.df)
@@ -136,18 +126,13 @@ class PanelParam(ScrollAreaVertical):
             list_html.append('<tr>\n')
             # Run
             list_html.append('<td nowrap style="text-align: right;">%d</td>\n' % (r + 1))
-            # AF init
-            af_init = self.df.at[r + 1, 'af_init']
-            list_html.append('<td nowrap style="text-align: right;">%.5f</td>\n' % af_init)
-            # AF step
-            af_step = self.df.at[r + 1, 'af_step']
-            list_html.append('<td nowrap style="text-align: right;">%.5f</td>\n' % af_step)
-            # AF max
-            af_max = self.df.at[r + 1, 'af_max']
-            list_html.append('<td nowrap style="text-align: right;">%.5f</td>\n' % af_max)
-            # Total
-            total = self.df.at[r + 1, 'Total']
-            list_html.append('<td nowrap style="text-align: right;">{:,}</td>\n'.format(int(total)))
+
+            for c, colname in enumerate(self.df.columns):
+                value = self.df.at[r + 1, colname]
+                if colname == self.coltotal:
+                    list_html.append('<td nowrap style="text-align: right;">%d</td>\n' % int(value))
+                else:
+                    list_html.append('<td nowrap style="text-align: right;">%.5f</td>\n' % value)
 
             list_html.append('</tr>\n')
 
@@ -158,4 +143,3 @@ class PanelParam(ScrollAreaVertical):
 
         with open(name_html, mode='w') as f:
             f.writelines(list_html)
-
