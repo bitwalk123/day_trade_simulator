@@ -4,7 +4,6 @@ from PySide6.QtWidgets import QSizePolicy
 from structs.res import AppRes
 from widgets.buttons import FolderButton
 from widgets.container import Widget, PadH
-from widgets.dialog import DirDialog
 from widgets.entry import EntryDir
 from widgets.labels import LabelTitle
 from widgets.layouts import HBoxLayout
@@ -16,8 +15,8 @@ class PanelOutput(Widget):
     def __init__(self, res: AppRes):
         super().__init__()
         self.setSizePolicy(
-            QSizePolicy.Policy.Preferred,
             QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed,
         )
         layout_output = HBoxLayout()
         self.setLayout(layout_output)
