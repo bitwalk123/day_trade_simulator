@@ -203,6 +203,7 @@ class Executor(QMainWindow):
         elif not os.path.isdir(self.path_output):
             os.mkdir(self.path_output)
 
+        self.panelParam.clearTotal()
         self.code_target = self.comboCode.currentText()
         self.counter_max = self.panelParam.getLevelMax()
         self.counter = 0
@@ -211,22 +212,33 @@ class Executor(QMainWindow):
         self.loop_simulation()
 
     def loop_simulation(self):
-        dict_target = self.dict_dict_target[self.code_target]
-        dict_target['flag_losscut'] = False
-        dict_target['af_init'] = self.panelParam.getAFinit(self.counter)
-        dict_target['af_step'] = self.panelParam.getAFstep(self.counter)
-        dict_target['af_max'] = self.panelParam.getAFmax(self.counter)
         # カウンターのインクリメント
         self.counter += 1
 
-        self.delete_winmain()
         # ---------------
         #  Simulator 起動
         # ---------------
-        self.winmain = WinMain(self.res, dict_target, self.threadpool, self.pbar)
-        self.winmain.simulationCompleted.connect(self.next_simulation)
-        self.winmain.setFixedSize(1600, 800)
-        self.winmain.show()
+        if self.winmain == None:
+            dict_target = self.dict_dict_target[self.code_target]
+
+            dict_target['flag_losscut'] = False
+            dict_target['af_init'] = self.panelParam.getAFinit(self.counter)
+            dict_target['af_step'] = self.panelParam.getAFstep(self.counter)
+            dict_target['af_max'] = self.panelParam.getAFmax(self.counter)
+
+            self.winmain = WinMain(self.res, dict_target, self.threadpool, self.pbar)
+            self.winmain.simulationCompleted.connect(self.next_simulation)
+            self.winmain.setFixedSize(1600, 800)
+            self.winmain.show()
+        else:
+            self.winmain.dock.setLossCutEnabled(False)
+            af_init = self.panelParam.getAFinit(self.counter)
+            af_step = self.panelParam.getAFstep(self.counter)
+            af_max = self.panelParam.getAFmax(self.counter)
+            self.winmain.dock.objAFinit.setValue(af_init)
+            self.winmain.dock.objAFstep.setValue(af_step)
+            self.winmain.dock.objAFmax.setValue(af_max)
+
         self.winmain.autoSimulationStart()
 
     def next_simulation(self, dict_result: dict):
@@ -239,6 +251,8 @@ class Executor(QMainWindow):
 
         # 結果の処理
         self.panelParam.setTotal(self.counter, dict_result['total'])
+
+        # ループまたは終了処理
         if self.counter < self.counter_max:
             self.loop_simulation()
         else:
