@@ -35,8 +35,8 @@ class EntryDir(Entry):
         self.setEnabled(False)
 
         self.setSizePolicy(
-            QSizePolicy.Policy.Preferred,
             QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed,
         )
 
 
