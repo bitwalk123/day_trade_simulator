@@ -13,6 +13,9 @@ class RealTimePSAR:
         self.af_step = af_step
         self.af_max = af_max
 
+        # 保持しておく指標
+        self.ep = None
+
         # クラス内で使用するデータフレーム
         df = pd.DataFrame()
         df.index.name = 'Datetime'
@@ -71,6 +74,9 @@ class RealTimePSAR:
         self.df.loc[dt1, 'AF'] = af1
         self.df.loc[dt1, 'PSAR'] = psar1
 
+        # 保持しておく指標
+        self.ep = ep1
+
         # 現在のトレンドを返す
         return trend1
 
@@ -100,12 +106,19 @@ class RealTimePSAR:
             else:
                 return False
 
-    def get_df(self) -> pd.DataFrame:
+    def getPSAR(self) -> pd.DataFrame:
         """
         PSAR のデータフレームを返す
         :return: PSAR のデータフレーム
         """
         return self.df
+
+    def getEP(self) -> float:
+        """
+        現在保持している EP の値を取得
+        :return:
+        """
+        return self.ep
 
     @staticmethod
     def trend_from_prices(price0: float, price1: float) -> int:
