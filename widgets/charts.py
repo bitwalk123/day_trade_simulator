@@ -2,13 +2,15 @@ import os
 
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+import numpy as np
+import pandas as pd
 from matplotlib import dates as mdates
 from matplotlib.backends.backend_qtagg import (
     FigureCanvasQTAgg as FigureCanvas,
     NavigationToolbar2QT as NavigationToolbar,
 )
 from matplotlib.figure import Figure
-import matplotlib.ticker as ticker
 
 from funcs.plots import (
     clearAxes,
@@ -36,13 +38,13 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.size'] = 14
 
         self.ax = dict()
-        n = 2
+        n = 3
 
         if n > 1:
             gs = self.fig.add_gridspec(
                 n, 1,
                 wspace=0.0, hspace=0.0,
-                height_ratios=[2 if i == 0 else 1 for i in range(n)]
+                height_ratios=[3 if i == 0 else 1 for i in range(n)]
             )
             for i, axis in enumerate(gs.subplots(sharex='col')):
                 self.ax[i] = axis
@@ -68,6 +70,7 @@ class Canvas(FigureCanvas):
 
         # ティックデータ
         df_tick = dict_plot['tick']
+
         # 含み益データ
         df_profit = dict_plot['profit']
 
@@ -91,6 +94,14 @@ class Canvas(FigureCanvas):
                 color=color,
                 s=5,
             )
+
+        # EP トレンド
+        self.ax[0].plot(
+            df_tick['EP'],
+            color='magenta',
+            linewidth=0.5,
+            alpha=0.75,
+        )
 
         # チャート・タイトル
         # self.ax[0].set_title(dict_plot['title'])
@@ -116,35 +127,49 @@ class Canvas(FigureCanvas):
             get_range_xaxis(df_tick)
         )
 
-        # 含み益トレンド
-        if len(df_profit) > 0:
-            self.ax[1].plot(
-                df_profit['Profit'],
-                color='black',
-                linewidth=0.5,
-                alpha=0.75,
-            )
-            self.ax[1].plot(
-                df_profit['ProfitMax'],
-                color='red',
-                linewidth=0.5,
-                alpha=0.75,
-            )
-        # y = 0 の横線
-        self.ax[1].axhline(
-            0,
-            linewidth=0.75,
-            color='#444',
+        # | EP - Price |
+        idx = 1
+        self.ax[idx].set_ylabel('|EP - Price|')
+        ser_ep_diff = np.abs(df_tick['EP'] - df_tick['Price']) / dict_plot['price_tick_min']
+        self.ax[idx].plot(
+            ser_ep_diff,
+            color='C0',
+            linewidth=0.5,
+            alpha=0.75,
         )
 
-        # Y2軸タイトル
-        self.ax[1].set_ylabel(dict_plot['ylabel_profit'])
+        # 含み益トレンド
+        if len(df_profit) > 0:
+            idx = 2
+            self.ax[idx].set_ylabel(dict_plot['ylabel_profit'])
+            self.plot_profit(idx, df_profit)
 
         # グリッド線
         drawGrid(self.fig)
 
         # 再描画
         refreshDraw(self.fig)
+
+    def plot_profit(self, idx: int, df_profit: pd.DataFrame):
+        self.ax[idx].plot(
+            df_profit['Profit'],
+            color='black',
+            linewidth=0.5,
+            alpha=0.75,
+        )
+        self.ax[idx].plot(
+            df_profit['ProfitMax'],
+            color='red',
+            linewidth=0.5,
+            alpha=0.75,
+        )
+
+        # y = 0 の横線
+        self.ax[idx].axhline(
+            0,
+            linewidth=0.75,
+            color='#444',
+        )
 
     def save(self, filename):
         self.fig.savefig(filename)

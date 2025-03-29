@@ -6,101 +6,146 @@ class RealTimePSAR:
     """
     Realtime Parabolic SAR
     """
-    def __init__(self, af_init=0.001, af_step=0.001, af_max=0.04):
+    __version__ = '1.1.0'
+
+    def __init__(self, af_init=0.000, af_step=0.001, af_max=0.01):
         self.af_init = af_init
         self.af_step = af_step
         self.af_max = af_max
-        # dateframe used in this class
+
+        # クラス内で使用するデータフレーム
         df = pd.DataFrame()
         df.index.name = 'Datetime'
         self.df = df.astype(float)
 
-    def add(self, t1, p1) -> int:
+    def add(self, dt1: pd.Timestamp, price1: float) -> int:
+        # データフレームの行数
         r = len(self.df)
-        self.df.loc[t1, 'Price'] = p1
 
         if r == 0:
-            self.add_psar(t1, 0, np.nan, np.nan, np.nan)
-            return 0
-
-        t0 = self.df.index[r - 1]
-        p0 = self.df.loc[t0, 'Price']
-
-        if r == 1:
-            trend1 = self.trend_from_prices(p0, p1)
-            self.trend_reversal(t1, p1, trend1, p1)
-
-            return int(trend1)
+            # 最初は時刻と中立トレンドを記録
+            trend1 = 0
+            ep1 = np.nan
+            af1 = np.nan
+            psar1 = np.nan
         else:
-            trend0 = self.df.loc[t0, 'TREND']
-            ep0 = self.df.loc[t0, 'EP']
-            af0 = self.df.loc[t0, 'AF']
-            psar0 = self.df.loc[t0, 'PSAR']
+            # 一つ前のデータを取得
+            dt0 = self.df.index[r - 1]
+            price0 = self.df.loc[dt0, 'Price']
+            trend0 = self.df.loc[dt0, 'TREND']
+            ep0 = self.df.loc[dt0, 'EP']
+            af0 = self.df.loc[dt0, 'AF']
+            psar0 = self.df.loc[dt0, 'PSAR']
 
-            if 0 < trend0:
-                if p1 < psar0:
-                    trend1 = -1
-                    self.trend_reversal(t1, p1, trend1, ep0)
-                else:
-                    trend1 = trend0
-                    if ep0 < p1:
-                        ep1 = p1
-                        if af0 < self.af_max - self.af_step:
-                            af1 = af0 + self.af_step
-                        else:
-                            af1 = self.af_max
-                    else:
-                        ep1 = ep0
-                        af1 = af0
-                    psar1 = psar0 + af1 * (ep1 - psar0)
-                    self.add_psar(t1, trend1, ep1, af1, psar1)
-            elif trend0 < 0:
-                if psar0 < p1:
-                    trend1 = 1
-                    self.trend_reversal(t1, p1, trend1, ep0)
-                else:
-                    trend1 = trend0
-                    if p1 < ep0:
-                        ep1 = p1
-                        if af0 < self.af_max - self.af_step:
-                            af1 = af0 + self.af_step
-                        else:
-                            af1 = self.af_max
-                    else:
-                        ep1 = ep0
-                        af1 = af0
-                    psar1 = psar0 + af1 * (ep1 - psar0)
-                    self.add_psar(t1, trend1, ep1, af1, psar1)
-            else:
-                trend1 = self.trend_from_prices(p0, p1)
+            if r == 1:
+                trend1 = self.trend_from_prices(price0, price1)
+                ep1 = price1
+                af1 = self.af_init
+                psar1 = price1
+            elif trend0 == 0:
+                trend1 = self.trend_from_prices(price0, price1)
                 ep1 = ep0
                 af1 = af0
-                psar1 = psar0 + af1 * (ep1 - psar0)
-                self.add_psar(t1, trend1, ep1, af1, psar1)
+                psar1 = self.update_psar(ep1, af1, psar0)
+            elif self.cmp_psar(trend0, price1, psar0):
+                # トレンド反転
+                trend1 = trend0 * -1
+                ep1 = price1
+                af1 = self.af_init
+                psar1 = ep0
+            else:
+                # 同一トレンド
+                trend1 = trend0
+                if self.cmp_ep(trend0, price1, ep0):
+                    # EP と AF の更新
+                    ep1, af1 = self.update_ep_af(price1, af0)
+                else:
+                    ep1 = ep0
+                    af1 = af0
+                psar1 = self.update_psar(ep1, af1, psar0)
 
-            return int(trend1)
+        # データフレームに新たな行を追加
+        self.df.loc[dt1, 'Price'] = price1
+        self.df.loc[dt1, 'TREND'] = trend1
+        self.df.loc[dt1, 'EP'] = ep1
+        self.df.loc[dt1, 'AF'] = af1
+        self.df.loc[dt1, 'PSAR'] = psar1
+
+        # 現在のトレンドを返す
+        return trend1
 
     @staticmethod
-    def trend_from_prices(p0, p1):
-        if p0 < p1:
-            trend = 1
-        elif p1 < p0:
-            trend = -1
+    def cmp_psar(trend: int, price: float, psar: float) -> bool:
+        if 0 < trend:
+            if price < psar:
+                return True
+            else:
+                return False
         else:
-            trend = 0
-        return trend
+            if psar < price:
+                return True
+            else:
+                return False
 
-    def trend_reversal(self, t, p, trend1, ep0):
-        ep1 = p
-        af1 = self.af_init
-        psar1 = ep0
-        self.add_psar(t, trend1, ep1, af1, psar1)
+    @staticmethod
+    def cmp_ep(trend: int, price: float, ep: float) -> bool:
+        if 0 < trend:
+            if ep < price:
+                return True
+            else:
+                return False
+        else:
+            if price < ep:
+                return True
+            else:
+                return False
 
-    def add_psar(self, t, trend, ep, af, psar):
-        self.df.loc[t, 'TREND'] = trend
-        self.df.loc[t, 'EP'] = ep
-        self.df.loc[t, 'AF'] = af
-        self.df.loc[t, 'PSAR'] = psar
-
-    def get_df(self):
+    def get_df(self) -> pd.DataFrame:
+        """
+        PSAR のデータフレームを返す
+        :return: PSAR のデータフレーム
+        """
         return self.df
+
+    @staticmethod
+    def trend_from_prices(price0: float, price1: float) -> int:
+        """
+        p0 と p1 を比較してトレンドを返す。
+        :param price0:
+        :param price1:
+        :return:
+        """
+        if price0 < price1:
+            return 1
+        elif price1 < price0:
+            return -1
+        else:
+            return 0
+
+    def update_ep_af(self, price: float, af: float) -> tuple[float, float]:
+        """
+        EP（極値）と AF（加速因数）の更新
+        :param price:
+        :param af:
+        :return:
+        """
+        # EP の更新
+        ep_new = price
+
+        # AF の更新
+        if af < self.af_max - self.af_step:
+            af_new = af + self.af_step
+        else:
+            af_new = self.af_max
+
+        return ep_new, af_new
+
+    def update_psar(self, ep: float, af: float, psar: float) -> float:
+        """
+        PSAR を AF で更新
+        :param ep:
+        :param af:
+        :param psar:
+        :return:
+        """
+        return psar + af * (ep - psar)
