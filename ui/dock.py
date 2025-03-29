@@ -308,7 +308,7 @@ class DockMain(QDockWidget):
         # 損切（ロスカット）因数 ⇨ 呼び値と株数を乗じて損切価格を決める
         dict_param['factor_losscut'] = self.objFactorLosscut.getValue()
 
-    def get_psar_af_param(self, dict_param: dict):
+    def getAFparams(self, dict_param: dict):
         """
         Parabolic SAR の AF（加速因数）パラメータの取得
         :param dict_param: パラメータを保持する辞書
@@ -317,6 +317,9 @@ class DockMain(QDockWidget):
         dict_param['af_init'] = self.objAFinit.getValue()
         dict_param['af_step'] = self.objAFstep.getValue()
         dict_param['af_max'] = self.objAFmax.getValue()
+
+    def getPriceTickMin(self) -> float:
+        return self.objTickPriceMin.getValue()
 
     def get_tick_date_price(self, dict_param: dict):
         """
@@ -337,7 +340,7 @@ class DockMain(QDockWidget):
         :return:
         """
         dict_af = dict()
-        self.get_psar_af_param(dict_af)
+        self.getAFparams(dict_af)
 
         # 設定ダイアログを表示
         dlg = DlgAFSetting(self.res, dict_af)
@@ -364,7 +367,7 @@ class DockMain(QDockWidget):
         # シミュレータへ渡すデータ＆パラメータを準備
         self.get_losscut_param(dict_param)  # 損切パラメータ
         self.get_tick_date_price(dict_param)  # ティックデータ
-        self.get_psar_af_param(dict_param)  # PSAR パラメータ
+        self.getAFparams(dict_param)  # PSAR パラメータ
 
         # 売買単位
         dict_param['unit'] = self.objUnit.getValue()
