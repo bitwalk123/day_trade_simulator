@@ -13,6 +13,10 @@ class RealTimePSAR:
         self.af_step = af_step
         self.af_max = af_max
 
+        # 保持しておく指標
+        self.ep = 0
+        self.ep_count = 0  # 同じ EP である回数
+
         # クラス内で使用するデータフレーム
         df = pd.DataFrame()
         df.index.name = 'Datetime'
@@ -71,6 +75,14 @@ class RealTimePSAR:
         self.df.loc[dt1, 'AF'] = af1
         self.df.loc[dt1, 'PSAR'] = psar1
 
+        # 保持しておく指標
+        if self.ep == ep1:
+            self.ep_count += 1
+        else:
+            self.ep = ep1
+            self.ep_count = 0  # EP のカウンタをリセット
+        self.df.loc[dt1, 'EPcount'] = self.ep_count
+
         # 現在のトレンドを返す
         return trend1
 
@@ -100,12 +112,26 @@ class RealTimePSAR:
             else:
                 return False
 
-    def get_df(self) -> pd.DataFrame:
+    def getPSAR(self) -> pd.DataFrame:
         """
         PSAR のデータフレームを返す
         :return: PSAR のデータフレーム
         """
         return self.df
+
+    def getEP(self) -> float:
+        """
+        現在保持している EP の値を取得
+        :return:
+        """
+        return self.ep
+
+    def getEPcount(self) -> int:
+        """
+        現在保持している EP count の値を取得
+        :return:
+        """
+        return self.ep_count
 
     @staticmethod
     def trend_from_prices(price0: float, price1: float) -> int:
