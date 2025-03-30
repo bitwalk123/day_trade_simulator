@@ -104,7 +104,6 @@ class Canvas(FigureCanvas):
         )
 
         # チャート・タイトル
-        # self.ax[0].set_title(dict_plot['title'])
         self.fig.suptitle(dict_plot['title'])
         self.ax[0].set_title(dict_plot['subtitle'], fontsize='small')
 
@@ -127,16 +126,16 @@ class Canvas(FigureCanvas):
             get_range_xaxis(df_tick)
         )
 
-        # | EP - Price |
-        idx = 1
-        self.ax[idx].set_ylabel('|EP - Price|')
-        ser_ep_diff = np.abs(df_tick['EP'] - df_tick['Price']) / dict_plot['price_tick_min']
-        self.ax[idx].plot(
-            ser_ep_diff,
-            color='C0',
-            linewidth=0.5,
-            alpha=0.75,
-        )
+        # | EP count |
+        if 'EPcount' in df_tick.columns:
+            idx = 1
+            self.ax[idx].set_ylabel('EP count')
+            self.ax[idx].plot(
+                df_tick['EPcount'],
+                color='C0',
+                linewidth=1,
+                alpha=1,
+            )
 
         # 含み益トレンド
         if len(df_profit) > 0:
