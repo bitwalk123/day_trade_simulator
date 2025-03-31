@@ -161,7 +161,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             self.eval_profit(t_current, p_current)
 
         dict_result = dict()
-        dict_result['tick'] = self.psar.get_df()
+        dict_result['tick'] = self.psar.getPSAR()
         dict_result['profit'] = self.posman.get_profit_history()
         dict_result['order'] = self.posman.get_order_history()
         dict_result['column_format'] = self.posman.get_column_format_order()
