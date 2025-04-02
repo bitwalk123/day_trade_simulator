@@ -35,9 +35,6 @@ class WinMain(QMainWindow):
         self.threadpool = threadpool
         self.pbar = pbar
 
-        # チャートのサブタイトル書式
-        self.af_param_format = 'AF: init = %.5f, step = %.5f, max = %.5f'
-
         # 注文履歴
         self.order_hist: WinOrderHistory | None = None  # 注文履歴
         self.df_order: pd.DataFrame | None = None
@@ -66,6 +63,11 @@ class WinMain(QMainWindow):
             Qt.ToolBarArea.BottomToolBarArea,
             navtoolbar,
         )
+
+        # チャートのサブタイトル書式 (1)
+        self.af_param_format = 'AF: init = %.5f, step = %.5f, max = %.5f'
+        # チャートのサブタイトル書式 (2)
+        self.af_param_locccut_format = 'AF: init = %.5f, step = %.5f, max = %.5f, losscut factor = %d'
 
         # _____________________________________________________________________
         # チャートに渡す情報を dict_target にせずに、
@@ -142,13 +144,23 @@ class WinMain(QMainWindow):
         # プロットを更新
         dict_plot = dict()
         dict_plot['title'] = self.dict_target['title']
+
         dict_param = dict()
         self.dock.getAFparams(dict_param)
-        dict_plot['subtitle'] = self.af_param_format % (
-            dict_param['af_init'],
-            dict_param['af_step'],
-            dict_param['af_max']
-        )
+        if self.dock.isLossCutEnabled():
+            losscut_factor = self.dock.objFactorLosscut.getValue()
+            dict_plot['subtitle'] = self.af_param_locccut_format % (
+                dict_param['af_init'],
+                dict_param['af_step'],
+                dict_param['af_max'],
+                losscut_factor
+            )
+        else:
+            dict_plot['subtitle'] = self.af_param_format % (
+                dict_param['af_init'],
+                dict_param['af_step'],
+                dict_param['af_max']
+            )
         dict_plot['price_tick_min'] = self.dock.getPriceTickMin()
         dict_plot['tick'] = df_tick
         dict_plot['profit'] = df_profit
