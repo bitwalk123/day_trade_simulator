@@ -8,7 +8,7 @@ from PySide6.QtCore import (
 )
 
 from tech.rtpsar import RealTimePSAR
-from sim.position_manager import PositionManager
+from sim.posman import PositionManager
 
 
 class SimulatorSignal(QObject):

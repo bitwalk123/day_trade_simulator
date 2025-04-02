@@ -66,11 +66,18 @@ class TradeSimulator(QMainWindow):
         """
         # 現在のタブをすべて削除
         self.base.deleteAllTabs()
+
         # 新しいタブを追加
         for dict_target in list_target:
             code = dict_target['code']
-            tabobj = WinMain(self.res, dict_target, self.threadpool, self.pbar)
-            self.base.addTab(tabobj, code)
+            tabObj = WinMain(
+                self.res,
+                dict_target,
+                self.threadpool,
+                self.pbar
+            )
+            self.base.addTab(tabObj, code)
+
         # 進捗をリセット
         self.pbar.reset()
 
