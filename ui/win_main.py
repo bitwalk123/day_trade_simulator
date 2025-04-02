@@ -1,8 +1,15 @@
 import os
 
 import pandas as pd
-from PySide6.QtCore import Qt, QThreadPool, Signal
-from PySide6.QtWidgets import QMainWindow, QProgressBar
+from PySide6.QtCore import (
+    QThreadPool,
+    Qt,
+    Signal,
+)
+from PySide6.QtWidgets import (
+    QMainWindow,
+    QProgressBar,
+)
 
 from funcs.conv import df_to_html
 from structs.res import AppRes
@@ -60,7 +67,9 @@ class WinMain(QMainWindow):
             navtoolbar,
         )
 
-        # チャートに渡す情報を dict_target にせずに、敢えて必要分のみを dict_plot へ移して渡す。
+        # _____________________________________________________________________
+        # チャートに渡す情報を dict_target にせずに、
+        # 敢えて必要分のみを dict_plot へ移して渡す。
         # これは、パラメータを変更して再描画するために自由度を確保するため。
         dict_plot = dict()
         dict_plot['title'] = dict_target['title']
@@ -74,6 +83,7 @@ class WinMain(QMainWindow):
         dict_plot['profit'] = pd.DataFrame()
         dict_plot['ylabel_tick'] = 'Price'
         dict_plot['ylabel_profit'] = 'Profit'
+
         # プロット
         canvas.plot(dict_plot)
 
@@ -87,15 +97,26 @@ class WinMain(QMainWindow):
         if self.order_hist is not None:
             self.order_hist.hide()
             self.order_hist.deleteLater()
-        self.order_hist = WinOrderHistory(self.res, self.df_order, self.column_format, self.total_profit)
-        self.order_hist.requestOrderHistoryHTML.connect(self.on_order_history_html)
+        self.order_hist = WinOrderHistory(
+            self.res,
+            self.df_order,
+            self.column_format,
+            self.total_profit
+        )
+        self.order_hist.requestOrderHistoryHTML.connect(
+            self.on_order_history_html
+        )
         self.order_hist.show()
 
     def on_order_history_html(self):
         if self.df_order is None:
             return
 
-        list_html = df_to_html(self.df_order, self.column_format, self.total_profit)
+        list_html = df_to_html(
+            self.df_order,
+            self.column_format,
+            self.total_profit
+        )
 
         home = os.path.expanduser("~")
         name_html = os.path.join(home, 'result.html')
