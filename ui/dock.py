@@ -2,7 +2,6 @@ import os
 
 from PySide6.QtCore import (
     QMargins,
-    Qt,
     Signal,
 )
 from PySide6.QtGui import QIcon
@@ -23,12 +22,14 @@ from widgets.container import Frame, PadH
 from widgets.labels import (
     LabelDate,
     LabelFlat,
+    LabelFlatRight,
     LabelFloat,
+    LabelInt,
     LabelString,
     LabelTime,
     LabelTitle,
     LabelValue,
-    LabelUnit, LabelFlatRight, LabelInt,
+    LabelUnit,
 )
 from widgets.layouts import GridLayout
 
