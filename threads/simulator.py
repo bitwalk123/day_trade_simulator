@@ -164,7 +164,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         dict_result['tick'] = self.psar.getPSAR()
         dict_result['profit'] = self.posman.getProfitHistory()
         dict_result['order'] = self.posman.getOrderHistory()
-        dict_result['column_format'] = self.posman.getColumnFormatOrder()
+        dict_result['column_format'] = self.posman.getColFormatOrder()
         dict_result['total'] = self.posman.getTotal()
 
         # ---------------------------------------------------------------------
@@ -182,7 +182,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         :param note:
         :return:
         """
-        total = self.posman.closePosition(t_current, p_current, note)
+        total = self.posman.posClose(t_current, p_current, note)
         # ---------------------------------------------------------------------
         # 🧿 建玉を返却したことを通知
         self.positionClose.emit(total)
@@ -196,7 +196,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         :param note:
         :return:
         """
-        dict_position = self.posman.openPosition(t_current, p_current, note)
+        dict_position = self.posman.posOpen(t_current, p_current, note)
         # ---------------------------------------------------------------------
         # 🧿 建玉を持ったことを通知
         self.positionOpen.emit(dict_position)
