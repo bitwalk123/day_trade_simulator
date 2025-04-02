@@ -6,9 +6,9 @@ class PositionManager:
     建玉管理クラス
     """
 
-    def __init__(self, unit: int):
+    def __init__(self, unit: int = 100):
         # インスタンス変数の初期化
-        self.unit = unit # 売買単位
+        self.unit = unit  # 売買単位
         self.trend: int = 0  # Parabolic SAR トレンドシグナル
         self.price = 0  # 建玉取得時の株価
         self.profit_max = 0  # 最大含み益
@@ -126,7 +126,7 @@ class PositionManager:
         else:
             return False
 
-    def setTrend(self, trend):
+    def setTrend(self, trend: int):
         """
         PSAR トレンドの設定
         :param trend:
@@ -164,14 +164,14 @@ class PositionManager:
         df.columns = self.column_name
         return df
 
-    def evalProfit(self, t, price) -> dict:
+    def evalProfit(self, t: pd.Timestamp, price: float) -> dict:
         """
         含み損益を評価
         :param t:
         :param price:
         :return:
         """
-        profit = self.getProfit(t, price)
+        profit = self.get_profit(price)
         if self.profit_max < profit:
             self.profit_max = profit
 
@@ -188,7 +188,7 @@ class PositionManager:
 
         return dict_profit
 
-    def getProfit(self, t, price):
+    def get_profit(self, price: float):
         if not self.hasPosition():
             return 0.
 
