@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 
 from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
+from ui.panel_losscut import PanelLossCut
 from ui.panel_output import PanelOutput
 from ui.panel_param import PanelParam
 from ui.win_main import WinMain
@@ -103,6 +104,13 @@ class Executor(QMainWindow):
 
         self.objDate = objDate = LabelDate()
         layout.addWidget(objDate, r, 1)
+
+        r += 1
+        labLossCut = LabelTitle('ロスカット')
+        layout.addWidget(labLossCut, r, 0)
+
+        self.panelLossCut = panel_losscut = PanelLossCut(res)
+        layout.addWidget(panel_losscut, r, 1, 1, 2)
 
         r += 1
         labTargetCode = LabelFlat('【水準】')
@@ -226,15 +234,26 @@ class Executor(QMainWindow):
             dict_target['af_step'] = self.panelParam.getAFstep(self.counter)
             dict_target['af_max'] = self.panelParam.getAFmax(self.counter)
 
+            if self.panelLossCut.IsLossCutEnabled():
+                dict_target['flag_losscut'] = True
+                dict_target['factor_losscut']=self.panelLossCut.getLossCutFactor()
+            else:
+                dict_target['flag_losscut'] = False
+
             self.winmain = WinMain(self.res, dict_target, self.threadpool, self.pbar)
             self.winmain.simulationCompleted.connect(self.next_simulation)
             self.winmain.setFixedSize(1600, 800)
             self.winmain.show()
         else:
-            self.winmain.dock.setLossCutEnabled(False)
             af_init = self.panelParam.getAFinit(self.counter)
             af_step = self.panelParam.getAFstep(self.counter)
             af_max = self.panelParam.getAFmax(self.counter)
+
+            if self.panelLossCut.IsLossCutEnabled():
+                self.winmain.dock.setLossCutEnabled(True)
+            else:
+                self.winmain.dock.setLossCutEnabled(False)
+
             self.winmain.dock.objAFinit.setValue(af_init)
             self.winmain.dock.objAFstep.setValue(af_step)
             self.winmain.dock.objAFmax.setValue(af_max)

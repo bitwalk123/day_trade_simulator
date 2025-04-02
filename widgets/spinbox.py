@@ -21,6 +21,9 @@ class SpinBox(QSpinBox):
                 padding-left: 2px;
                 padding-right: 2px;
             }
+            QSpinBox:disabled {
+                color: gray;
+            }
         """)
         self.setMinimumWidth(75)
 
