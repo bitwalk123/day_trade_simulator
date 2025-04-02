@@ -79,6 +79,11 @@ class PositionManager:
             return False
 
     def get_profit(self, price: float):
+        """
+        保持しているトレンドから含み益を算出
+        :param price: 株価
+        :return:
+        """
         if not self.hasPosition():
             return 0.
 
