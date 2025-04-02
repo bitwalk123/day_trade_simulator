@@ -38,7 +38,7 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.size'] = 14
 
         self.ax = dict()
-        n = 3
+        n = 2
 
         if n > 1:
             gs = self.fig.add_gridspec(
@@ -126,6 +126,7 @@ class Canvas(FigureCanvas):
             get_range_xaxis(df_tick)
         )
 
+        """
         # | EP count |
         if 'EPcount' in df_tick.columns:
             idx = 1
@@ -136,10 +137,11 @@ class Canvas(FigureCanvas):
                 linewidth=1,
                 alpha=1,
             )
+        """
 
         # 含み益トレンド
         if len(df_profit) > 0:
-            idx = 2
+            idx = 1
             self.ax[idx].set_ylabel(dict_plot['ylabel_profit'])
             self.plot_profit(idx, df_profit)
 
