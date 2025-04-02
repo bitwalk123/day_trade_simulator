@@ -132,13 +132,13 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
                 # =============================================================
                 #  トレンド反転処理（はじめ）
-                if self.posman.get_trend() != trend:
+                if self.posman.getTrend() != trend:
                     # 建玉を持って入れば返済
-                    if self.posman.has_position():
+                    if self.posman.hasPosition():
                         self.position_close(t_current, p_current)
 
                     # トレンドを更新
-                    self.posman.set_trend(trend)
+                    self.posman.setTrend(trend)
                     # トレンドに従って建玉を持つ
                     self.position_open(t_current, p_current)
 
@@ -155,17 +155,17 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
         # 建玉を持って入れば返済
-        if self.posman.has_position():
+        if self.posman.hasPosition():
             self.position_close(t_current, p_current, '強制（大引け）')
             # 含み益の評価
             self.eval_profit(t_current, p_current)
 
         dict_result = dict()
         dict_result['tick'] = self.psar.getPSAR()
-        dict_result['profit'] = self.posman.get_profit_history()
-        dict_result['order'] = self.posman.get_order_history()
-        dict_result['column_format'] = self.posman.get_column_format_order()
-        dict_result['total'] = self.posman.get_total()
+        dict_result['profit'] = self.posman.getProfitHistory()
+        dict_result['order'] = self.posman.getOrderHistory()
+        dict_result['column_format'] = self.posman.getColumnFormatOrder()
+        dict_result['total'] = self.posman.getTotal()
 
         # ---------------------------------------------------------------------
         # 🧿 スレッド処理の終了を通知
@@ -182,7 +182,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         :param note:
         :return:
         """
-        total = self.posman.close(t_current, p_current, note)
+        total = self.posman.closePosition(t_current, p_current, note)
         # ---------------------------------------------------------------------
         # 🧿 建玉を返却したことを通知
         self.positionClose.emit(total)
@@ -196,7 +196,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         :param note:
         :return:
         """
-        dict_position = self.posman.open(t_current, p_current, note)
+        dict_position = self.posman.openPosition(t_current, p_current, note)
         # ---------------------------------------------------------------------
         # 🧿 建玉を持ったことを通知
         self.positionOpen.emit(dict_position)
@@ -209,7 +209,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         :param p_current:
         :return:
         """
-        dict_profit = self.posman.eval_profit(t_current, p_current)
+        dict_profit = self.posman.evalProfit(t_current, p_current)
         # ---------------------------------------------------------------------
         # 🧿 更新された含み益を通知
         self.updateProfit.emit(dict_profit)
