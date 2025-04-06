@@ -47,6 +47,7 @@ class RealTimePSAR:
                 af1 = self.af_init
                 psar1 = price1
             elif trend0 == 0:
+                # トレンドが中立の時
                 trend1 = self.trend_from_prices(price0, price1)
                 ep1 = ep0
                 af1 = af0

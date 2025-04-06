@@ -117,19 +117,19 @@ class DockMain(QDockWidget):
         layout.addWidget(unitTickPrice, r, 2)
 
         r += 1
-        labTickPriceMin = LabelTitle('呼値')
-        layout.addWidget(labTickPriceMin, r, 0)
+        labNominalPrice = LabelTitle('呼値')
+        layout.addWidget(labNominalPrice, r, 0)
 
-        self.objTickPriceMin = objTickPriceMin = LabelValue()
-        objTickPriceMin.setValue(dict_target['price_tick_min'])
-        layout.addWidget(objTickPriceMin, r, 1)
+        self.objNominalPrice = objNominalPrice = LabelValue()
+        objNominalPrice.setValue(dict_target['price_tick_min'])
+        layout.addWidget(objNominalPrice, r, 1)
 
-        unitTickPriceMin = LabelUnit('円')
-        layout.addWidget(unitTickPriceMin, r, 2)
+        unitNominalPrice = LabelUnit('円')
+        layout.addWidget(unitNominalPrice, r, 2)
 
-        self.objTickPriceMinEdit = objTickPriceMinEdit = EditButton(res)
-        objTickPriceMinEdit.clicked.connect(self.on_modify_tick_price_min)
-        layout.addWidget(objTickPriceMinEdit, r, 3)
+        self.objNominalPriceEdit = objNominalPriceEdit = EditButton(res)
+        objNominalPriceEdit.clicked.connect(self.on_modify_nominal_price)
+        layout.addWidget(objNominalPriceEdit, r, 3)
 
         r += 1
         labTransaction = LabelFlat('【取引】')
@@ -264,6 +264,10 @@ class DockMain(QDockWidget):
             objFactorLosscut.setValue(0)
         layout.addWidget(objFactorLosscut, r, 1)
 
+        self.objFactorLosscutEdit = objFactorLosscutEdit = EditButton(res)
+        objFactorLosscutEdit.clicked.connect(self.on_modify_factor_losscut)
+        layout.addWidget(objFactorLosscutEdit, r, 3)
+
         r += 1
         base_control = QWidget()
         layout.addWidget(base_control, r, 0, 1, 4)
@@ -320,7 +324,7 @@ class DockMain(QDockWidget):
         dict_param['af_max'] = self.objAFmax.getValue()
 
     def getPriceTickMin(self) -> float:
-        return self.objTickPriceMin.getValue()
+        return self.objNominalPrice.getValue()
 
     def get_tick_date_price(self, dict_param: dict):
         """
@@ -350,7 +354,10 @@ class DockMain(QDockWidget):
             self.objAFstep.setValue(dict_af['af_step'])
             self.objAFmax.setValue(dict_af['af_max'])
 
-    def on_modify_tick_price_min(self):
+    def on_modify_factor_losscut(self):
+        pass
+
+    def on_modify_nominal_price(self):
         pass
 
     def on_modify_unit(self):
@@ -373,7 +380,7 @@ class DockMain(QDockWidget):
         # 売買単位
         dict_param['unit'] = self.objUnit.getValue()
         # 呼び値
-        dict_param['tick_price_min'] = self.objTickPriceMin.getValue()
+        dict_param['tick_price_min'] = self.objNominalPrice.getValue()
 
         # ---------------------------------
         # 🧿 シミュレーション開始リクエストの通知
