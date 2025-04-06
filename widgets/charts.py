@@ -38,7 +38,7 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.size'] = 14
 
         self.ax = dict()
-        n = 2
+        n = 3
 
         if n > 1:
             gs = self.fig.add_gridspec(
@@ -77,7 +77,8 @@ class Canvas(FigureCanvas):
         # =============
         #  ティックデータ
         # =============
-        self.ax[0].plot(
+        idx = 0
+        self.ax[idx].plot(
             df_tick['Price'],
             color='black',
             linewidth=0.5,
@@ -88,7 +89,7 @@ class Canvas(FigureCanvas):
         df_bear = df_tick[df_tick['TREND'] < 0]
         df_bull = df_tick[df_tick['TREND'] > 0]
         for df, color in zip([df_bear, df_bull], ['blue', 'red']):
-            self.ax[0].scatter(
+            self.ax[idx].scatter(
                 x=df.index,
                 y=df['PSAR'],
                 color=color,
@@ -96,7 +97,7 @@ class Canvas(FigureCanvas):
             )
 
         # EP トレンド
-        self.ax[0].plot(
+        self.ax[idx].plot(
             df_tick['EP'],
             color='magenta',
             linewidth=0.5,
@@ -105,43 +106,42 @@ class Canvas(FigureCanvas):
 
         # チャート・タイトル
         self.fig.suptitle(dict_plot['title'])
-        self.ax[0].set_title(dict_plot['subtitle'], fontsize='small')
+        self.ax[idx].set_title(dict_plot['subtitle'], fontsize='small')
 
         # Y1軸タイトル
-        self.ax[0].set_ylabel(dict_plot['ylabel_tick'])
+        self.ax[idx].set_ylabel(dict_plot['ylabel_tick'])
 
         # X軸の時刻刻みを調整
         tick_position, tick_labels = getMajorXTicks(df_tick)
-        self.ax[0].set_xticks(
+        self.ax[idx].set_xticks(
             ticks=tick_position,
             labels=tick_labels,
         )
-        self.ax[0].xaxis.set_major_formatter(
+        self.ax[idx].xaxis.set_major_formatter(
             mdates.DateFormatter('%H:%M')
         )
-        # self.ax[0].xaxis.set_minor_locator(
+        # self.ax[idx].xaxis.set_minor_locator(
         #    mdates.MinuteLocator(interval=5)
         # )
-        self.ax[0].set_xlim(
+        self.ax[idx].set_xlim(
             get_range_xaxis(df_tick)
         )
 
-        """
-        # | EP count |
-        if 'EPcount' in df_tick.columns:
-            idx = 1
-            self.ax[idx].set_ylabel('EP count')
+        # | EP - price |/ nom
+        idx += 1
+        if 'EPPriceDelta' in df_tick.columns:
+            ser_ep_price = df_tick['EPPriceDelta'] / dict_plot['price_nominal']
+            self.ax[idx].set_ylabel('|EP - Price|/nom')
             self.ax[idx].plot(
-                df_tick['EPcount'],
+                ser_ep_price,
                 color='C0',
                 linewidth=1,
                 alpha=1,
             )
-        """
 
         # 含み益トレンド
         if len(df_profit) > 0:
-            idx = 1
+            idx += 1
             self.ax[idx].set_ylabel(dict_plot['ylabel_profit'])
             self.plot_profit(idx, df_profit)
 

@@ -80,7 +80,7 @@ class WinMain(QMainWindow):
             dict_target['af_step'],
             dict_target['af_max']
         )
-        dict_plot['price_tick_min'] = dict_target['price_tick_min']
+        dict_plot['price_nominal'] = dict_target['price_nominal']
         dict_plot['tick'] = dict_target['tick']
         dict_plot['profit'] = pd.DataFrame()
         dict_plot['ylabel_tick'] = 'Price'
@@ -161,7 +161,8 @@ class WinMain(QMainWindow):
                 dict_param['af_step'],
                 dict_param['af_max']
             )
-        dict_plot['price_tick_min'] = self.dock.getPriceTickMin()
+
+        dict_plot['price_nominal'] = self.dock.getNominalPrice()
         dict_plot['tick'] = df_tick
         dict_plot['profit'] = df_profit
         dict_plot['ylabel_tick'] = 'Price'
