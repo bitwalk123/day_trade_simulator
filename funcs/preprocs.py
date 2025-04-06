@@ -54,8 +54,8 @@ def prep_dataset(file_excel: str) -> list:
 
         # 呼び値
         r = list(df_cover.index).index('呼値')
-        price_tick_min = df_cover.iloc[r, c]
-        dict_target['price_tick_min'] = price_tick_min
+        price_nominal = df_cover.iloc[r, c]
+        dict_target['price_nominal'] = price_nominal
 
         # AF
         r = list(df_cover.index).index('AF（初期値）')
@@ -283,8 +283,8 @@ def read_sheet_cover_params(
 
     # 呼び値
     row = list(df_cover.index).index('呼値')
-    price_tick_min = df_cover.iloc[row, col]
-    dict_target['price_tick_min'] = price_tick_min
+    price_nominal = df_cover.iloc[row, col]
+    dict_target['price_nominal'] = price_nominal
 
     # 売買単位
     row = list(df_cover.index).index('売買単位')

@@ -84,6 +84,10 @@ class RealTimePSAR:
             self.ep_count = 0  # EP のカウンタをリセット
         self.df.loc[dt1, 'EPcount'] = self.ep_count
 
+        # |Price - EP| を保存
+        # 呼値では割っていない
+        self.df.loc[dt1, 'EPPriceDelta'] = np.abs(price1 - ep1)
+
         # 現在のトレンドを返す
         return trend1
 
@@ -119,6 +123,10 @@ class RealTimePSAR:
         :return: PSAR のデータフレーム
         """
         return self.df
+
+    def getPricePSARDelta(self, price: float) -> float:
+        # return self.df.loc[dt, 'EPPriceDelta']
+        return np.abs(price - self.ep)
 
     def getEP(self) -> float:
         """
