@@ -35,7 +35,7 @@ class PanelLossCut(Widget):
         self.sb_losscut_factor = sb_losscut_factor = SpinBox()
         sb_losscut_factor.setValue(3)
         sb_losscut_factor.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
-        sb_losscut_factor.setFixedWidth(50)
+        sb_losscut_factor.setFixedWidth(100)
         sb_losscut_factor.setDisabled(True)
         layout.addWidget(sb_losscut_factor)
 
