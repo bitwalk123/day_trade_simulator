@@ -278,6 +278,7 @@ def read_sheet_cover_params(
 
     # 現在日付の保持
     row = list(df_cover.index).index('現在日付')
+    #print(df_cover.iloc[row, col])
     date = df_cover.iloc[row, col].replace('/', '-')
     dict_target['date'] = date
 
