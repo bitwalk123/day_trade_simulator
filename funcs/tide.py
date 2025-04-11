@@ -82,3 +82,12 @@ def remove_tz_from_index(df: pd.DataFrame):
     name_index = df.index.name
     df.index = [ts_jst.tz_localize(None) for ts_jst in df.index]
     df.index.name = name_index
+
+
+def get_time_str(dt: pd.Timestamp) -> str:
+    """
+    Pandas の Timestamp 変数から時刻文字列 HH:MM:SS を取得
+    :param dt:
+    :return:
+    """
+    return '{:0=2}:{:0=2}:{:0=2}'.format(dt.hour, dt.minute, dt.second)
