@@ -63,4 +63,4 @@ class ScrollAreaVertical(QScrollArea):
 class Widget(QWidget):
     def __init__(self):
         super().__init__()
-        self.setContentsMargins(QMargins(0, 0, 0, 0))
+        self.setContentsMargins(QMargins(2, 2, 2, 2))

@@ -21,7 +21,7 @@ from widgets.buttons import (
     StartButton,
 )
 from widgets.combo import ComboBox
-from widgets.container import PadH, ScrollAreaVertical
+from widgets.container import PadH, ScrollAreaVertical, Widget
 from widgets.dialog import DirDialog, FileDialogExcel
 from widgets.entry import EntryExcelFile
 from widgets.labels import (
@@ -82,7 +82,7 @@ class Executor(QMainWindow):
         """
 
         # メイン
-        base = QWidget()
+        base = Widget()
         self.setCentralWidget(base)
 
         layout = GridLayout()
