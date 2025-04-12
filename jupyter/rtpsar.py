@@ -7,12 +7,14 @@ class RealTimePSAR:
     Realtime Parabolic SAR
     検証用クラス
     """
-    __version__ = '1.2.0'
+    __version__ = '1.3.0'
 
     def __init__(self, af_init=0.000, af_step=0.001, af_max=0.01):
         self.af_init = af_init
         self.af_step = af_step
         self.af_max = af_max
+
+        self.baseline = np.nan
 
         # クラス内で使用するデータフレーム
         df = pd.DataFrame()
@@ -43,18 +45,21 @@ class RealTimePSAR:
                 ep1 = price1
                 af1 = self.af_init
                 psar1 = price1
+                self.baseline = price1
             elif trend0 == 0:
                 # トレンドが中立の時
                 trend1 = self.trend_from_prices(price0, price1)
                 ep1 = ep0
                 af1 = af0
                 psar1 = self.update_psar(ep1, af1, psar0)
+                self.baseline = price1
             elif self.cmp_psar(trend0, price1, psar0):
                 # トレンド反転
                 trend1 = trend0 * -1
                 ep1 = price1
                 af1 = self.af_init
                 psar1 = ep0
+                self.baseline = price1
             else:
                 # 同一トレンド
                 trend1 = trend0
@@ -72,6 +77,7 @@ class RealTimePSAR:
         self.df.loc[dt1, 'EP'] = ep1
         self.df.loc[dt1, 'AF'] = af1
         self.df.loc[dt1, 'PSAR'] = psar1
+        self.df.loc[dt1, 'Baseline'] = self.baseline
 
         # 現在のトレンドを返す
         return trend1
