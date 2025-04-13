@@ -14,6 +14,7 @@ class RealTimePSAR:
         self.af_step = af_step
         self.af_max = af_max
 
+        # トレンド反転したときの株価
         self.baseline = np.nan
 
         # クラス内で使用するデータフレーム
