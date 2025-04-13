@@ -38,7 +38,7 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.size'] = 14
 
         self.ax = dict()
-        n = 3
+        n = 2
 
         if n > 1:
             gs = self.fig.add_gridspec(
@@ -104,6 +104,24 @@ class Canvas(FigureCanvas):
             alpha=0.75,
         )
 
+        # 含み損益を色分けして塗りつぶす
+        if 'Baseline' in df_tick.columns:
+            # Price vs. Baseline
+            color_gain = '#088'
+            color_loss = '#808'
+
+            x = df_bear.index
+            y1 = df_bear['Price']
+            y2 = df_bear['Baseline']
+            self.ax[idx].fill_between(x, y1, y2, where=(y1 < y2), color=color_gain, alpha=0.2)
+            self.ax[idx].fill_between(x, y1, y2, where=(y1 > y2), color=color_loss, alpha=0.2)
+
+            x = df_bull.index
+            y1 = df_bull['Price']
+            y2 = df_bull['Baseline']
+            self.ax[idx].fill_between(x, y1, y2, where=(y1 > y2), color=color_gain, alpha=0.2)
+            self.ax[idx].fill_between(x, y1, y2, where=(y1 < y2), color=color_loss, alpha=0.2)
+
         # チャート・タイトル
         self.fig.suptitle(dict_plot['title'])
         self.ax[idx].set_title(dict_plot['subtitle'], fontsize='small')
@@ -120,24 +138,9 @@ class Canvas(FigureCanvas):
         self.ax[idx].xaxis.set_major_formatter(
             mdates.DateFormatter('%H:%M')
         )
-        # self.ax[idx].xaxis.set_minor_locator(
-        #    mdates.MinuteLocator(interval=5)
-        # )
         self.ax[idx].set_xlim(
             get_range_xaxis(df_tick)
         )
-
-        # | EP - price |/ nom
-        idx += 1
-        if 'EPPriceDelta' in df_tick.columns:
-            ser_ep_price = df_tick['EPPriceDelta'] / dict_plot['price_nominal']
-            self.ax[idx].set_ylabel('|EP - Price|/nom')
-            self.ax[idx].plot(
-                ser_ep_price,
-                color='C0',
-                linewidth=1,
-                alpha=1,
-            )
 
         # 含み益トレンド
         if len(df_profit) > 0:
