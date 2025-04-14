@@ -97,30 +97,30 @@ class Canvas(FigureCanvas):
             )
 
         # EP トレンド
-        self.ax[idx].plot(
-            df_tick['EP'],
-            color='magenta',
-            linewidth=0.5,
-            alpha=0.75,
-        )
+        self.ax[idx].plot(df_tick['EP'], linewidth=1.25, linestyle='dotted', color='magenta', alpha=1, label=r'$EP_{0}$')
+
+        # ロスカット用補助線
+        if 'Losscut' in df_tick.columns:
+            self.ax[0].plot(df_tick['Losscut'], linewidth=1, linestyle='dashed', color='#040', label='Losscut')
 
         # 含み損益を色分けして塗りつぶす
         if 'Baseline' in df_tick.columns:
             # Price vs. Baseline
-            color_gain = '#088'
-            color_loss = '#808'
+            color_gain = '#00c'
+            color_loss = '#c00'
+            alpha = 0.1
 
             x = df_bear.index
             y1 = df_bear['Price']
             y2 = df_bear['Baseline']
-            self.ax[idx].fill_between(x, y1, y2, where=(y1 < y2), color=color_gain, alpha=0.2)
-            self.ax[idx].fill_between(x, y1, y2, where=(y1 > y2), color=color_loss, alpha=0.2)
+            self.ax[idx].fill_between(x, y1, y2, where=(y1 < y2), color=color_gain, alpha=alpha)
+            self.ax[idx].fill_between(x, y1, y2, where=(y1 > y2), color=color_loss, alpha=alpha)
 
             x = df_bull.index
             y1 = df_bull['Price']
             y2 = df_bull['Baseline']
-            self.ax[idx].fill_between(x, y1, y2, where=(y1 > y2), color=color_gain, alpha=0.2)
-            self.ax[idx].fill_between(x, y1, y2, where=(y1 < y2), color=color_loss, alpha=0.2)
+            self.ax[idx].fill_between(x, y1, y2, where=(y1 > y2), color=color_gain, alpha=alpha)
+            self.ax[idx].fill_between(x, y1, y2, where=(y1 < y2), color=color_loss, alpha=alpha)
 
         # チャート・タイトル
         self.fig.suptitle(dict_plot['title'])
@@ -141,6 +141,9 @@ class Canvas(FigureCanvas):
         self.ax[idx].set_xlim(
             get_range_xaxis(df_tick)
         )
+
+        # 判例
+        self.ax[idx].legend(fontsize=9)
 
         # 含み益トレンド
         if len(df_profit) > 0:
