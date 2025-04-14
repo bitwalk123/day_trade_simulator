@@ -10,7 +10,7 @@ class SpinBox(QSpinBox):
         )
         self.setSizePolicy(
             QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding
+            QSizePolicy.Policy.Fixed
         )
         self.setStyleSheet("""
             QSpinBox:editable {
