@@ -38,7 +38,7 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.size'] = 14
 
         self.ax = dict()
-        n = 3
+        n = 2
 
         if n > 1:
             gs = self.fig.add_gridspec(
@@ -97,12 +97,30 @@ class Canvas(FigureCanvas):
             )
 
         # EP トレンド
-        self.ax[idx].plot(
-            df_tick['EP'],
-            color='magenta',
-            linewidth=0.5,
-            alpha=0.75,
-        )
+        self.ax[idx].plot(df_tick['EP'], linewidth=1.25, linestyle='dotted', color='magenta', alpha=1, label=r'$EP_{0}$')
+
+        # ロスカット用補助線
+        if 'Losscut' in df_tick.columns:
+            self.ax[0].plot(df_tick['Losscut'], linewidth=1, linestyle='dashed', color='#040', label='Losscut')
+
+        # 含み損益を色分けして塗りつぶす
+        if 'Baseline' in df_tick.columns:
+            # Price vs. Baseline
+            color_gain = '#00c'
+            color_loss = '#c00'
+            alpha = 0.1
+
+            x = df_bear.index
+            y1 = df_bear['Price']
+            y2 = df_bear['Baseline']
+            self.ax[idx].fill_between(x, y1, y2, where=(y1 < y2), color=color_gain, alpha=alpha)
+            self.ax[idx].fill_between(x, y1, y2, where=(y1 > y2), color=color_loss, alpha=alpha)
+
+            x = df_bull.index
+            y1 = df_bull['Price']
+            y2 = df_bull['Baseline']
+            self.ax[idx].fill_between(x, y1, y2, where=(y1 > y2), color=color_gain, alpha=alpha)
+            self.ax[idx].fill_between(x, y1, y2, where=(y1 < y2), color=color_loss, alpha=alpha)
 
         # チャート・タイトル
         self.fig.suptitle(dict_plot['title'])
@@ -120,24 +138,12 @@ class Canvas(FigureCanvas):
         self.ax[idx].xaxis.set_major_formatter(
             mdates.DateFormatter('%H:%M')
         )
-        # self.ax[idx].xaxis.set_minor_locator(
-        #    mdates.MinuteLocator(interval=5)
-        # )
         self.ax[idx].set_xlim(
             get_range_xaxis(df_tick)
         )
 
-        # | EP - price |/ nom
-        idx += 1
-        if 'EPPriceDelta' in df_tick.columns:
-            ser_ep_price = df_tick['EPPriceDelta'] / dict_plot['price_nominal']
-            self.ax[idx].set_ylabel('|EP - Price|/nom')
-            self.ax[idx].plot(
-                ser_ep_price,
-                color='C0',
-                linewidth=1,
-                alpha=1,
-            )
+        # 判例
+        self.ax[idx].legend(fontsize=9)
 
         # 含み益トレンド
         if len(df_profit) > 0:

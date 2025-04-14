@@ -7,7 +7,7 @@ class RealTimePSAR:
     Realtime Parabolic SAR
     検証用クラス
     """
-    __version__ = '1.4.0'
+    __version__ = '1.3.0'
 
     def __init__(self, af_init=0.000, af_step=0.001, af_max=0.01):
         self.af_init = af_init
@@ -16,12 +16,6 @@ class RealTimePSAR:
 
         # トレンド反転したときの株価
         self.baseline = np.nan
-
-        # 双曲線の補助線（ロスカット用）
-        self.r = np.nan
-        self.p = np.nan
-        self.q = 50
-        self.x = np.nan
 
         # クラス内で使用するデータフレーム
         df = pd.DataFrame()
@@ -49,42 +43,24 @@ class RealTimePSAR:
 
             if r == 1:
                 trend1 = self.trend_from_prices(price0, price1)
-                if trend1 == 0:
-                    ep1 = ep0
-                    af1 = af0
-                    psar1 = psar0
-                    self.baseline = np.nan
-                else:
-                    ep1 = price1
-                    af1 = self.af_init
-                    psar1 = price1
-                    self.baseline = price1
+                ep1 = price1
+                af1 = self.af_init
+                psar1 = price1
+                self.baseline = price1
             elif trend0 == 0:
-                # トレンドが中立の時（ほとんどありえないが念のため）
+                # トレンドが中立の時
                 trend1 = self.trend_from_prices(price0, price1)
-                if trend1 == 0:
-                    ep1 = ep0
-                    af1 = af0
-                    psar1 = psar0
-                    self.baseline = np.nan
-                else:
-                    ep1 = price1
-                    af1 = self.af_init
-                    psar1 = price1
-                    self.baseline = price1
+                ep1 = ep0
+                af1 = af0
+                psar1 = self.update_psar(ep1, af1, psar0)
+                self.baseline = price1
             elif self.cmp_psar(trend0, price1, psar0):
-                # _/_/_/_/_/_/
                 # トレンド反転
-                # _/_/_/_/_/_/
                 trend1 = trend0 * -1
                 ep1 = price1
                 af1 = self.af_init
                 psar1 = ep0
                 self.baseline = price1
-                # 双曲線の補助線
-                self.p = price1
-                self.r = (price1 - ep0) * self.q
-                self.x = 0
             else:
                 # 同一トレンド
                 trend1 = trend0
@@ -103,14 +79,6 @@ class RealTimePSAR:
         self.df.loc[dt1, 'AF'] = af1
         self.df.loc[dt1, 'PSAR'] = psar1
         self.df.loc[dt1, 'Baseline'] = self.baseline
-
-        # 双曲線の補助線
-        try:
-            self.df.loc[dt1, 'Losscut'] = self.p - self.r / (self.x + self.q)
-            self.x += 1
-        except ZeroDivisionError:
-            self.df.loc[dt1, 'Losscut'] = np.nan
-            print('ZeroDivisionError')
 
         # 現在のトレンドを返す
         return trend1

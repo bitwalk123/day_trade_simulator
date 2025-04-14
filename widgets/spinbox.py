@@ -12,16 +12,14 @@ class SpinBox(QSpinBox):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding
         )
-        self.setContentsMargins(QMargins(0, 0, 0, 0))
         self.setStyleSheet("""
-            QSpinBox {
+            QSpinBox:editable {
                 font-family: monospace;
                 background-color: white;
                 color: black;
-                padding-left: 2px;
-                padding-right: 2px;
             }
             QSpinBox:disabled {
+                background-color: lightgray;
                 color: gray;
             }
         """)
