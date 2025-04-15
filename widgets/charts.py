@@ -97,7 +97,7 @@ class Canvas(FigureCanvas):
             )
 
         # EP トレンド
-        self.ax[idx].plot(df_tick['EP'], linewidth=1.25, linestyle='dotted', color='magenta', alpha=1, label=r'$EP_{0}$')
+        self.ax[idx].plot(df_tick['EP'], linewidth=1.25, linestyle='dotted', color='magenta', alpha=1, label=r'$EP$')
 
         # ロスカット用補助線
         if 'Losscut' in df_tick.columns:
