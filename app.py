@@ -20,6 +20,7 @@ from widgets.tabwidget import TabWidget
 
 class TradeSimulator(QMainWindow):
     __app_name__ = 'Trade Simulator'
+    __version__ = '1.0.0'
 
     def __init__(self):
         super().__init__()
