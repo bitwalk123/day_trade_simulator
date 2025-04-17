@@ -15,7 +15,7 @@ class TableView(QTableView):
             }
         """)
 
-        self.setAlternatingRowColors(True)
+        # self.setAlternatingRowColors(True)
         self.horizontalHeader().setStretchLastSection(True)
         # self.setSelectionBehavior(QTableView.SelectRows)
 

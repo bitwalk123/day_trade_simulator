@@ -36,6 +36,7 @@ from widgets.toolbar import ToolBar
 
 class Executor(QMainWindow):
     __app_name__ = 'Executor'
+    __version__ = '1.0.0'
 
     def __init__(self):
         super().__init__()
