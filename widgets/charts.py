@@ -3,7 +3,6 @@ import os
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import numpy as np
 import pandas as pd
 from matplotlib import dates as mdates
 from matplotlib.backends.backend_qtagg import (
