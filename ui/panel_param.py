@@ -17,11 +17,29 @@ from widgets.layouts import GridLayout
 class PanelParam(ScrollAreaVertical):
     def __init__(self, res: AppRes, file_json: str):
         super().__init__()
+        self.dict_obj = dict()
+        self.counter_max = 0  # 水準数を保持
+
         self.setSizePolicy(
             QSizePolicy.Policy.Preferred,
             QSizePolicy.Policy.Expanding,
         )
 
+        # =====================================================================
+        #  水準テーブル
+        # =====================================================================
+        base = Widget()
+        self.setWidget(base)
+        self.layout = GridLayout()
+        base.setLayout(self.layout)
+
+        self.genTable(res, file_json)
+
+    def clearTotal(self):
+        for r in range(len(self.df)):
+            self.setTotal(r + 1, 0.0)
+
+    def genTable(self, res: AppRes, file_json: str):
         # ----------------------------------
         #  パラメータ AF（加速因数）水準の読み込み
         # ----------------------------------
@@ -31,32 +49,22 @@ class PanelParam(ScrollAreaVertical):
         df[coltotal] = 0
 
         # 水準テーブル用オブジェクト
-        self.dict_obj = dict_obj = dict()
+        self.dict_obj = dict()
         self.counter_max = len(df)  # 水準数を保持
-
-        # =====================================================================
-        #  水準テーブル
-        # =====================================================================
-        base = Widget()
-        self.setWidget(base)
-        layout = GridLayout()
-        base.setLayout(layout)
 
         r = 0
         labNo = LabelTitleRaised('#')
-        layout.addWidget(labNo, r, 0)
-
+        self.layout.addWidget(labNo, r, 0)
         for c, colname in enumerate(self.df.columns):
             labAFinit = LabelTitleRaised(colname)
-            layout.addWidget(labAFinit, r, c + 1)
-
+            self.layout.addWidget(labAFinit, r, c + 1)
         for i in range(len(self.df)):
             r += 1
 
             objNo = LabelIntRaised()
             objNo.setValue(r)
-            dict_obj[r] = dict()
-            layout.addWidget(objNo, r, 0)
+            self.dict_obj[r] = dict()
+            self.layout.addWidget(objNo, r, 0)
 
             for c, colname in enumerate(self.df.columns):
                 if colname == self.coltotal:
@@ -64,12 +72,8 @@ class PanelParam(ScrollAreaVertical):
                 else:
                     obj = LabelFloat()
                 obj.setValue(df.at[r, colname])
-                dict_obj[r][colname] = obj
-                layout.addWidget(obj, r, c + 1)
-
-    def clearTotal(self):
-        for r in range(len(self.df)):
-            self.setTotal(r + 1, 0.0)
+                self.dict_obj[r][colname] = obj
+                self.layout.addWidget(obj, r, c + 1)
 
     def getLevelMax(self) -> int:
         return self.counter_max
