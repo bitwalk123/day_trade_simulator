@@ -6,7 +6,6 @@ from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
     QProgressBar,
-    QWidget,
 )
 
 from structs.res import AppRes
