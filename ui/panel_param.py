@@ -40,6 +40,9 @@ class PanelParam(ScrollAreaVertical):
             self.setTotal(r + 1, 0.0)
 
     def genTable(self, res: AppRes, file_json: str):
+        # レイアウトされたウィジェットを削除
+        self.reset_layout()
+
         # ----------------------------------
         #  パラメータ AF（加速因数）水準の読み込み
         # ----------------------------------
@@ -94,17 +97,6 @@ class PanelParam(ScrollAreaVertical):
         obj: LabelValue = self.dict_obj[i][self.coltotal]
         return obj.getValue()
 
-    def setTotal(self, i: int, total: float):
-        """setTotal - 合計損益を対象ウィジェットに設定
-
-        :param i:     カウンタは既にインクリメントされている（1 から始まる）。
-        :param total: 合計損益
-        :return:
-        """
-        obj: LabelValue = self.dict_obj[i][self.coltotal]
-        obj.setValue(total)
-        self.df.at[i, self.coltotal] = total
-
     def getResult(self, name_html: str):
         list_html = list()
 
@@ -146,3 +138,26 @@ class PanelParam(ScrollAreaVertical):
 
         with open(name_html, mode='w') as f:
             f.writelines(list_html)
+
+    def reset_layout(self):
+        count_row = self.layout.rowCount()
+        count_col = self.layout.columnCount()
+        for r in range(count_row):
+            for c in range(count_col):
+                item = self.layout.itemAtPosition(r, c)
+                if item is not None:
+                    w = item.widget()
+                    self.layout.removeWidget(w)
+                    w.hide()
+                    w.deleteLater()
+
+    def setTotal(self, i: int, total: float):
+        """setTotal - 合計損益を対象ウィジェットに設定
+
+        :param i:     カウンタは既にインクリメントされている（1 から始まる）。
+        :param total: 合計損益
+        :return:
+        """
+        obj: LabelValue = self.dict_obj[i][self.coltotal]
+        obj.setValue(total)
+        self.df.at[i, self.coltotal] = total
