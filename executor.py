@@ -115,7 +115,7 @@ class Executor(QMainWindow):
         layout.addWidget(labLevel, r, 0)
 
         self.objComboLevel = objComboLevel = ComboBox()
-        file_json = 'doe_af.json'
+        file_json = 'doe_default.json'
         objComboLevel.addItem(file_json)
         layout.addWidget(objComboLevel, r, 1, 1, 2)
 

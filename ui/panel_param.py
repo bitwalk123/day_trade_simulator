@@ -46,7 +46,6 @@ class PanelParam(ScrollAreaVertical):
         # ----------------------------------
         #  パラメータ AF（加速因数）水準の読み込み
         # ----------------------------------
-        # file_json = 'doe_af.json'
         self.df = df = pd.read_json(os.path.join(res.dir_config, file_json))
         self.coltotal = coltotal = 'total'
         df[coltotal] = 0
@@ -150,6 +149,7 @@ class PanelParam(ScrollAreaVertical):
                     self.layout.removeWidget(w)
                     w.hide()
                     w.deleteLater()
+                self.layout.removeItem(item)
 
     def setTotal(self, i: int, total: float):
         """setTotal - 合計損益を対象ウィジェットに設定
