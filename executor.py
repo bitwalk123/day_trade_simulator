@@ -20,7 +20,7 @@ from widgets.buttons import (
     StartButton,
 )
 from widgets.combo import ComboBox
-from widgets.container import PadH, ScrollAreaVertical, Widget
+from widgets.container import PadH, Widget
 from widgets.dialog import DirDialog, FileDialogExcel
 from widgets.entry import EntryExcelFile
 from widgets.labels import (
@@ -96,7 +96,7 @@ class Executor(QMainWindow):
         layout.addWidget(comboCode, r, 1)
 
         hpad = PadH()
-        layout.addWidget(hpad, r, 2)
+        layout.addWidget(hpad, r, 3)
 
         r += 1
         labDate = LabelTitle('現在日付')
@@ -110,27 +110,30 @@ class Executor(QMainWindow):
         layout.addWidget(labLossCut, r, 0)
 
         self.panelLossCut = panel_losscut = PanelLossCut(res)
-        layout.addWidget(panel_losscut, r, 1, 1, 2)
+        layout.addWidget(panel_losscut, r, 1, 1, 3)
 
         r += 1
-        labTargetCode = LabelFlat('【水準】')
-        layout.addWidget(labTargetCode, r, 0)
+        labLevel = LabelFlat('【水準】')
+        layout.addWidget(labLevel, r, 0)
+
+        self.objComboLevel = objComboLevel = ComboBox()
+        layout.addWidget(objComboLevel, r, 1, 1, 2)
 
         r += 1
         self.panelParam = panel_param = PanelParam(res)
-        layout.addWidget(panel_param, r, 0, 1, 3)
+        layout.addWidget(panel_param, r, 0, 1, 4)
 
         r += 1
         self.panelOutput = panel_output = PanelOutput(res)
         panel_output.selectDir.connect(self.on_dir_dialog_select)
-        layout.addWidget(panel_output, r, 0, 1, 3)
+        layout.addWidget(panel_output, r, 0, 1, 4)
 
         r += 1
         self.btnStart = but_start = StartButton(res)
         but_start.setFixedHeight(40)
         but_start.setToolTip('シミュレーション開始')
         but_start.clicked.connect(self.on_simulation_start)
-        layout.addWidget(but_start, r, 0, 1, 3)
+        layout.addWidget(but_start, r, 0, 1, 4)
 
         # ステータス・バー
         statusbar = StatusBar()
