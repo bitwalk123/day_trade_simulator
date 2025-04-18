@@ -115,8 +115,12 @@ class Executor(QMainWindow):
         layout.addWidget(labLevel, r, 0)
 
         self.objComboLevel = objComboLevel = ComboBox()
-        layout.addWidget(objComboLevel, r, 1, 1, col_max - 2)
         file_json = 'doe_af.json'
+        objComboLevel.addItem(file_json)
+        layout.addWidget(objComboLevel, r, 1, 1, 2)
+
+        hpad = PadH()
+        layout.addWidget(hpad, r, 3, 1, col_max - 3)
 
         r += 1
         self.panelParam = panel_param = PanelParam(res, file_json)
