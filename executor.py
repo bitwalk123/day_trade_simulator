@@ -88,15 +88,13 @@ class Executor(QMainWindow):
         layout = GridLayout()
         base.setLayout(layout)
 
+        col_max = 4
         r = 0
         labCode = LabelTitle('銘柄コード')
         layout.addWidget(labCode, r, 0)
 
         self.comboCode = comboCode = ComboBox()
         layout.addWidget(comboCode, r, 1)
-
-        hpad = PadH()
-        layout.addWidget(hpad, r, 3)
 
         r += 1
         labDate = LabelTitle('現在日付')
@@ -110,30 +108,31 @@ class Executor(QMainWindow):
         layout.addWidget(labLossCut, r, 0)
 
         self.panelLossCut = panel_losscut = PanelLossCut(res)
-        layout.addWidget(panel_losscut, r, 1, 1, 3)
+        layout.addWidget(panel_losscut, r, 1, 1, col_max - 1)
 
         r += 1
         labLevel = LabelFlat('【水準】')
         layout.addWidget(labLevel, r, 0)
 
         self.objComboLevel = objComboLevel = ComboBox()
-        layout.addWidget(objComboLevel, r, 1, 1, 2)
+        layout.addWidget(objComboLevel, r, 1, 1, col_max - 2)
 
         r += 1
-        self.panelParam = panel_param = PanelParam(res)
-        layout.addWidget(panel_param, r, 0, 1, 4)
+        file_json = 'doe_af.json'
+        self.panelParam = panel_param = PanelParam(res, file_json)
+        layout.addWidget(panel_param, r, 0, 1, col_max)
 
         r += 1
         self.panelOutput = panel_output = PanelOutput(res)
         panel_output.selectDir.connect(self.on_dir_dialog_select)
-        layout.addWidget(panel_output, r, 0, 1, 4)
+        layout.addWidget(panel_output, r, 0, 1, col_max)
 
         r += 1
         self.btnStart = but_start = StartButton(res)
         but_start.setFixedHeight(40)
         but_start.setToolTip('シミュレーション開始')
         but_start.clicked.connect(self.on_simulation_start)
-        layout.addWidget(but_start, r, 0, 1, 4)
+        layout.addWidget(but_start, r, 0, 1, col_max)
 
         # ステータス・バー
         statusbar = StatusBar()
@@ -239,7 +238,7 @@ class Executor(QMainWindow):
 
             if self.panelLossCut.IsLossCutEnabled():
                 dict_target['flag_losscut'] = True
-                dict_target['factor_losscut']=self.panelLossCut.getLossCutFactor()
+                dict_target['factor_losscut'] = self.panelLossCut.getLossCutFactor()
             else:
                 dict_target['flag_losscut'] = False
 
