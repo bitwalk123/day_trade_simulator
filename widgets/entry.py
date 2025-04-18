@@ -11,12 +11,6 @@ class Entry(QLineEdit):
         self.setFrame(True)
         self.setContentsMargins(0, 0, 0, 0)
         self.setFixedWidth(75)
-        """
-        self.setSizePolicy(
-            QSizePolicy.Policy.Preferred,
-            QSizePolicy.Policy.Preferred
-        )
-        """
         self.setStyleSheet("""
             QLineEdit {
                 font-family: monospace;

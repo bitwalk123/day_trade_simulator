@@ -15,48 +15,58 @@ from widgets.layouts import GridLayout
 
 
 class PanelParam(ScrollAreaVertical):
-    def __init__(self, res: AppRes):
+    def __init__(self, res: AppRes, file_json: str):
         super().__init__()
+        self.dict_obj = dict()
+        self.counter_max = 0  # 水準数を保持
+
         self.setSizePolicy(
             QSizePolicy.Policy.Preferred,
             QSizePolicy.Policy.Expanding,
         )
-
-        # ----------------------------------
-        #  パラメータ AF（加速因数）水準の読み込み
-        # ----------------------------------
-        file_json = 'doe_af.json'
-        self.df = df = pd.read_json(os.path.join(res.dir_config, file_json))
-        self.coltotal = coltotal = 'total'
-        df[coltotal] = 0
-
-        # 水準テーブル用オブジェクト
-        self.dict_obj = dict_obj = dict()
-        self.counter_max = len(df)  # 水準数を保持
 
         # =====================================================================
         #  水準テーブル
         # =====================================================================
         base = Widget()
         self.setWidget(base)
-        layout = GridLayout()
-        base.setLayout(layout)
+        self.layout = GridLayout()
+        base.setLayout(self.layout)
+
+        self.genTable(res, file_json)
+
+    def clearTotal(self):
+        for r in range(len(self.df)):
+            self.setTotal(r + 1, 0.0)
+
+    def genTable(self, res: AppRes, file_json: str):
+        # レイアウトされたウィジェットを削除
+        self.reset_layout()
+
+        # ----------------------------------
+        #  パラメータ AF（加速因数）水準の読み込み
+        # ----------------------------------
+        self.df = df = pd.read_json(os.path.join(res.dir_config, file_json))
+        self.coltotal = coltotal = 'total'
+        df[coltotal] = 0
+
+        # 水準テーブル用オブジェクト
+        self.dict_obj = dict()
+        self.counter_max = len(df)  # 水準数を保持
 
         r = 0
         labNo = LabelTitleRaised('#')
-        layout.addWidget(labNo, r, 0)
-
+        self.layout.addWidget(labNo, r, 0)
         for c, colname in enumerate(self.df.columns):
             labAFinit = LabelTitleRaised(colname)
-            layout.addWidget(labAFinit, r, c + 1)
-
+            self.layout.addWidget(labAFinit, r, c + 1)
         for i in range(len(self.df)):
             r += 1
 
             objNo = LabelIntRaised()
             objNo.setValue(r)
-            dict_obj[r] = dict()
-            layout.addWidget(objNo, r, 0)
+            self.dict_obj[r] = dict()
+            self.layout.addWidget(objNo, r, 0)
 
             for c, colname in enumerate(self.df.columns):
                 if colname == self.coltotal:
@@ -64,12 +74,8 @@ class PanelParam(ScrollAreaVertical):
                 else:
                     obj = LabelFloat()
                 obj.setValue(df.at[r, colname])
-                dict_obj[r][colname] = obj
-                layout.addWidget(obj, r, c + 1)
-
-    def clearTotal(self):
-        for r in range(len(self.df)):
-            self.setTotal(r + 1, 0.0)
+                self.dict_obj[r][colname] = obj
+                self.layout.addWidget(obj, r, c + 1)
 
     def getLevelMax(self) -> int:
         return self.counter_max
@@ -89,18 +95,6 @@ class PanelParam(ScrollAreaVertical):
     def getTotal(self, i: int) -> float:
         obj: LabelValue = self.dict_obj[i][self.coltotal]
         return obj.getValue()
-
-
-    def setTotal(self, i: int, total: float):
-        """setTotal - 合計損益を対象ウィジェットに設定
-
-        :param i:     カウンタは既にインクリメントされている（1 から始まる）。
-        :param total: 合計損益
-        :return:
-        """
-        obj: LabelValue = self.dict_obj[i][self.coltotal]
-        obj.setValue(total)
-        self.df.at[i, self.coltotal] = total
 
     def getResult(self, name_html: str):
         list_html = list()
@@ -143,3 +137,27 @@ class PanelParam(ScrollAreaVertical):
 
         with open(name_html, mode='w') as f:
             f.writelines(list_html)
+
+    def reset_layout(self):
+        count_row = self.layout.rowCount()
+        count_col = self.layout.columnCount()
+        for r in range(count_row):
+            for c in range(count_col):
+                item = self.layout.itemAtPosition(r, c)
+                if item is not None:
+                    w = item.widget()
+                    self.layout.removeWidget(w)
+                    w.hide()
+                    w.deleteLater()
+                self.layout.removeItem(item)
+
+    def setTotal(self, i: int, total: float):
+        """setTotal - 合計損益を対象ウィジェットに設定
+
+        :param i:     カウンタは既にインクリメントされている（1 から始まる）。
+        :param total: 合計損益
+        :return:
+        """
+        obj: LabelValue = self.dict_obj[i][self.coltotal]
+        obj.setValue(total)
+        self.df.at[i, self.coltotal] = total
