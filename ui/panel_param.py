@@ -149,7 +149,7 @@ class PanelParam(ScrollAreaVertical):
                     self.layout.removeWidget(w)
                     w.hide()
                     w.deleteLater()
-                self.layout.removeItem(item)
+                # self.layout.removeItem(item)
 
     def setTotal(self, i: int, total: float):
         """setTotal - 合計損益を対象ウィジェットに設定
