@@ -72,15 +72,8 @@ class Executor(QMainWindow):
 
         self.but_choose = but_choose = ChooseButton(res)
         but_choose.setDisabled(True)
-        but_choose.clicked.connect(self.on_file_selected)
+        but_choose.clicked.connect(self.on_excel_read)
         toolbar.addWidget(but_choose)
-
-        """
-        but_test = QToolButton()
-        but_test.setText('テスト')
-        but_test.clicked.connect(self.function_test)
-        toolbar.addWidget(but_test)
-        """
 
         # メイン
         base = Widget()
@@ -166,6 +159,7 @@ class Executor(QMainWindow):
         :param list_target:
         :return:
         """
+        self.comboCode.clear()
         for dict_target in list_target:
             code = dict_target['code']
             self.comboCode.addItem(code)
@@ -201,7 +195,7 @@ class Executor(QMainWindow):
         self.ent_sheet.setExcelFile(file_excel)
         self.but_choose.setEnabled(True)
 
-    def on_file_selected(self):
+    def on_excel_read(self):
         """
         選択した Excel ファイルの読み込みと解析用データ準備
         :param file_excel:
@@ -223,15 +217,17 @@ class Executor(QMainWindow):
         elif not os.path.isdir(self.path_output):
             os.mkdir(self.path_output)
 
+        # print([self.comboCode.itemText(i) for i in range(self.comboCode.count())])
+
         self.panelParam.clearTotal()
         self.code_target = self.comboCode.currentText()
         self.counter_max = self.panelParam.getLevelMax()
         self.counter = 0
 
-        # シミュレーション・ループ開始
-        self.loop_simulation()
+        # AF 用シミュレーション・ループ開始
+        self.loop_simulation_af()
 
-    def loop_simulation(self):
+    def loop_simulation_af(self):
         # カウンターのインクリメント
         self.counter += 1
 
@@ -285,7 +281,7 @@ class Executor(QMainWindow):
 
         # ループまたは終了処理
         if self.counter < self.counter_max:
-            self.loop_simulation()
+            self.loop_simulation_af()
         else:
             self.delete_winmain()
             name_html = os.path.join(
