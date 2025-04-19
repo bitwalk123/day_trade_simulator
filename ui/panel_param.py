@@ -141,6 +141,7 @@ class PanelParam(ScrollAreaVertical):
     def reset_layout(self):
         count_row = self.layout.rowCount()
         count_col = self.layout.columnCount()
+
         for r in range(count_row):
             for c in range(count_col):
                 item = self.layout.itemAtPosition(r, c)
@@ -149,6 +150,7 @@ class PanelParam(ScrollAreaVertical):
                     self.layout.removeWidget(w)
                     w.hide()
                     w.deleteLater()
+                # このメソッドで十分かもしれないが念のため
                 # self.layout.removeItem(item)
 
     def setTotal(self, i: int, total: float):

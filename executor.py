@@ -72,7 +72,7 @@ class Executor(QMainWindow):
 
         self.but_choose = but_choose = ChooseButton(res)
         but_choose.setDisabled(True)
-        but_choose.clicked.connect(self.on_file_selected)
+        but_choose.clicked.connect(self.on_excel_read)
         toolbar.addWidget(but_choose)
 
         """
@@ -166,6 +166,7 @@ class Executor(QMainWindow):
         :param list_target:
         :return:
         """
+        self.comboCode.clear()
         for dict_target in list_target:
             code = dict_target['code']
             self.comboCode.addItem(code)
@@ -201,7 +202,7 @@ class Executor(QMainWindow):
         self.ent_sheet.setExcelFile(file_excel)
         self.but_choose.setEnabled(True)
 
-    def on_file_selected(self):
+    def on_excel_read(self):
         """
         選択した Excel ファイルの読み込みと解析用データ準備
         :param file_excel:
