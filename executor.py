@@ -219,15 +219,18 @@ class Executor(QMainWindow):
 
         # print([self.comboCode.itemText(i) for i in range(self.comboCode.count())])
 
+        self.loop_simulation_1_code()
+
+    def loop_simulation_1_code(self):
         self.panelParam.clearTotal()
         self.code_target = self.comboCode.currentText()
         self.counter_max = self.panelParam.getLevelMax()
         self.counter = 0
 
         # AF 用シミュレーション・ループ開始
-        self.loop_simulation_af()
+        self.loop_simulation_2_af()
 
-    def loop_simulation_af(self):
+    def loop_simulation_2_af(self):
         # カウンターのインクリメント
         self.counter += 1
 
@@ -281,7 +284,7 @@ class Executor(QMainWindow):
 
         # ループまたは終了処理
         if self.counter < self.counter_max:
-            self.loop_simulation_af()
+            self.loop_simulation_2_af()
         else:
             self.delete_winmain()
             name_html = os.path.join(
