@@ -153,23 +153,6 @@ class Executor(QMainWindow):
             self.winmain.deleteLater()
             self.winmain = None
 
-    def on_dataset_ready(self, list_target):
-        """
-        データセットに基づき、銘柄毎のタブ画面を作成
-        :param list_target:
-        :return:
-        """
-        self.comboCode.clear()
-        for dict_target in list_target:
-            code = dict_target['code']
-            self.comboCode.addItem(code)
-            self.dict_dict_target[code] = dict_target
-
-        self.objDate.setText(list_target[0]['date'])
-
-        # 進捗をリセット
-        self.pbar.reset()
-
     def on_dir_dialog_select(self):
         dialog = DirDialog()
         if not dialog.exec():
@@ -204,8 +187,25 @@ class Executor(QMainWindow):
         file_excel = self.ent_sheet.get_ExcelFile()
         prep_ds = WorkerPrepDataset(file_excel)
         prep_ds.updateProgress.connect(self.on_status_update)
-        prep_ds.threadFinished.connect(self.on_dataset_ready)
+        prep_ds.threadFinished.connect(self.on_excel_read_completed)
         self.threadpool.start(prep_ds)
+
+    def on_excel_read_completed(self, list_target):
+        """
+        データセットに基づき、銘柄毎のタブ画面を作成
+        :param list_target:
+        :return:
+        """
+        self.comboCode.clear()
+        for dict_target in list_target:
+            code = dict_target['code']
+            self.comboCode.addItem(code)
+            self.dict_dict_target[code] = dict_target
+
+        self.objDate.setText(list_target[0]['date'])
+
+        # 進捗をリセット
+        self.pbar.reset()
 
     def on_json_changed(self, file_json: str):
         self.panelParam.genTable(self.res, file_json)
