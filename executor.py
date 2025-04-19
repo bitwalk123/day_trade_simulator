@@ -75,13 +75,6 @@ class Executor(QMainWindow):
         but_choose.clicked.connect(self.on_excel_read)
         toolbar.addWidget(but_choose)
 
-        """
-        but_test = QToolButton()
-        but_test.setText('テスト')
-        but_test.clicked.connect(self.function_test)
-        toolbar.addWidget(but_test)
-        """
-
         # メイン
         base = Widget()
         self.setCentralWidget(base)
