@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QProgressBar,
 )
 
+from funcs.io import get_doe_json
 from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
 from ui.panel_losscut import PanelLossCut
@@ -115,14 +116,16 @@ class Executor(QMainWindow):
         layout.addWidget(labLevel, r, 0)
 
         self.objComboLevel = objComboLevel = ComboBox()
-        file_json = 'doe_default.json'
-        objComboLevel.addItem(file_json)
+        list_json = get_doe_json(res)
+        objComboLevel.addItems(list_json)
+        objComboLevel.currentTextChanged.connect(self.on_json_changed)
         layout.addWidget(objComboLevel, r, 1, 1, 2)
 
         hpad = PadH()
         layout.addWidget(hpad, r, 3, 1, col_max - 3)
 
         r += 1
+        file_json = objComboLevel.currentText()
         self.panelParam = panel_param = PanelParam(res, file_json)
         layout.addWidget(panel_param, r, 0, 1, col_max)
 
@@ -156,18 +159,6 @@ class Executor(QMainWindow):
             self.winmain.hide()
             self.winmain.deleteLater()
             self.winmain = None
-
-    def on_file_selected(self):
-        """
-        選択した Excel ファイルの読み込みと解析用データ準備
-        :param file_excel:
-        :return:
-        """
-        file_excel = self.ent_sheet.get_ExcelFile()
-        prep_ds = WorkerPrepDataset(file_excel)
-        prep_ds.updateProgress.connect(self.on_status_update)
-        prep_ds.threadFinished.connect(self.on_dataset_ready)
-        self.threadpool.start(prep_ds)
 
     def on_dataset_ready(self, list_target):
         """
@@ -209,6 +200,21 @@ class Executor(QMainWindow):
         file_excel = dialog.selectedFiles()[0]
         self.ent_sheet.setExcelFile(file_excel)
         self.but_choose.setEnabled(True)
+
+    def on_file_selected(self):
+        """
+        選択した Excel ファイルの読み込みと解析用データ準備
+        :param file_excel:
+        :return:
+        """
+        file_excel = self.ent_sheet.get_ExcelFile()
+        prep_ds = WorkerPrepDataset(file_excel)
+        prep_ds.updateProgress.connect(self.on_status_update)
+        prep_ds.threadFinished.connect(self.on_dataset_ready)
+        self.threadpool.start(prep_ds)
+
+    def on_json_changed(self, file_json: str):
+        self.panelParam.genTable(self.res, file_json)
 
     def on_simulation_start(self):
         if self.path_output is None:
