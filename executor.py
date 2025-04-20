@@ -45,6 +45,7 @@ class Executor(QMainWindow):
         self.dict_dict_target = dict()
 
         # シミュレーション・ループ用オブジェクト＆カウンタ
+        self.code_counter: int = 0
         self.code_target = None
         self.winmain: None | WinMain = None
         self.counter: int = 0
@@ -219,16 +220,21 @@ class Executor(QMainWindow):
 
         # print([self.comboCode.itemText(i) for i in range(self.comboCode.count())])
 
+        self.code_counter = 0
         self.loop_simulation_1_code()
 
     def loop_simulation_1_code(self):
-        self.panelParam.clearTotal()
-        self.code_target = self.comboCode.currentText()
-        self.counter_max = self.panelParam.getLevelMax()
-        self.counter = 0
+        if self.comboCode.count() <= self.code_counter:
+            print('Completed!')
+        else:
+            self.comboCode.setCurrentIndex(self.code_counter)
+            self.panelParam.clearTotal()
+            self.code_target = self.comboCode.currentText()
+            self.counter_max = self.panelParam.getLevelMax()
+            self.counter = 0
 
-        # AF 用シミュレーション・ループ開始
-        self.loop_simulation_2_af()
+            # AF 用シミュレーション・ループ開始
+            self.loop_simulation_2_af()
 
     def loop_simulation_2_af(self):
         # カウンターのインクリメント
@@ -292,7 +298,9 @@ class Executor(QMainWindow):
                 'summary_%s_%d.html' % (self.code_target, self.counter)
             )
             self.panelParam.getResult(name_html)
-            print('Completed!')
+            self.code_counter += 1
+            # print('Completed!')
+            self.loop_simulation_1_code()
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)
