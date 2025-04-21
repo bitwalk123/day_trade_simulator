@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QProgressBar,
 )
 
+from funcs.io import get_doe_json
 from structs.res import AppRes
 from threads.preprocs import WorkerPrepDataset
 from ui.panel_losscut import PanelLossCut
@@ -44,6 +45,7 @@ class Executor(QMainWindow):
         self.dict_dict_target = dict()
 
         # シミュレーション・ループ用オブジェクト＆カウンタ
+        self.code_counter: int = 0
         self.code_target = None
         self.winmain: None | WinMain = None
         self.counter: int = 0
@@ -71,15 +73,8 @@ class Executor(QMainWindow):
 
         self.but_choose = but_choose = ChooseButton(res)
         but_choose.setDisabled(True)
-        but_choose.clicked.connect(self.on_file_selected)
+        but_choose.clicked.connect(self.on_excel_read)
         toolbar.addWidget(but_choose)
-
-        """
-        but_test = QToolButton()
-        but_test.setText('テスト')
-        but_test.clicked.connect(self.function_test)
-        toolbar.addWidget(but_test)
-        """
 
         # メイン
         base = Widget()
@@ -115,14 +110,16 @@ class Executor(QMainWindow):
         layout.addWidget(labLevel, r, 0)
 
         self.objComboLevel = objComboLevel = ComboBox()
-        file_json = 'doe_default.json'
-        objComboLevel.addItem(file_json)
+        list_json = get_doe_json(res)
+        objComboLevel.addItems(list_json)
+        objComboLevel.currentTextChanged.connect(self.on_json_changed)
         layout.addWidget(objComboLevel, r, 1, 1, 2)
 
         hpad = PadH()
         layout.addWidget(hpad, r, 3, 1, col_max - 3)
 
         r += 1
+        file_json = objComboLevel.currentText()
         self.panelParam = panel_param = PanelParam(res, file_json)
         layout.addWidget(panel_param, r, 0, 1, col_max)
 
@@ -157,34 +154,6 @@ class Executor(QMainWindow):
             self.winmain.deleteLater()
             self.winmain = None
 
-    def on_file_selected(self):
-        """
-        選択した Excel ファイルの読み込みと解析用データ準備
-        :param file_excel:
-        :return:
-        """
-        file_excel = self.ent_sheet.get_ExcelFile()
-        prep_ds = WorkerPrepDataset(file_excel)
-        prep_ds.updateProgress.connect(self.on_status_update)
-        prep_ds.threadFinished.connect(self.on_dataset_ready)
-        self.threadpool.start(prep_ds)
-
-    def on_dataset_ready(self, list_target):
-        """
-        データセットに基づき、銘柄毎のタブ画面を作成
-        :param list_target:
-        :return:
-        """
-        for dict_target in list_target:
-            code = dict_target['code']
-            self.comboCode.addItem(code)
-            self.dict_dict_target[code] = dict_target
-
-        self.objDate.setText(list_target[0]['date'])
-
-        # 進捗をリセット
-        self.pbar.reset()
-
     def on_dir_dialog_select(self):
         dialog = DirDialog()
         if not dialog.exec():
@@ -210,6 +179,38 @@ class Executor(QMainWindow):
         self.ent_sheet.setExcelFile(file_excel)
         self.but_choose.setEnabled(True)
 
+    def on_excel_read(self):
+        """
+        選択した Excel ファイルの読み込みと解析用データ準備
+        :param file_excel:
+        :return:
+        """
+        file_excel = self.ent_sheet.get_ExcelFile()
+        prep_ds = WorkerPrepDataset(file_excel)
+        prep_ds.updateProgress.connect(self.on_status_update)
+        prep_ds.threadFinished.connect(self.on_excel_read_completed)
+        self.threadpool.start(prep_ds)
+
+    def on_excel_read_completed(self, list_target):
+        """
+        データセットに基づき、銘柄毎のタブ画面を作成
+        :param list_target:
+        :return:
+        """
+        self.comboCode.clear()
+        for dict_target in list_target:
+            code = dict_target['code']
+            self.comboCode.addItem(code)
+            self.dict_dict_target[code] = dict_target
+
+        self.objDate.setText(list_target[0]['date'])
+
+        # 進捗をリセット
+        self.pbar.reset()
+
+    def on_json_changed(self, file_json: str):
+        self.panelParam.genTable(self.res, file_json)
+
     def on_simulation_start(self):
         if self.path_output is None:
             print('結果の出力先が指定されていないので開始できません。')
@@ -217,15 +218,25 @@ class Executor(QMainWindow):
         elif not os.path.isdir(self.path_output):
             os.mkdir(self.path_output)
 
-        self.panelParam.clearTotal()
-        self.code_target = self.comboCode.currentText()
-        self.counter_max = self.panelParam.getLevelMax()
-        self.counter = 0
+        # print([self.comboCode.itemText(i) for i in range(self.comboCode.count())])
 
-        # シミュレーション・ループ開始
-        self.loop_simulation()
+        self.code_counter = 0
+        self.loop_simulation_1_code()
 
-    def loop_simulation(self):
+    def loop_simulation_1_code(self):
+        if self.comboCode.count() <= self.code_counter:
+            print('Completed!')
+        else:
+            self.comboCode.setCurrentIndex(self.code_counter)
+            self.panelParam.clearTotal()
+            self.code_target = self.comboCode.currentText()
+            self.counter_max = self.panelParam.getLevelMax()
+            self.counter = 0
+
+            # AF 用シミュレーション・ループ開始
+            self.loop_simulation_2_af()
+
+    def loop_simulation_2_af(self):
         # カウンターのインクリメント
         self.counter += 1
 
@@ -279,7 +290,7 @@ class Executor(QMainWindow):
 
         # ループまたは終了処理
         if self.counter < self.counter_max:
-            self.loop_simulation()
+            self.loop_simulation_2_af()
         else:
             self.delete_winmain()
             name_html = os.path.join(
@@ -287,7 +298,9 @@ class Executor(QMainWindow):
                 'summary_%s_%d.html' % (self.code_target, self.counter)
             )
             self.panelParam.getResult(name_html)
-            print('Completed!')
+            self.code_counter += 1
+            # print('Completed!')
+            self.loop_simulation_1_code()
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)
