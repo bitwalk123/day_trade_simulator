@@ -139,3 +139,53 @@ def get_formatted_tick_data(df: pd.DataFrame, date_str: str, colname: str) -> pd
         df_result.at[dt_target, 'Price'] = df0['終値'].iloc[len(df0) - 1]
 
     return df_result
+
+def get_format_tick_sheet(df: pd.DataFrame, date_str: str, colname: str) -> pd.DataFrame:
+    """
+    RssMarket 関数で取得した Tick データを秒単位のデータで整形する
+    １分間に数個しかないデータ、たくさんあるデータそれぞれに対応して、１分間に等間隔に振り分ける。
+    間隔はマイクロ秒単位で刻んで、秒単位に間引きする。
+    :param df:
+    :param date_str:
+    :param colname:
+    :return:
+    """
+    total = 60 * 1000000  # １秒間をマイクロ秒単位で扱う
+
+    td1 = datetime.timedelta(microseconds=1)
+    td2 = datetime.timedelta(seconds=1)
+
+    df0 = df[df[colname] != '--------'].copy()
+    list_time = sorted(list(set(df0[colname])))
+    for time in list_time:
+        ticktime = pd.to_datetime('%s %s' % (date_str, time))
+        df1 = df0[df0[colname] == time]
+        n = len(df1) # 行数 = 同時刻の個数
+        if n > 0:
+            step = int(total / n)  # １分間（マイクロ秒）を同時刻の個数で割ってステップ幅を決める
+            for r in df1.index:
+                df0.loc[r, 'Time'] = ticktime
+                ticktime += td1 * step  # ステップ幅でインクリメント
+
+    # 1 秒間隔のデータにフォーマット
+    df_result = pd.DataFrame()
+    dt = pd.to_datetime('%s %s' % (date_str, list_time[0]))
+    dt_end = pd.to_datetime('%s 15:24:59' % date_str)
+    while dt < dt_end:
+        # 時刻は先頭 + 1 秒から始める。
+        dt_target = dt + td2
+        # 対象データは dt_target の 1 秒前から dt_target 直前まで
+        df1 = df0[(dt <= df0['Time']) & (df0['Time'] < dt_target)]
+        if len(df1) > 0:
+            df_result.at[dt_target, 'Time'] = get_time_str(dt_target)
+            # 株価は dt_target 直線の値を採用する
+            df_result.at[dt_target, 'Price'] = df1['終値'].iloc[len(df1) - 1]
+        dt = dt_target
+
+    # 大引けの値があれば加えておく
+    dt_target = pd.to_datetime('%s 15:30:00.0' % date_str)
+    if dt_target == df0['Time'].iloc[len(df0) - 1]:
+        df_result.at[dt_target, 'Time'] = get_time_str(dt_target)
+        df_result.at[dt_target, 'Price'] = df0['終値'].iloc[len(df0) - 1]
+
+    return df_result
