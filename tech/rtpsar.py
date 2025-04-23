@@ -9,7 +9,7 @@ class RealTimePSAR:
     """
     __version__ = '1.4.0'
 
-    def __init__(self, af_init=0.000, af_step=0.001, af_max=0.01):
+    def __init__(self, af_init=0.000, af_step=0.001, af_max=0.01, q=50):
         self.af_init = af_init
         self.af_step = af_step
         self.af_max = af_max
@@ -17,10 +17,14 @@ class RealTimePSAR:
         # トレンド反転したときの株価
         self.baseline = np.nan
 
+        # トレンド ＆ EP 更新モニター
+        self.n_trend = 1
+        self.n_ep_update = 0
+
         # 双曲線の補助線（ロスカット用）
         self.r = np.nan
         self.p = np.nan
-        self.q = 50
+        self.q = q
         self.x = np.nan
 
         # クラス内で使用するデータフレーム
@@ -53,12 +57,20 @@ class RealTimePSAR:
                     ep1 = ep0
                     af1 = af0
                     psar1 = psar0
+
+                    # トレンド反転したときの株価
                     self.baseline = np.nan
                 else:
                     ep1 = price1
                     af1 = self.af_init
                     psar1 = price1
+
+                    # トレンド反転したときの株価
                     self.baseline = price1
+
+                    # トレンド ＆ EP 更新モニター
+                    self.n_trend = 1
+                    self.n_ep_update = 0
             elif trend0 == 0:
                 # トレンドが中立の時（ほとんどありえないが念のため）
                 trend1 = self.trend_from_prices(price0, price1)
@@ -66,21 +78,37 @@ class RealTimePSAR:
                     ep1 = ep0
                     af1 = af0
                     psar1 = psar0
+
+                    # トレンド反転したときの株価
                     self.baseline = np.nan
                 else:
                     ep1 = price1
                     af1 = self.af_init
                     psar1 = price1
+
+                    # トレンド反転したときの株価
                     self.baseline = price1
+
+                    # トレンド ＆ EP 更新モニター
+                    self.n_trend = 1
+                    self.n_ep_update = 0
             elif self.cmp_psar(trend0, price1, psar0):
                 # _/_/_/_/_/_/
                 # トレンド反転
                 # _/_/_/_/_/_/
                 trend1 = trend0 * -1
+
                 ep1 = price1
                 af1 = self.af_init
                 psar1 = ep0
+
+                # トレンド反転したときの株価
                 self.baseline = price1
+
+                # トレンド ＆ EP 更新モニター
+                self.n_trend = 1
+                self.n_ep_update = 0
+
                 # 双曲線の補助線
                 self.p = price1
                 self.r = (price1 - ep0) * self.q
@@ -88,12 +116,21 @@ class RealTimePSAR:
             else:
                 # 同一トレンド
                 trend1 = trend0
+
+                # トレンドモニター
+                self.n_trend += 1
+
+                # EP 更新するか？
                 if self.cmp_ep(trend0, price1, ep0):
                     # EP と AF の更新
                     ep1, af1 = self.update_ep_af(price1, af0)
+
+                    # EP 更新モニター
+                    self.n_ep_update += 1
                 else:
                     ep1 = ep0
                     af1 = af0
+
                 psar1 = self.update_psar(ep1, af1, psar0)
 
         # データフレームに新たな行を追加
@@ -111,6 +148,10 @@ class RealTimePSAR:
         except ZeroDivisionError:
             self.df.loc[dt1, 'Losscut'] = np.nan
             print('ZeroDivisionError')
+
+        # トレンド＆EP更新モニター
+        self.df.loc[dt1, 'TrendN'] = self.n_trend
+        self.df.loc[dt1, 'EPupd'] = self.n_ep_update
 
         # 現在のトレンドを返す
         return trend1
