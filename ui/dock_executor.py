@@ -33,7 +33,7 @@ class DockExecutor(QDockWidget):
         self.dir = dir
         files = sorted(os.listdir(dir))
 
-        pattern = re.compile(r'^trader_.+\.xlsm$')
+        pattern = re.compile(r'^trader_[0-9]{8}\.xlsm$')
         for file in files:
             m = pattern.match(file)
             if m:
