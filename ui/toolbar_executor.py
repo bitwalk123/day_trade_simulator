@@ -1,3 +1,4 @@
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QToolBar
 
 from structs.res import AppRes
@@ -6,6 +7,8 @@ from widgets.dialog import DirDialog
 
 
 class ToolbarExecutor(QToolBar):
+    dirSelected = Signal(str)
+
     def __init__(self, res: AppRes):
         super().__init__()
 
@@ -13,6 +16,7 @@ class ToolbarExecutor(QToolBar):
         #  UI
         # =====================================================================
         but_folder = FolderButton(res)
+        but_folder.setToolTip('Excel ファイルが保存されているフォルダを選択')
         but_folder.clicked.connect(self.on_dlg_dir_sel)
         self.addWidget(but_folder)
 
@@ -22,4 +26,4 @@ class ToolbarExecutor(QToolBar):
             return
 
         basedir = dialog.selectedFiles()[0]
-        print(basedir)
+        self.dirSelected.emit(basedir)

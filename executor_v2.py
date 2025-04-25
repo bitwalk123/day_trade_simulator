@@ -1,12 +1,15 @@
 import os
 import sys
 
-from PySide6.QtCore import QThreadPool
+from PySide6.QtCore import QThreadPool, Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow
 
 from structs.res import AppRes
+from ui.dock_executor import DockExecutor
 from ui.toolbar_executor import ToolbarExecutor
+from widgets.progress import ProgressBar
+from widgets.statusbar import StatusBar
 
 
 class Executor(QMainWindow):
@@ -19,16 +22,33 @@ class Executor(QMainWindow):
         self.threadpool = QThreadPool()
 
         # ウィンドウ・アイコンとタイトル
-        icon = QIcon(os.path.join(res.dir_image, 'start.png'))
-        self.setWindowIcon(icon)
-        self.setWindowTitle(self.__app_name__)
+        self.setWindowIcon(QIcon(os.path.join(res.dir_image, 'start.png')))
+        self.setWindowTitle('%s - %s' % (self.__app_name__, self.__version__))
 
         # =====================================================================
         #  UI
         # =====================================================================
         # ツールバー
         toolbar = ToolbarExecutor(res)
+        toolbar.dirSelected.connect(self.exel_dir_selected)
         self.addToolBar(toolbar)
+
+        # ドック
+        self.dock = dock = DockExecutor(res)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
+
+        # メイン・ウィンドウ
+
+        # ステータスバー
+        statusbar = StatusBar()
+        self.setStatusBar(statusbar)
+
+        self.pbar = pbar = ProgressBar()
+        self.pbar.setRange(0, 100)
+        statusbar.addPermanentWidget(pbar, stretch=1)
+
+    def exel_dir_selected(self, dir_exel: str):
+        print(dir_exel)
 
 
 def main():
