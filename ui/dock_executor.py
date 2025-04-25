@@ -1,9 +1,10 @@
 import os
 import re
 
-from PySide6.QtWidgets import QDockWidget, QWidget, QCheckBox
+from PySide6.QtWidgets import QDockWidget, QCheckBox
 
 from structs.res import AppRes
+from widgets.container import ScrollAreaVertical, Widget
 from widgets.layouts import VBoxLayout
 
 
@@ -19,8 +20,12 @@ class DockExecutor(QDockWidget):
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # UI
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-        base = QWidget()
-        self.setWidget(base)
+        sa = ScrollAreaVertical()
+        self.setWidget(sa)
+
+        base = Widget()
+        sa.setWidget(base)
+
         self.vbox = vbox = VBoxLayout()
         base.setLayout(vbox)
 
