@@ -1,11 +1,12 @@
 import os
 import re
 
+from PySide6.QtCore import QMargins
 from PySide6.QtWidgets import QDockWidget, QCheckBox
 
 from structs.res import AppRes
 from widgets.container import ScrollAreaVertical, Widget
-from widgets.layouts import VBoxLayout
+from widgets.layouts import VBoxLayout, HBoxLayout
 
 
 class DockExecutor(QDockWidget):
@@ -20,6 +21,17 @@ class DockExecutor(QDockWidget):
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # UI
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
+        # タイトルバー
+        # title = Widget()
+        # hbox = HBoxLayout()
+        # title.setLayout(hbox)
+        cb_all = QCheckBox('Select All')
+        cb_all.setStyleSheet('margin-left: 10px;')
+        # hbox.addWidget(cb_all)
+        # self.setTitleBarWidget(title)
+        self.setTitleBarWidget(cb_all)
+
+        # メイン
         sa = ScrollAreaVertical()
         self.setWidget(sa)
 
