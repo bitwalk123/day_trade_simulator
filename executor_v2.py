@@ -47,8 +47,8 @@ class Executor(QMainWindow):
         self.pbar.setRange(0, 100)
         statusbar.addPermanentWidget(pbar, stretch=1)
 
-    def exel_dir_selected(self, dir_exel: str):
-        print(dir_exel)
+    def exel_dir_selected(self, dir: str):
+        self.dock.setExcelDir(dir)
 
 
 def main():
