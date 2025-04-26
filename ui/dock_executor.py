@@ -65,6 +65,14 @@ class DockExecutor(QDockWidget):
     def deselect_all(self):
         self.cb_status_change_all(False)
 
+    def getExcelFiles(self):
+        for idx in range(self.vbox.count()):
+            item = self.vbox.itemAt(idx)
+            cb: QCheckBox | QWidget = item.widget()
+            if cb.isChecked():
+                filename = cb.text()
+                print(filename)
+
     def select_all(self):
         state = True
         self.cb_status_change_all(True)
@@ -76,7 +84,8 @@ class DockExecutor(QDockWidget):
         self.clear_layout()
         print(self.vbox.count())
 
-        pattern = re.compile(r'^trader_[0-9]{8}\.xlsm$')
+        # 対象の Excel ファイル名のパターン
+        pattern = self.res.default_excel_file_pattern
         for file in files:
             m = pattern.match(file)
             if m:
