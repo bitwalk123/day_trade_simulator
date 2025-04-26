@@ -10,7 +10,7 @@ from widgets.buttons import StartButton
 from widgets.combo import ComboBox
 from widgets.container import Widget, PadH
 from widgets.dialog import DirDialog
-from widgets.entry import EntryDir, EntryWithDir
+from widgets.entry import EntryFile, EntryWithDir
 from widgets.labels import (
     LabelDate,
     LabelFlat,
@@ -32,11 +32,11 @@ class WinExecutor(Widget):
         col_max = 4
 
         r = 0
-        labSrcPath = LabelTitle('ソース')
-        layout.addWidget(labSrcPath, r, 0)
+        labSrcFile = LabelTitle('ソース')
+        layout.addWidget(labSrcFile, r, 0)
 
-        self.entSrcPath = entSrcPath = EntryDir()
-        layout.addWidget(entSrcPath, r, 1, 1, col_max - 1)
+        self.entSrcFile = entSrcFile = EntryFile()
+        layout.addWidget(entSrcFile, r, 1, 1, col_max - 1)
 
         r += 1
         labOutPath = LabelTitle('出力先')

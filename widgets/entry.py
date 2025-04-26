@@ -40,6 +40,18 @@ class EntryDir(Entry):
         )
 
 
+class EntryFile(Entry):
+    def __init__(self):
+        super().__init__()
+        self.setMinimumWidth(300)
+        self.setEnabled(False)
+
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed,
+        )
+
+
 class EntryExcelFile(Entry):
     def __init__(self):
         super().__init__()
