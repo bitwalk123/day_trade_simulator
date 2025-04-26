@@ -47,14 +47,6 @@ class DockExecutor(QDockWidget):
         self.vbox = vbox = VBoxLayout()
         base.setLayout(vbox)
 
-    def clear_layout(self):
-        while self.vbox.count():
-            # 常に先頭を削除するようにループ
-            item = self.vbox.takeAt(0)
-            widget = item.widget()
-            if widget is not None:
-                widget.deleteLater()
-
     def cb_status_change_all(self, state: bool):
         for idx in range(self.vbox.count()):
             item = self.vbox.itemAt(idx)
@@ -72,6 +64,14 @@ class DockExecutor(QDockWidget):
                 filename = cb.text()
                 print(filename)
 
+    def reset_layout(self):
+        while self.vbox.count():
+            # 常に先頭を削除するようにループ
+            item = self.vbox.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+
     def select_all(self):
         state = True
         self.cb_status_change_all(True)
@@ -80,8 +80,8 @@ class DockExecutor(QDockWidget):
         self.dir = dir
         files = sorted(os.listdir(dir))
 
-        self.clear_layout()
-        print(self.vbox.count())
+        # レイアウトのリセット
+        self.reset_layout()
 
         # 対象の Excel ファイル名のパターン
         pattern = self.res.default_excel_file_pattern
