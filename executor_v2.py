@@ -6,12 +6,12 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow
 
 from structs.res import AppRes
+from threads.broker import BrokerThreadLoop
 from ui.dock_executor import DockExecutor
 from ui.win_executor import WinExecutor
 from ui.toolbar_executor import ToolbarExecutor
 from widgets.progress import ProgressBar
 from widgets.statusbar import StatusBar
-
 
 class Executor(QMainWindow):
     __app_name__ = 'Executor'
@@ -60,9 +60,9 @@ class Executor(QMainWindow):
 
     def on_start_simulation(self):
         print('start simulation!')
-        dir, list_file = self.dock.getExcelFiles()
-        print(dir)
-        print(list_file)
+        broker = BrokerThreadLoop(*self.dock.getExcelFiles())
+        print(broker.dir)
+        print(broker.files)
 
 def main():
     app = QApplication(sys.argv)
