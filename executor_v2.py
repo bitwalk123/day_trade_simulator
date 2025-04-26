@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 
 from structs.res import AppRes
 from ui.dock_executor import DockExecutor
-from ui.panel_executor import PanelExecutor
+from ui.win_executor import WinExecutor
 from ui.toolbar_executor import ToolbarExecutor
 from widgets.progress import ProgressBar
 from widgets.statusbar import StatusBar
@@ -39,8 +39,9 @@ class Executor(QMainWindow):
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
         # メイン・ウィンドウ
-        panel = PanelExecutor(res)
-        self.setCentralWidget(panel)
+        win = WinExecutor(res)
+        win.startClicked.connect(self.on_start_simulation)
+        self.setCentralWidget(win)
 
         # ステータスバー
         statusbar = StatusBar()
@@ -56,6 +57,9 @@ class Executor(QMainWindow):
 
     def exel_dir_selected(self, dir: str):
         self.dock.setExcelDir(dir)
+
+    def on_start_simulation(self):
+        print('start simulation!')
 
 
 def main():
