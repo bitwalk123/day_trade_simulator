@@ -2,10 +2,11 @@ import os
 import re
 
 from PySide6.QtCore import QMargins
-from PySide6.QtWidgets import QDockWidget, QCheckBox, QPushButton, QWidget
+from PySide6.QtWidgets import QDockWidget, QCheckBox, QPushButton, QWidget, QSizePolicy
 
 from structs.res import AppRes
-from widgets.container import ScrollAreaVertical, Widget
+from widgets.checks import CheckBoxFile
+from widgets.container import ScrollAreaVertical, Widget, PadH
 from widgets.layouts import VBoxLayout, HBoxLayout
 
 
@@ -22,15 +23,26 @@ class DockExecutor(QDockWidget):
         # UI
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # タイトルバー
-        but_all = QPushButton('Select All')
-        but_all.clicked.connect(self.select_all)
-        self.setTitleBarWidget(but_all)
+        title = Widget()
+        self.setTitleBarWidget(title)
+        hbox = HBoxLayout()
+        hbox.setContentsMargins(QMargins(0, 0, 0, 0))
+        title.setLayout(hbox)
+        but_sell_all = QPushButton('Select All')
+        but_sell_all.clicked.connect(self.select_all)
+        hbox.addWidget(but_sell_all)
+        but_desell_all = QPushButton('Deselect All')
+        but_desell_all.clicked.connect(self.deselect_all)
+        hbox.addWidget(but_desell_all)
+        hpad = PadH()
+        hbox.addWidget(hpad)
 
         # メイン
         sa = ScrollAreaVertical()
         self.setWidget(sa)
 
         base = Widget()
+        base.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sa.setWidget(base)
 
         self.vbox = vbox = VBoxLayout()
@@ -44,11 +56,18 @@ class DockExecutor(QDockWidget):
             if widget is not None:
                 widget.deleteLater()
 
-    def select_all(self):
+    def cb_status_change_all(self, state: bool):
         for idx in range(self.vbox.count()):
             item = self.vbox.itemAt(idx)
             cb: QCheckBox | QWidget = item.widget()
-            cb.setChecked(True)
+            cb.setChecked(state)
+
+    def deselect_all(self):
+        self.cb_status_change_all(False)
+
+    def select_all(self):
+        state = True
+        self.cb_status_change_all(True)
 
     def setExcelDir(self, dir: str):
         self.dir = dir
@@ -61,5 +80,5 @@ class DockExecutor(QDockWidget):
         for file in files:
             m = pattern.match(file)
             if m:
-                cb = QCheckBox(file)
+                cb = CheckBoxFile(file)
                 self.vbox.addWidget(cb)
