@@ -25,6 +25,16 @@ class CheckBoxLossCut(CheckBox):
         """)
 
 
+class CheckBoxFile(QCheckBox):
+    def __init__(self, filename: str):
+        super().__init__(filename)
+        self.setStyleSheet("""
+            QCheckBox {
+                font-family: monospace;
+            }
+        """)
+
+
 class Switch(QAbstractButton):
     """Implementation of a clean looking toggle switch translated from
     https://stackoverflow.com/a/38102598/1124661
