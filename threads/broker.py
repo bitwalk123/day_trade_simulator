@@ -1,3 +1,5 @@
+import os
+
 from PySide6.QtCore import QObject, QThreadPool, Signal
 
 from ui.dock_executor import DockExecutor
@@ -16,6 +18,8 @@ class BrokerThreadLoop(QObject):
         self.output_dir = None
 
         self.dir, self.files = dock.getExcelFiles()
+        self.counter = 0
+        self.n_files = len(self.files)
 
     def getDir(self) -> str:
         return self.dir
@@ -25,7 +29,7 @@ class BrokerThreadLoop(QObject):
 
     def start(self):
         # Excel ファイルの確認
-        if len(self.files) == 0:
+        if self.n_files == 0:
             msg = '### Excel ファイルが選択されていません。'
             self.errorMessage.emit(msg)
             self.threadFinished.emit(False)
@@ -41,3 +45,6 @@ class BrokerThreadLoop(QObject):
 
         self.output_dir = output_dir
 
+        self.counter = 0
+        file_excel = str(os.path.join(self.dir, self.files[self.counter]))
+        self.win.setSrcFile(file_excel)

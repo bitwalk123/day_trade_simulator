@@ -108,3 +108,6 @@ class WinExecutor(Widget):
 
     def on_simulation_start(self):
         self.startClicked.emit()
+
+    def setSrcFile(self, file: str):
+        self.entSrcFile.setText(file)
