@@ -5,12 +5,12 @@ from PySide6.QtCore import Signal
 from funcs.io import get_doe_json
 from structs.res import AppRes
 from ui.panel_losscut import PanelLossCut
-from ui.panel_output import PanelOutput
 from ui.panel_param import PanelParam
 from widgets.buttons import StartButton
 from widgets.combo import ComboBox
 from widgets.container import Widget, PadH
 from widgets.dialog import DirDialog
+from widgets.entry import EntryDir, EntryWithDir
 from widgets.labels import (
     LabelDate,
     LabelFlat,
@@ -32,6 +32,21 @@ class WinExecutor(Widget):
         col_max = 4
 
         r = 0
+        labSrcPath = LabelTitle('ソース')
+        layout.addWidget(labSrcPath, r, 0)
+
+        self.entSrcPath = entSrcPath = EntryDir()
+        layout.addWidget(entSrcPath, r, 1, 1, col_max - 1)
+
+        r += 1
+        labOutPath = LabelTitle('出力先')
+        layout.addWidget(labOutPath, r, 0)
+
+        self.panelOutput = panel_output = EntryWithDir(res)
+        panel_output.selectDir.connect(self.on_dir_dialog_select)
+        layout.addWidget(panel_output, r, 1, 1, col_max - 1)
+
+        r += 1
         labCode = LabelTitle('銘柄コード')
         layout.addWidget(labCode, r, 0)
 
@@ -71,11 +86,6 @@ class WinExecutor(Widget):
         layout.addWidget(panel_param, r, 0, 1, col_max)
 
         r += 1
-        self.panelOutput = panel_output = PanelOutput(res)
-        panel_output.selectDir.connect(self.on_dir_dialog_select)
-        layout.addWidget(panel_output, r, 0, 1, col_max)
-
-        r += 1
         self.btnStart = but_start = StartButton(res)
         but_start.setFixedHeight(40)
         but_start.setToolTip('シミュレーション開始')
@@ -90,11 +100,8 @@ class WinExecutor(Widget):
         if not dialog.exec():
             return
 
-        basedir = dialog.selectedFiles()[0]
-        dateStr = self.objDate.text()
-        if dateStr is not None:
-            self.path_output = path = os.path.join(basedir, dateStr)
-            self.panelOutput.setOutput(path)
+        dir_output = dialog.selectedFiles()[0]
+        self.panelOutput.setDir(dir_output)
 
     def on_simulation_start(self):
         self.startClicked.emit()

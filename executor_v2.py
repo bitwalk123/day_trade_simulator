@@ -60,7 +60,9 @@ class Executor(QMainWindow):
 
     def on_start_simulation(self):
         print('start simulation!')
-
+        dir, list_file = self.dock.getExcelFiles()
+        print(dir)
+        print(list_file)
 
 def main():
     app = QApplication(sys.argv)

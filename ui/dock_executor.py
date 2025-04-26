@@ -57,12 +57,15 @@ class DockExecutor(QDockWidget):
         self.cb_status_change_all(False)
 
     def getExcelFiles(self):
+        list_file = list()
         for idx in range(self.vbox.count()):
             item = self.vbox.itemAt(idx)
             cb: QCheckBox | QWidget = item.widget()
             if cb.isChecked():
                 filename = cb.text()
-                print(filename)
+                list_file.append(filename)
+
+        return self.dir, list_file
 
     def reset_layout(self):
         while self.vbox.count():
