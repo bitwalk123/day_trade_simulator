@@ -2,7 +2,7 @@ import os
 import re
 
 from PySide6.QtCore import QMargins
-from PySide6.QtWidgets import QDockWidget, QCheckBox
+from PySide6.QtWidgets import QDockWidget, QCheckBox, QPushButton, QWidget
 
 from structs.res import AppRes
 from widgets.container import ScrollAreaVertical, Widget
@@ -22,14 +22,9 @@ class DockExecutor(QDockWidget):
         # UI
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # タイトルバー
-        # title = Widget()
-        # hbox = HBoxLayout()
-        # title.setLayout(hbox)
-        cb_all = QCheckBox('Select All')
-        cb_all.setStyleSheet('margin-left: 10px;')
-        # hbox.addWidget(cb_all)
-        # self.setTitleBarWidget(title)
-        self.setTitleBarWidget(cb_all)
+        but_all = QPushButton('Select All')
+        but_all.clicked.connect(self.select_all)
+        self.setTitleBarWidget(but_all)
 
         # メイン
         sa = ScrollAreaVertical()
@@ -41,12 +36,30 @@ class DockExecutor(QDockWidget):
         self.vbox = vbox = VBoxLayout()
         base.setLayout(vbox)
 
+    def clear_layout(self):
+        while self.vbox.count():
+            # 常に先頭を削除するようにループ
+            item = self.vbox.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+
+    def select_all(self):
+        for idx in range(self.vbox.count()):
+            item = self.vbox.itemAt(idx)
+            cb: QCheckBox | QWidget = item.widget()
+            cb.setChecked(True)
+
     def setExcelDir(self, dir: str):
         self.dir = dir
         files = sorted(os.listdir(dir))
+
+        self.clear_layout()
+        print(self.vbox.count())
 
         pattern = re.compile(r'^trader_[0-9]{8}\.xlsm$')
         for file in files:
             m = pattern.match(file)
             if m:
-                self.vbox.addWidget(QCheckBox(file))
+                cb = QCheckBox(file)
+                self.vbox.addWidget(cb)
