@@ -23,6 +23,7 @@ class Entry(QLineEdit):
                 background-color: white;
                 color: black;
                 padding-left:5px;
+                padding-right:5px;
             }
         """)
 
