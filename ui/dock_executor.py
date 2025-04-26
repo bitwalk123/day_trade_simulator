@@ -26,7 +26,6 @@ class DockExecutor(QDockWidget):
         title = Widget()
         self.setTitleBarWidget(title)
         hbox = HBoxLayout()
-        hbox.setContentsMargins(QMargins(0, 0, 0, 0))
         title.setLayout(hbox)
         but_sell_all = QPushButton('Select All')
         but_sell_all.clicked.connect(self.select_all)

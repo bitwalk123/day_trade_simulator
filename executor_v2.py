@@ -7,6 +7,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow
 
 from structs.res import AppRes
 from ui.dock_executor import DockExecutor
+from ui.panel_executor import PanelExecutor
 from ui.toolbar_executor import ToolbarExecutor
 from widgets.progress import ProgressBar
 from widgets.statusbar import StatusBar
@@ -38,6 +39,8 @@ class Executor(QMainWindow):
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
         # メイン・ウィンドウ
+        panel = PanelExecutor(res)
+        self.setCentralWidget(panel)
 
         # ステータスバー
         statusbar = StatusBar()
@@ -46,6 +49,10 @@ class Executor(QMainWindow):
         self.pbar = pbar = ProgressBar()
         self.pbar.setRange(0, 100)
         statusbar.addPermanentWidget(pbar, stretch=1)
+
+    def closeEvent(self, event):
+        print('アプリケーションを終了します。')
+        event.accept()  # let the window close
 
     def exel_dir_selected(self, dir: str):
         self.dock.setExcelDir(dir)

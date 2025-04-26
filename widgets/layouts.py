@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QMargins
 from PySide6.QtWidgets import (
     QGridLayout,
     QHBoxLayout,
@@ -17,9 +17,11 @@ class HBoxLayout(QHBoxLayout):
     def __init__(self):
         super().__init__()
         self.setSpacing(0)
+        self.setContentsMargins(QMargins(0, 0, 0, 0))
 
 
 class VBoxLayout(QVBoxLayout):
     def __init__(self):
         super().__init__()
         self.setSpacing(0)
+        self.setContentsMargins(QMargins(0, 0, 0, 0))
