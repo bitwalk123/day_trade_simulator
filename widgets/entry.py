@@ -103,6 +103,9 @@ class EntryWithDir(Widget):
         padh = PadH()
         layout.addWidget(padh)
 
+    def getDir(self) -> str:
+        return self.entOutput.text()
+
     def on_dir_dialog_select(self):
         """
         dialog = DirDialog()

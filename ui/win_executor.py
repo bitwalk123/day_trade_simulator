@@ -42,9 +42,9 @@ class WinExecutor(Widget):
         labOutPath = LabelTitle('出力先')
         layout.addWidget(labOutPath, r, 0)
 
-        self.panelOutput = panel_output = EntryWithDir(res)
-        panel_output.selectDir.connect(self.on_dir_dialog_select)
-        layout.addWidget(panel_output, r, 1, 1, col_max - 1)
+        self.output_dir = output_dir = EntryWithDir(res)
+        output_dir.selectDir.connect(self.on_dir_dialog_select)
+        layout.addWidget(output_dir, r, 1, 1, col_max - 1)
 
         r += 1
         labCode = LabelTitle('銘柄コード')
@@ -92,6 +92,9 @@ class WinExecutor(Widget):
         but_start.clicked.connect(self.on_simulation_start)
         layout.addWidget(but_start, r, 0, 1, col_max)
 
+    def getOutputDir(self) -> str:
+        return self.output_dir.getDir()
+
     def on_json_changed(self, file_json: str):
         self.panelParam.genTable(self.res, file_json)
 
@@ -101,7 +104,7 @@ class WinExecutor(Widget):
             return
 
         dir_output = dialog.selectedFiles()[0]
-        self.panelOutput.setDir(dir_output)
+        self.output_dir.setDir(dir_output)
 
     def on_simulation_start(self):
         self.startClicked.emit()
