@@ -6,6 +6,7 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow
 
 from structs.res import AppRes
+from threads.broker import BrokerThreadLoop
 from ui.dock_executor import DockExecutor
 from ui.win_executor import WinExecutor
 from ui.toolbar_executor import ToolbarExecutor
@@ -21,6 +22,7 @@ class Executor(QMainWindow):
         super().__init__()
         self.res = res = AppRes()
         self.threadpool = QThreadPool()
+        self.broker = None
 
         # ウィンドウ・アイコンとタイトル
         self.setWindowIcon(QIcon(os.path.join(res.dir_image, 'start.png')))
@@ -39,9 +41,9 @@ class Executor(QMainWindow):
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
         # メイン・ウィンドウ
-        win = WinExecutor(res)
-        win.startClicked.connect(self.on_start_simulation)
-        self.setCentralWidget(win)
+        self.win_main = win_main = WinExecutor(res)
+        win_main.startClicked.connect(self.on_start_simulation)
+        self.setCentralWidget(win_main)
 
         # ステータスバー
         statusbar = StatusBar()
@@ -60,9 +62,24 @@ class Executor(QMainWindow):
 
     def on_start_simulation(self):
         print('start simulation!')
-        dir, list_file = self.dock.getExcelFiles()
-        print(dir)
-        print(list_file)
+        self.broker = broker = BrokerThreadLoop(
+            self.res, self.threadpool, self.dock, self.win_main, self.pbar
+        )
+        broker.errorMessage.connect(self.show_error_message)
+        broker.threadFinished.connect(self.thread_complete)
+
+        # シミュレーション開始
+        broker.start()
+
+    def show_error_message(self, msg):
+        print(msg)
+
+    def thread_complete(self, result: bool):
+        if result:
+            print('スレッド処理を正常終了しました。')
+        else:
+            print('スレッド処理を異常終了しました。')
+
 
 def main():
     app = QApplication(sys.argv)

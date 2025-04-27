@@ -40,6 +40,18 @@ class EntryDir(Entry):
         )
 
 
+class EntryFile(Entry):
+    def __init__(self):
+        super().__init__()
+        self.setMinimumWidth(300)
+        self.setEnabled(False)
+
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed,
+        )
+
+
 class EntryExcelFile(Entry):
     def __init__(self):
         super().__init__()
@@ -90,6 +102,9 @@ class EntryWithDir(Widget):
 
         padh = PadH()
         layout.addWidget(padh)
+
+    def getDir(self) -> str:
+        return self.entOutput.text()
 
     def on_dir_dialog_select(self):
         """
