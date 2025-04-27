@@ -93,8 +93,20 @@ class WinExecutor(Widget):
         but_start.clicked.connect(self.on_simulation_start)
         layout.addWidget(but_start, r, 0, 1, col_max)
 
+    def clearTotal(self):
+        self.panelParam.clearTotal()
+
     def getLevelMax(self) -> int:
         return self.panelParam.getLevelMax()
+
+    def getAFinit(self, row: int):
+        return self.panelParam.getAFinit(row)
+
+    def getAFstep(self, row: int):
+        return self.panelParam.getAFstep(row)
+
+    def getAFmax(self, row: int):
+        return self.panelParam.getAFmax(row)
 
     def getOutputDir(self) -> str:
         return self.output_dir.getDir()
@@ -113,6 +125,9 @@ class WinExecutor(Widget):
     def on_simulation_start(self):
         self.startClicked.emit()
 
+    def saveResult(self, name_html: str):
+        self.panelParam.saveResult(name_html)
+
     def setCode(self, code: str):
         self.objCode.setText(code)
 
@@ -121,3 +136,6 @@ class WinExecutor(Widget):
 
     def setSrcFile(self, file: str):
         self.entSrcFile.setText(file)
+
+    def setTotal(self, row: int, total: float):
+        self.panelParam.setTotal(row, total)

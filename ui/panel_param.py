@@ -96,7 +96,7 @@ class PanelParam(ScrollAreaVertical):
         obj: LabelValue = self.dict_obj[i][self.coltotal]
         return obj.getValue()
 
-    def getResult(self, name_html: str):
+    def saveResult(self, name_html: str):
         list_html = list()
 
         # table

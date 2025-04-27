@@ -7,6 +7,7 @@ from PySide6.QtCore import (
 )
 from PySide6.QtWidgets import QProgressBar
 
+from structs.app_enum import LoopStatus
 from structs.res import AppRes
 from threads.counter import CounterLoop
 from threads.preprocs import WorkerPrepDataset
@@ -48,8 +49,10 @@ class BrokerThreadLoop(QObject):
         self.dict_dict_target = dict()
 
     def create_winmain(self, dict_target):
+        if self.winmain is not None:
+            self.winmain.deleteLater()
         self.winmain = WinMain(self.res, dict_target, self.threadpool, self.pbar)
-        self.winmain.simulationCompleted.connect(self.loop_simulation)
+        self.winmain.simulationCompleted.connect(self.loop_simulation_next)
         self.winmain.setFixedSize(1600, 800)
         self.winmain.show()
 
@@ -60,10 +63,23 @@ class BrokerThreadLoop(QObject):
         return self.files
 
     def loop_simulation(self):
-        pass
+        n_condition = self.counter.getCountCondition()
+        af_init = self.panel.getAFinit(n_condition)
+        af_step = self.panel.getAFstep(n_condition)
+        af_max = self.panel.getAFmax(n_condition)
+
+        if self.panel.panelLossCut.IsLossCutEnabled():
+            self.winmain.dock.setLossCutEnabled(True)
+        else:
+            self.winmain.dock.setLossCutEnabled(False)
+
+        self.winmain.dock.objAFinit.setValue(af_init)
+        self.winmain.dock.objAFstep.setValue(af_step)
+        self.winmain.dock.objAFmax.setValue(af_max)
+        self.winmain.autoSimulationStart()
 
     def loop_simulation_init(self):
-        file_excel = str(os.path.join(self.dir, self.files[self.cnt_file]))
+        file_excel = str(os.path.join(self.dir, self.files[self.counter.getCountFile()]))
         self.panel.setSrcFile(file_excel)
 
         prep_ds = WorkerPrepDataset(file_excel)
@@ -72,16 +88,54 @@ class BrokerThreadLoop(QObject):
         self.threadpool.start(prep_ds)
 
     def loop_simulation_next(self, dict_result: dict):
-        """
-        name_chart = os.path.join(
-            self.path_output,
-            'chart_%s_%d.png' % (self.code_target, self.counter)
-        )
-        self.winmain.saveChart(name_chart)
-        print(self.code_target, self.counter, dict_result['total'])
+        dir_save = str(os.path.join(self.output_dir, dict_result['date']))
+        if not os.path.isdir(dir_save):
+            os.mkdir(dir_save)
 
-        """
-        pass
+        name_chart = 'chart_{:s}_{:0>3d}.png'.format(
+            self.list_target[self.counter.getCountCode()]['code'],
+            self.counter.getCountCondition()
+        )
+        name_chart = os.path.join(dir_save, name_chart)
+        #print(name_chart)
+        self.winmain.saveChart(name_chart)
+        print(
+            self.list_target[self.counter.getCountCode()]['code'],
+            self.counter.getCountCondition(),
+            dict_result['total']
+        )
+
+        # 結果の処理
+        self.panel.setTotal(self.counter.getCountCondition(), dict_result['total'])
+
+        # カウンタのインクリメント
+        result = self.counter.increment()
+
+        if result == LoopStatus.NEXT_CONDITION:
+            # シミュレーション・ループ
+            self.loop_simulation()
+        else:
+            # 全条件の Total を保存
+            name_html = 'summary_{:s}_{:s}.html'.format(
+                dict_result['date'],
+                self.list_target[self.counter.getCountCode()]['code']
+            )
+            name_html = os.path.join(dir_save, name_html)
+            self.panel.saveResult(name_html)
+
+            if result == LoopStatus.NEXT_CODE:
+                self.panel.clearTotal()
+                dict_target = self.list_target[self.counter.getCountCode()]
+                self.create_winmain(dict_target)
+
+                # シミュレーション・ループ
+                self.loop_simulation()
+            elif result == LoopStatus.NEXT_FILE:
+                self.loop_simulation_init()
+            else:
+                if self.winmain is not None:
+                    self.winmain.deleteLater()
+                print('complete simulation')
 
     def start(self):
         # Excel ファイルの確認
@@ -123,8 +177,10 @@ class BrokerThreadLoop(QObject):
 
         # シミュレータウィンドウの表示
         dict_target = list_target[0]
-        if self.winmain is None:
-            self.create_winmain(dict_target)
+        self.create_winmain(dict_target)
+
+        # シミュレーション・ループ
+        self.loop_simulation()
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)

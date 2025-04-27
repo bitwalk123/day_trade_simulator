@@ -32,7 +32,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         self.ser_tick: pd.Series = dict_param['tick']
 
         # 日付文字列
-        date_str = dict_param['date']
+        self.date_str = date_str = dict_param['date']
 
         # 売買単位
         unit = dict_param['unit']
@@ -162,6 +162,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             self.eval_profit(t_current, p_current)
 
         dict_result = dict()
+        dict_result['date']= self.date_str
         dict_result['tick'] = self.psar.getPSAR()
         dict_result['profit'] = self.posman.getProfitHistory()
         dict_result['order'] = self.posman.getOrderHistory()
