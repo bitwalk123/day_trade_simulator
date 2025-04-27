@@ -63,7 +63,7 @@ class Executor(QMainWindow):
     def on_start_simulation(self):
         print('start simulation!')
         self.broker = broker = BrokerThreadLoop(
-            self.dock, self.win_main, self.threadpool
+            self.res, self.threadpool, self.dock, self.win_main, self.pbar
         )
         broker.errorMessage.connect(self.show_error_message)
         broker.threadFinished.connect(self.thread_complete)

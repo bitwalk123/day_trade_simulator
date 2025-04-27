@@ -14,6 +14,7 @@ from widgets.entry import EntryFile, EntryWithDir
 from widgets.labels import (
     LabelDate,
     LabelFlat,
+    LabelString,
     LabelTitle,
 )
 from widgets.layouts import GridLayout
@@ -50,8 +51,8 @@ class WinExecutor(Widget):
         labCode = LabelTitle('銘柄コード')
         layout.addWidget(labCode, r, 0)
 
-        self.comboCode = comboCode = ComboBox()
-        layout.addWidget(comboCode, r, 1)
+        self.objCode = objCode = LabelString()
+        layout.addWidget(objCode, r, 1)
 
         r += 1
         labDate = LabelTitle('現在日付')
@@ -108,6 +109,12 @@ class WinExecutor(Widget):
 
     def on_simulation_start(self):
         self.startClicked.emit()
+
+    def setCode(self, code: str):
+        self.objCode.setText(code)
+
+    def setDate(self, date: str):
+        self.objDate.setText(date)
 
     def setSrcFile(self, file: str):
         self.entSrcFile.setText(file)
