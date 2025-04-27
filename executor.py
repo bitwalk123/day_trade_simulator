@@ -297,7 +297,7 @@ class Executor(QMainWindow):
                 self.path_output,
                 'summary_%s_%d.html' % (self.code_target, self.counter)
             )
-            self.panelParam.getResult(name_html)
+            self.panelParam.saveResult(name_html)
             self.code_counter += 1
             # print('Completed!')
             self.loop_simulation_1_code()
@@ -306,7 +306,7 @@ class Executor(QMainWindow):
         self.pbar.setValue(progress)
 
     def function_test(self):
-        self.panelParam.getResult('test.html')
+        self.panelParam.saveResult('test.html')
 
 
 def main():
