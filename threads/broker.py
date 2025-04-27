@@ -42,8 +42,15 @@ class BrokerThreadLoop(QObject):
 
         # ループカウンタ
         self.counter = CounterLoop()
+        self.counter.setMaxFile(len(self.files))
 
         self.dict_dict_target = dict()
+
+    def create_winmain(self, dict_target):
+        self.winmain = WinMain(self.res, dict_target, self.threadpool, self.pbar)
+        self.winmain.simulationCompleted.connect(self.loop_simulation)
+        self.winmain.setFixedSize(1600, 800)
+        self.winmain.show()
 
     def getDir(self) -> str:
         return self.dir
@@ -109,12 +116,8 @@ class BrokerThreadLoop(QObject):
         self.panel.setCode(dict_target['code'])
         self.panel.setDate(dict_target['date'])
 
-        if self.winmain is not None:
-            self.winmain.deleteLater()
-        self.winmain = WinMain(self.res, dict_target, self.threadpool, self.pbar)
-        self.winmain.simulationCompleted.connect(self.loop_simulation)
-        self.winmain.setFixedSize(1600, 800)
-        self.winmain.show()
+        if self.winmain is None:
+            self.create_winmain(dict_target)
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)
