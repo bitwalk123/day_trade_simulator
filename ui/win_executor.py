@@ -93,6 +93,9 @@ class WinExecutor(Widget):
         but_start.clicked.connect(self.on_simulation_start)
         layout.addWidget(but_start, r, 0, 1, col_max)
 
+    def getLevelMax(self) -> int:
+        return self.panelParam.getLevelMax()
+
     def getOutputDir(self) -> str:
         return self.output_dir.getDir()
 

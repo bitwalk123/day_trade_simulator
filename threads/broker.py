@@ -36,6 +36,7 @@ class BrokerThreadLoop(QObject):
 
         self.winmain = None
         self.output_dir = None
+        self.list_target = None
 
         # シミュレーション対象の Excel ファイルを取得
         self.dir, self.files = dock.getExcelFiles()
@@ -100,7 +101,10 @@ class BrokerThreadLoop(QObject):
         else:
             self.output_dir = output_dir
 
-        self.cnt_file = 0
+        # 水準数を設定
+        self.counter.setMaxRow(self.panel.getLevelMax())
+
+        # ループの初期設定
         self.loop_simulation_init()
 
     def on_excel_read_completed(self, list_target):
@@ -111,11 +115,14 @@ class BrokerThreadLoop(QObject):
         """
         print('Excel read completed')
 
+        # ターゲット銘柄のリストを保持
+        self.list_target = list_target
+
+        # 銘柄数の設定
+        self.counter.setMaxCode(len(list_target))
+
         # シミュレータウィンドウの表示
         dict_target = list_target[0]
-        self.panel.setCode(dict_target['code'])
-        self.panel.setDate(dict_target['date'])
-
         if self.winmain is None:
             self.create_winmain(dict_target)
 
