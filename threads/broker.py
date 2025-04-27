@@ -1,9 +1,14 @@
 import os
 
-from PySide6.QtCore import QObject, QThreadPool, Signal
+from PySide6.QtCore import (
+    QObject,
+    QThreadPool,
+    Signal,
+)
 from PySide6.QtWidgets import QProgressBar
 
 from structs.res import AppRes
+from threads.counter import CounterLoop
 from threads.preprocs import WorkerPrepDataset
 from ui.dock_executor import DockExecutor
 from ui.win_executor import WinExecutor
@@ -29,14 +34,14 @@ class BrokerThreadLoop(QObject):
         self.panel = win
         self.pbar = pbar
 
+        self.winmain = None
         self.output_dir = None
 
+        # シミュレーション対象の Excel ファイルを取得
         self.dir, self.files = dock.getExcelFiles()
-        self.cnt_file = 0
-        self.total_file = len(self.files)
 
-        self.cnt_code = 0
-        self.total_code = 0
+        # ループカウンタ
+        self.counter = CounterLoop()
 
         self.dict_dict_target = dict()
 
@@ -58,9 +63,21 @@ class BrokerThreadLoop(QObject):
         prep_ds.threadFinished.connect(self.on_excel_read_completed)
         self.threadpool.start(prep_ds)
 
+    def loop_simulation_next(self, dict_result: dict):
+        """
+        name_chart = os.path.join(
+            self.path_output,
+            'chart_%s_%d.png' % (self.code_target, self.counter)
+        )
+        self.winmain.saveChart(name_chart)
+        print(self.code_target, self.counter, dict_result['total'])
+
+        """
+        pass
+
     def start(self):
         # Excel ファイルの確認
-        if self.total_file == 0:
+        if self.counter.getMaxFile() == 0:
             msg = '### Excel ファイルが選択されていません。'
             self.errorMessage.emit(msg)
             self.threadFinished.emit(False)
@@ -91,6 +108,9 @@ class BrokerThreadLoop(QObject):
         dict_target = list_target[0]
         self.panel.setCode(dict_target['code'])
         self.panel.setDate(dict_target['date'])
+
+        if self.winmain is not None:
+            self.winmain.deleteLater()
         self.winmain = WinMain(self.res, dict_target, self.threadpool, self.pbar)
         self.winmain.simulationCompleted.connect(self.loop_simulation)
         self.winmain.setFixedSize(1600, 800)
@@ -98,4 +118,3 @@ class BrokerThreadLoop(QObject):
 
     def on_status_update(self, progress: int):
         self.pbar.setValue(progress)
-
