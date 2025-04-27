@@ -32,19 +32,19 @@ class WinExecutor(Widget):
         col_max = 4
 
         r = 0
-        labSrcFile = LabelTitle('ソース')
-        layout.addWidget(labSrcFile, r, 0)
-
-        self.entSrcFile = entSrcFile = EntryFile()
-        layout.addWidget(entSrcFile, r, 1, 1, col_max - 1)
-
-        r += 1
         labOutPath = LabelTitle('出力先')
         layout.addWidget(labOutPath, r, 0)
 
         self.output_dir = output_dir = EntryWithDir(res)
         output_dir.selectDir.connect(self.on_dir_dialog_select)
         layout.addWidget(output_dir, r, 1, 1, col_max - 1)
+
+        r += 1
+        labSrcFile = LabelTitle('ソース')
+        layout.addWidget(labSrcFile, r, 0)
+
+        self.entSrcFile = entSrcFile = EntryFile()
+        layout.addWidget(entSrcFile, r, 1, 1, col_max - 1)
 
         r += 1
         labCode = LabelTitle('銘柄コード')
