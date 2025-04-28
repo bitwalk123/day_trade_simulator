@@ -29,7 +29,7 @@ class PanelLossCut(Widget):
         layout.addWidget(lab_losscut_factor)
 
         self.sb_losscut_factor = sb_losscut_factor = SpinBox()
-        sb_losscut_factor.setValue(3)
+        sb_losscut_factor.setValue(10)
         sb_losscut_factor.setFixedWidth(80)
         sb_losscut_factor.setDisabled(True)
         layout.addWidget(sb_losscut_factor)
