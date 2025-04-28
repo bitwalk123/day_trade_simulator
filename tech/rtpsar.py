@@ -34,7 +34,7 @@ class RealTimePSAR:
 
     def add(self, dt1: pd.Timestamp, price1: float) -> int:
         # データフレームの行数
-        r = len(self.df)  # 新たに挿入する行数に使用
+        r = len(self.df)
 
         if r == 0:
             # 最初は時刻と中立トレンドを記録
