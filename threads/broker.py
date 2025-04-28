@@ -20,33 +20,24 @@ class BrokerThreadLoop(QObject):
     errorMessage = Signal(str)
     threadFinished = Signal(bool)
 
-    def __init__(
-            self,
-            res: AppRes,
-            threadpool: QThreadPool,
-            dock: DockExecutor,
-            win: WinExecutor,
-            pbar: QProgressBar
-    ):
+    def __init__(self, params: dict):
         super().__init__()
-        self.res = res
-        self.threadpool = threadpool
-        self.dock = dock
-        self.panel = win
-        self.pbar = pbar
+        self.res = params['res']
+        self.threadpool = params['threadpool']
+        self.dock = params['dock']
+        self.panel = params['panel']
+        self.pbar = params['pbar']
 
         self.winmain = None
         self.output_dir = None
         self.list_target = None
 
         # シミュレーション対象の Excel ファイルを取得
-        self.dir, self.files = dock.getExcelFiles()
+        self.dir, self.files = self.dock.getExcelFiles()
 
         # ループカウンタ
         self.counter = CounterLoop()
         self.counter.setMaxFile(len(self.files))
-
-        self.dict_dict_target = dict()
 
     def create_winmain(self, dict_target):
         if self.winmain is not None:
