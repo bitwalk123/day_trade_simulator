@@ -6,6 +6,9 @@ from structs.res import AppRes
 
 
 def add_data_af(df_target: pd.DataFrame, df_tbl: pd.DataFrame, colname: str):
+    """
+    AF 水準依存性をシミュレーションした結果をまとめるための関数
+    """
     if len(df_target) == 0:
         df_target['af_init'] = df_tbl['af_init']
         df_target['af_step'] = df_tbl['af_step']
