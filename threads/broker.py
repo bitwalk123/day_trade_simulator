@@ -18,15 +18,15 @@ from ui.win_main import WinMain
 
 class BrokerThreadLoop(QObject):
     errorMessage = Signal(str)
-    threadFinished = Signal(bool)
+    simulationFinished = Signal(bool)
 
     def __init__(self, params: dict):
         super().__init__()
-        self.res = params['res']
-        self.threadpool = params['threadpool']
-        self.dock = params['dock']
-        self.panel = params['panel']
-        self.pbar = params['pbar']
+        self.res: AppRes = params['res']
+        self.threadpool: QThreadPool = params['threadpool']
+        self.dock: DockExecutor = params['dock']
+        self.panel: WinExecutor = params['panel']
+        self.pbar: QProgressBar = params['pbar']
 
         self.winmain = None
         self.output_dir = None
@@ -38,6 +38,11 @@ class BrokerThreadLoop(QObject):
         # ループカウンタ
         self.counter = CounterLoop()
         self.counter.setMaxFile(len(self.files))
+
+    def closeEvent(self, event):
+        if self.winmain is not None:
+            self.winmain.deleteLater()
+        event.accept()  # let the window close
 
     def create_winmain(self, dict_target):
         if self.winmain is not None:
@@ -163,20 +168,22 @@ class BrokerThreadLoop(QObject):
                 # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                 if self.winmain is not None:
                     self.winmain.deleteLater()
-                print('complete simulation')
+                # print('complete simulation')
+                self.simulationFinished.emit(True)
             else:
                 # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
                 # Unknown
                 # 不明なステータスで終了（念のため）
                 # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
-                print('complete simulation with unknown status')
+                # print('complete simulation with unknown status')
+                self.simulationFinished.emit(False)
 
     def start(self):
         # Excel ファイルの確認
         if self.counter.getMaxFile() == 0:
             msg = '### Excel ファイルが選択されていません。'
             self.errorMessage.emit(msg)
-            self.threadFinished.emit(False)
+            self.simulationFinished.emit(False)
             return
 
         # 出力先ディレクトリの確認
@@ -184,7 +191,7 @@ class BrokerThreadLoop(QObject):
         if output_dir == '':
             msg = '### 出力先ディレクトリが設定されていません。'
             self.errorMessage.emit(msg)
-            self.threadFinished.emit(False)
+            self.simulationFinished.emit(False)
             return
         else:
             self.output_dir = output_dir
