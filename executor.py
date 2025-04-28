@@ -61,14 +61,18 @@ class Executor(QMainWindow):
         self.dock.setExcelDir(dir)
 
     def on_start_simulation(self):
-        print('start simulation!')
-        self.broker = broker = BrokerThreadLoop(
-            self.res, self.threadpool, self.dock, self.win_main, self.pbar
-        )
+        params = dict()
+        params['res'] = self.res
+        params['threadpool'] = self.threadpool
+        params['dock'] = self.dock
+        params['panel'] = self.win_main
+        params['pbar'] = self.pbar
+        self.broker = broker = BrokerThreadLoop(params)
         broker.errorMessage.connect(self.show_error_message)
         broker.threadFinished.connect(self.thread_complete)
 
         # シミュレーション開始
+        print('start simulation!')
         broker.start()
 
     def show_error_message(self, msg):
