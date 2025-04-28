@@ -1,6 +1,17 @@
 import os
 
+import pandas as pd
+
 from structs.res import AppRes
+
+
+def add_data_af(df_target: pd.DataFrame, df_tbl: pd.DataFrame, colname: str):
+    if len(df_target) == 0:
+        df_target['af_init'] = df_tbl['af_init']
+        df_target['af_step'] = df_tbl['af_step']
+        df_target['af_max'] = df_tbl['af_max']
+
+    df_target[colname] = df_tbl['total']
 
 
 def get_csv_ohlc_name(res: AppRes, dict_info: dict, interval: str) -> str:
@@ -25,6 +36,7 @@ def get_excel_name(res: AppRes, dict_info: dict) -> str:
             dict_info["code"], dict_info["date"]
         )
     )
+
 
 def get_transaction_name(res: AppRes, dict_info: dict) -> str:
     return os.path.join(
