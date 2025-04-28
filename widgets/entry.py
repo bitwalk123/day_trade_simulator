@@ -2,7 +2,13 @@ import os
 import re
 
 import pandas as pd
+from PySide6.QtCore import Signal, QMargins
 from PySide6.QtWidgets import QLineEdit, QSizePolicy
+
+from structs.res import AppRes
+from widgets.buttons import FolderButton
+from widgets.container import Widget, PadH
+from widgets.layouts import HBoxLayout
 
 
 class Entry(QLineEdit):
@@ -17,6 +23,7 @@ class Entry(QLineEdit):
                 background-color: white;
                 color: black;
                 padding-left:5px;
+                padding-right:5px;
             }
         """)
 
@@ -24,7 +31,18 @@ class Entry(QLineEdit):
 class EntryDir(Entry):
     def __init__(self):
         super().__init__()
-        # self.setFixedWidth(300)
+        self.setMinimumWidth(300)
+        self.setEnabled(False)
+
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed,
+        )
+
+
+class EntryFile(Entry):
+    def __init__(self):
+        super().__init__()
         self.setMinimumWidth(300)
         self.setEnabled(False)
 
@@ -60,3 +78,46 @@ class EntryExcelFile(Entry):
 
     def get_ExcelFile(self) -> str:
         return self.filename
+
+
+class EntryWithDir(Widget):
+    selectDir = Signal()
+
+    def __init__(self, res: AppRes):
+        super().__init__()
+        self.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Fixed,
+        )
+        self.setContentsMargins(QMargins(0, 0, 0, 0))
+        layout = HBoxLayout()
+        self.setLayout(layout)
+
+        self.entOutput = entOutput = EntryDir()
+        layout.addWidget(entOutput)
+
+        but_dir = FolderButton(res)
+        but_dir.clicked.connect(self.on_dir_dialog_select)
+        layout.addWidget(but_dir)
+
+        padh = PadH()
+        layout.addWidget(padh)
+
+    def getDir(self) -> str:
+        return self.entOutput.text()
+
+    def on_dir_dialog_select(self):
+        """
+        dialog = DirDialog()
+        if not dialog.exec():
+            return
+
+        basedir = dialog.selectedFiles()[0]
+        dateStr = self.objDate.text()
+        if dateStr is not None:
+            self.entOutput.setText(os.path.join(basedir, dateStr))
+        """
+        self.selectDir.emit()
+
+    def setDir(self, dir: str):
+        self.entOutput.setText(dir)

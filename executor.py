@@ -1,312 +1,101 @@
 import os
 import sys
-from PySide6.QtCore import QThreadPool
-from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QProgressBar,
-)
 
-from funcs.io import get_doe_json
+from PySide6.QtCore import QThreadPool, Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication, QMainWindow
+
 from structs.res import AppRes
-from threads.preprocs import WorkerPrepDataset
-from ui.panel_losscut import PanelLossCut
-from ui.panel_output import PanelOutput
-from ui.panel_param import PanelParam
-from ui.win_main import WinMain
-from widgets.buttons import (
-    ChooseButton,
-    FolderButton,
-    StartButton,
-)
-from widgets.combo import ComboBox
-from widgets.container import PadH, Widget
-from widgets.dialog import DirDialog, FileDialogExcel
-from widgets.entry import EntryExcelFile
-from widgets.labels import (
-    LabelDate,
-    LabelFlat,
-    LabelTitle,
-)
-from widgets.layouts import GridLayout
+from threads.broker import BrokerThreadLoop
+from ui.dock_executor import DockExecutor
+from ui.win_executor import WinExecutor
+from ui.toolbar_executor import ToolbarExecutor
+from widgets.progress import ProgressBar
 from widgets.statusbar import StatusBar
-from widgets.toolbar import ToolBar
 
 
 class Executor(QMainWindow):
     __app_name__ = 'Executor'
-    __version__ = '1.0.0'
+    __version__ = '2.0.0'
 
     def __init__(self):
         super().__init__()
         self.res = res = AppRes()
         self.threadpool = QThreadPool()
-        self.dict_dict_target = dict()
-
-        # シミュレーション・ループ用オブジェクト＆カウンタ
-        self.code_counter: int = 0
-        self.code_target = None
-        self.winmain: None | WinMain = None
-        self.counter: int = 0
-        self.counter_max: int = 0
-        self.path_output = None
+        self.broker = None
 
         # ウィンドウ・アイコンとタイトル
-        icon = QIcon(os.path.join(res.dir_image, 'start.png'))
-        self.setWindowIcon(icon)
-        self.setWindowTitle(self.__app_name__)
+        self.setWindowIcon(QIcon(os.path.join(res.dir_image, 'start.png')))
+        self.setWindowTitle('%s - %s' % (self.__app_name__, self.__version__))
 
         # =====================================================================
         #  UI
         # =====================================================================
         # ツールバー
-        toolbar = ToolBar()
+        toolbar = ToolbarExecutor(res)
+        toolbar.dirSelected.connect(self.exel_dir_selected)
         self.addToolBar(toolbar)
 
-        but_folder = FolderButton(res)
-        but_folder.clicked.connect(self.on_file_dialog_open)
-        toolbar.addWidget(but_folder)
+        # ドック
+        self.dock = dock = DockExecutor(res)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, dock)
 
-        self.ent_sheet = ent_sheet = EntryExcelFile()
-        toolbar.addWidget(ent_sheet)
+        # メイン・ウィンドウ
+        self.win_main = win_main = WinExecutor(res)
+        win_main.startClicked.connect(self.on_start_simulation)
+        self.setCentralWidget(win_main)
 
-        self.but_choose = but_choose = ChooseButton(res)
-        but_choose.setDisabled(True)
-        but_choose.clicked.connect(self.on_excel_read)
-        toolbar.addWidget(but_choose)
-
-        # メイン
-        base = Widget()
-        self.setCentralWidget(base)
-
-        layout = GridLayout()
-        base.setLayout(layout)
-
-        col_max = 4
-        r = 0
-        labCode = LabelTitle('銘柄コード')
-        layout.addWidget(labCode, r, 0)
-
-        self.comboCode = comboCode = ComboBox()
-        layout.addWidget(comboCode, r, 1)
-
-        r += 1
-        labDate = LabelTitle('現在日付')
-        layout.addWidget(labDate, r, 0)
-
-        self.objDate = objDate = LabelDate()
-        layout.addWidget(objDate, r, 1)
-
-        r += 1
-        labLossCut = LabelTitle('ロスカット')
-        layout.addWidget(labLossCut, r, 0)
-
-        self.panelLossCut = panel_losscut = PanelLossCut(res)
-        layout.addWidget(panel_losscut, r, 1, 1, col_max - 1)
-
-        r += 1
-        labLevel = LabelFlat('【水準】')
-        layout.addWidget(labLevel, r, 0)
-
-        self.objComboLevel = objComboLevel = ComboBox()
-        list_json = get_doe_json(res)
-        objComboLevel.addItems(list_json)
-        objComboLevel.currentTextChanged.connect(self.on_json_changed)
-        layout.addWidget(objComboLevel, r, 1, 1, 2)
-
-        hpad = PadH()
-        layout.addWidget(hpad, r, 3, 1, col_max - 3)
-
-        r += 1
-        file_json = objComboLevel.currentText()
-        self.panelParam = panel_param = PanelParam(res, file_json)
-        layout.addWidget(panel_param, r, 0, 1, col_max)
-
-        r += 1
-        self.panelOutput = panel_output = PanelOutput(res)
-        panel_output.selectDir.connect(self.on_dir_dialog_select)
-        layout.addWidget(panel_output, r, 0, 1, col_max)
-
-        r += 1
-        self.btnStart = but_start = StartButton(res)
-        but_start.setFixedHeight(40)
-        but_start.setToolTip('シミュレーション開始')
-        but_start.clicked.connect(self.on_simulation_start)
-        layout.addWidget(but_start, r, 0, 1, col_max)
-
-        # ステータス・バー
+        # ステータスバー
         statusbar = StatusBar()
         self.setStatusBar(statusbar)
 
-        self.pbar = pbar = QProgressBar()
+        self.pbar = pbar = ProgressBar()
         self.pbar.setRange(0, 100)
         statusbar.addPermanentWidget(pbar, stretch=1)
 
     def closeEvent(self, event):
         print('アプリケーションを終了します。')
-        self.delete_winmain()
+        if self.broker is not None:
+            self.broker.deleteLater()
         event.accept()  # let the window close
 
-    def delete_winmain(self):
-        if self.winmain is not None:
-            self.winmain.hide()
-            self.winmain.deleteLater()
-            self.winmain = None
+    def exel_dir_selected(self, dir: str):
+        self.dock.setExcelDir(dir)
 
-    def on_dir_dialog_select(self):
-        dialog = DirDialog()
-        if not dialog.exec():
-            return
-
-        basedir = dialog.selectedFiles()[0]
-        dateStr = self.objDate.text()
-        if dateStr is not None:
-            self.path_output = path = os.path.join(basedir, dateStr)
-            self.panelOutput.setOutput(path)
-
-    def on_file_dialog_open(self):
+    def get_params4broker(self) -> dict:
         """
-        Excel Macro ファイルの読み込み
-        :return:
+        BrokerThreadLoop インスタンスへ渡すパラメータ
         """
-        dialog = FileDialogExcel(self.res)
-        # ファイルを選択されなければ何もしない
-        if not dialog.exec():
-            return
+        params = dict()
+        params['res'] = self.res
+        params['threadpool'] = self.threadpool
+        params['dock'] = self.dock
+        params['panel'] = self.win_main
+        params['pbar'] = self.pbar
 
-        file_excel = dialog.selectedFiles()[0]
-        self.ent_sheet.setExcelFile(file_excel)
-        self.but_choose.setEnabled(True)
+        return params
 
-    def on_excel_read(self):
+    def on_start_simulation(self):
         """
-        選択した Excel ファイルの読み込みと解析用データ準備
-        :param file_excel:
-        :return:
+        シミュレーション起動
         """
-        file_excel = self.ent_sheet.get_ExcelFile()
-        prep_ds = WorkerPrepDataset(file_excel)
-        prep_ds.updateProgress.connect(self.on_status_update)
-        prep_ds.threadFinished.connect(self.on_excel_read_completed)
-        self.threadpool.start(prep_ds)
+        params = self.get_params4broker()
+        self.broker = broker = BrokerThreadLoop(params)
+        broker.errorMessage.connect(self.on_show_error_message)
+        broker.simulationFinished.connect(self.on_simulation_finished)
 
-    def on_excel_read_completed(self, list_target):
-        """
-        データセットに基づき、銘柄毎のタブ画面を作成
-        :param list_target:
-        :return:
-        """
-        self.comboCode.clear()
-        for dict_target in list_target:
-            code = dict_target['code']
-            self.comboCode.addItem(code)
-            self.dict_dict_target[code] = dict_target
+        # BrokerThreadLoop インスタンスでシミュレーション開始
+        print('start simulation!')
+        broker.start()
 
-        self.objDate.setText(list_target[0]['date'])
+    def on_show_error_message(self, msg):
+        print(msg)
 
-        # 進捗をリセット
-        self.pbar.reset()
-
-    def on_json_changed(self, file_json: str):
-        self.panelParam.genTable(self.res, file_json)
-
-    def on_simulation_start(self):
-        if self.path_output is None:
-            print('結果の出力先が指定されていないので開始できません。')
-            return
-        elif not os.path.isdir(self.path_output):
-            os.mkdir(self.path_output)
-
-        # print([self.comboCode.itemText(i) for i in range(self.comboCode.count())])
-
-        self.code_counter = 0
-        self.loop_simulation_1_code()
-
-    def loop_simulation_1_code(self):
-        if self.comboCode.count() <= self.code_counter:
-            print('Completed!')
+    def on_simulation_finished(self, result: bool):
+        if result:
+            print('シミュレーションを正常終了しました。')
         else:
-            self.comboCode.setCurrentIndex(self.code_counter)
-            self.panelParam.clearTotal()
-            self.code_target = self.comboCode.currentText()
-            self.counter_max = self.panelParam.getLevelMax()
-            self.counter = 0
-
-            # AF 用シミュレーション・ループ開始
-            self.loop_simulation_2_af()
-
-    def loop_simulation_2_af(self):
-        # カウンターのインクリメント
-        self.counter += 1
-
-        # ---------------
-        #  Simulator 起動
-        # ---------------
-        if self.winmain == None:
-            dict_target = self.dict_dict_target[self.code_target]
-
-            dict_target['flag_losscut'] = False
-            dict_target['af_init'] = self.panelParam.getAFinit(self.counter)
-            dict_target['af_step'] = self.panelParam.getAFstep(self.counter)
-            dict_target['af_max'] = self.panelParam.getAFmax(self.counter)
-
-            if self.panelLossCut.IsLossCutEnabled():
-                dict_target['flag_losscut'] = True
-                dict_target['factor_losscut'] = self.panelLossCut.getLossCutFactor()
-            else:
-                dict_target['flag_losscut'] = False
-
-            self.winmain = WinMain(self.res, dict_target, self.threadpool, self.pbar)
-            self.winmain.simulationCompleted.connect(self.next_simulation)
-            self.winmain.setFixedSize(1600, 800)
-            self.winmain.show()
-        else:
-            af_init = self.panelParam.getAFinit(self.counter)
-            af_step = self.panelParam.getAFstep(self.counter)
-            af_max = self.panelParam.getAFmax(self.counter)
-
-            if self.panelLossCut.IsLossCutEnabled():
-                self.winmain.dock.setLossCutEnabled(True)
-            else:
-                self.winmain.dock.setLossCutEnabled(False)
-
-            self.winmain.dock.objAFinit.setValue(af_init)
-            self.winmain.dock.objAFstep.setValue(af_step)
-            self.winmain.dock.objAFmax.setValue(af_max)
-
-        self.winmain.autoSimulationStart()
-
-    def next_simulation(self, dict_result: dict):
-        name_chart = os.path.join(
-            self.path_output,
-            'chart_%s_%d.png' % (self.code_target, self.counter)
-        )
-        self.winmain.saveChart(name_chart)
-        print(self.code_target, self.counter, dict_result['total'])
-
-        # 結果の処理
-        self.panelParam.setTotal(self.counter, dict_result['total'])
-
-        # ループまたは終了処理
-        if self.counter < self.counter_max:
-            self.loop_simulation_2_af()
-        else:
-            self.delete_winmain()
-            name_html = os.path.join(
-                self.path_output,
-                'summary_%s_%d.html' % (self.code_target, self.counter)
-            )
-            self.panelParam.getResult(name_html)
-            self.code_counter += 1
-            # print('Completed!')
-            self.loop_simulation_1_code()
-
-    def on_status_update(self, progress: int):
-        self.pbar.setValue(progress)
-
-    def function_test(self):
-        self.panelParam.getResult('test.html')
+            print('シミュレーションを異常終了しました。')
 
 
 def main():
