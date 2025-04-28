@@ -3,7 +3,6 @@ import os
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
-import numpy as np
 import pandas as pd
 from matplotlib import dates as mdates
 from matplotlib.backends.backend_qtagg import (
@@ -28,17 +27,14 @@ class Canvas(FigureCanvas):
         self.fig = Figure()
         super().__init__(self.fig)
 
-        font = os.path.join(
-            res.dir_font,
-            'RictyDiminished-Regular.ttf',
-        )
+        font = os.path.join(res.dir_font, 'RictyDiminished-Regular.ttf')
         fm.fontManager.addfont(font)
         font_prop = fm.FontProperties(fname=font)
         plt.rcParams['font.family'] = font_prop.get_name()
         plt.rcParams['font.size'] = 14
 
         self.ax = dict()
-        n = 2
+        n = 3
 
         if n > 1:
             gs = self.fig.add_gridspec(
@@ -51,12 +47,7 @@ class Canvas(FigureCanvas):
         else:
             self.ax[0] = self.fig.add_subplot(111)
 
-        self.fig.subplots_adjust(
-            left=0.07,
-            right=0.99,
-            top=0.92,
-            bottom=0.06,
-        )
+        self.fig.subplots_adjust(left=0.07, right=0.99, top=0.92, bottom=0.06)
 
     def plot(self, dict_plot: dict):
         """
@@ -78,23 +69,13 @@ class Canvas(FigureCanvas):
         #  ティックデータ
         # =============
         idx = 0
-        self.ax[idx].plot(
-            df_tick['Price'],
-            color='black',
-            linewidth=0.5,
-            alpha=0.5,
-        )
+        self.ax[idx].plot(df_tick['Price'], color='black', linewidth=0.5, alpha=0.5)
 
         # PSAR トレンド
         df_bear = df_tick[df_tick['TREND'] < 0]
         df_bull = df_tick[df_tick['TREND'] > 0]
         for df, color in zip([df_bear, df_bull], ['blue', 'red']):
-            self.ax[idx].scatter(
-                x=df.index,
-                y=df['PSAR'],
-                color=color,
-                s=5,
-            )
+            self.ax[idx].scatter(x=df.index, y=df['PSAR'], color=color, s=5)
 
         # EP トレンド
         self.ax[idx].plot(df_tick['EP'], linewidth=1.25, linestyle='dotted', color='magenta', alpha=1, label=r'$EP$')
@@ -131,16 +112,9 @@ class Canvas(FigureCanvas):
 
         # X軸の時刻刻みを調整
         tick_position, tick_labels = getMajorXTicks(df_tick)
-        self.ax[idx].set_xticks(
-            ticks=tick_position,
-            labels=tick_labels,
-        )
-        self.ax[idx].xaxis.set_major_formatter(
-            mdates.DateFormatter('%H:%M')
-        )
-        self.ax[idx].set_xlim(
-            get_range_xaxis(df_tick)
-        )
+        self.ax[idx].set_xticks(ticks=tick_position, labels=tick_labels)
+        self.ax[idx].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+        self.ax[idx].set_xlim(get_range_xaxis(df_tick))
 
         # 判例
         self.ax[idx].legend(fontsize=9)
@@ -151,32 +125,29 @@ class Canvas(FigureCanvas):
             self.ax[idx].set_ylabel(dict_plot['ylabel_profit'])
             self.plot_profit(idx, df_profit)
 
+        # EP 更新回数
+        colname = 'EPupd'
+        if colname in df_tick.columns:
+            idx += 1
+            self.plot_epupd(idx, df_tick, colname)
+
         # グリッド線
         drawGrid(self.fig)
 
         # 再描画
         refreshDraw(self.fig)
 
-    def plot_profit(self, idx: int, df_profit: pd.DataFrame):
-        self.ax[idx].plot(
-            df_profit['Profit'],
-            color='black',
-            linewidth=0.5,
-            alpha=0.75,
-        )
-        self.ax[idx].plot(
-            df_profit['ProfitMax'],
-            color='red',
-            linewidth=0.5,
-            alpha=0.75,
-        )
-
+    def plot_epupd(self, idx, df_tick, colname):
+        self.ax[idx].set_ylabel('EP updated')
+        self.ax[idx].plot(df_tick[colname])
         # y = 0 の横線
-        self.ax[idx].axhline(
-            0,
-            linewidth=0.75,
-            color='#444',
-        )
+        self.ax[idx].axhline(0, linewidth=0.75, color='#444')
+
+    def plot_profit(self, idx: int, df_profit: pd.DataFrame):
+        self.ax[idx].plot(df_profit['Profit'], color='black', linewidth=0.5, alpha=0.75)
+        self.ax[idx].plot(df_profit['ProfitMax'], color='red', linewidth=0.5, alpha=0.75)
+        # y = 0 の横線
+        self.ax[idx].axhline(0, linewidth=0.75, color='#444')
 
     def save(self, filename):
         self.fig.savefig(filename)
@@ -187,10 +158,7 @@ class ChartOverlay(FigureCanvas):
         self.fig = Figure()
         super().__init__(self.fig)
 
-        font = os.path.join(
-            res.dir_font,
-            'RictyDiminished-Regular.ttf',
-        )
+        font = os.path.join(res.dir_font, 'RictyDiminished-Regular.ttf')
         fm.fontManager.addfont(font)
         font_prop = fm.FontProperties(fname=font)
         plt.rcParams['font.family'] = font_prop.get_name()
@@ -198,12 +166,7 @@ class ChartOverlay(FigureCanvas):
 
         self.ax = self.fig.add_subplot(111)
 
-        self.fig.subplots_adjust(
-            left=0.1,
-            right=0.95,
-            top=0.99,
-            bottom=0.05,
-        )
+        self.fig.subplots_adjust(left=0.1, right=0.95, top=0.99, bottom=0.05)
 
         self.x_max = None
         self.y_min = None
@@ -236,14 +199,8 @@ class ChartOverlay(FigureCanvas):
         # 消去
         clearAxes(self.fig)
 
-        self.ax.plot(
-            obj.getX(), obj.getY(),
-        )
-        self.ax.axhline(
-            0,
-            linewidth=0.75,
-            color='#444',
-        )
+        self.ax.plot(obj.getX(), obj.getY())
+        self.ax.axhline(0, linewidth=0.75, color='#444')
         self.ax.set_xlim(0, self.x_max)
         self.ax.set_ylim(self.y_min, self.y_max)
 
@@ -257,19 +214,13 @@ class ChartOverlay(FigureCanvas):
         refreshDraw(self.fig)
 
     def plotEach(self, obj: PairXY):
-        self.ax.plot(
-            obj.getX(), obj.getY(),
-        )
+        self.ax.plot(obj.getX(), obj.getY())
 
     def plotBlank(self):
         # 消去
         clearAxes(self.fig)
 
-        self.ax.axhline(
-            0,
-            linewidth=0.75,
-            color='#444',
-        )
+        self.ax.axhline(0, linewidth=0.75, color='#444')
         self.ax.set_xlim(0, self.x_max)
         self.ax.set_ylim(self.y_min, self.y_max)
 
@@ -292,10 +243,7 @@ class Contour(FigureCanvas):
         self.fig = Figure()
         super().__init__(self.fig)
 
-        font = os.path.join(
-            res.dir_font,
-            'RictyDiminished-Regular.ttf',
-        )
+        font = os.path.join(res.dir_font, 'RictyDiminished-Regular.ttf')
         fm.fontManager.addfont(font)
         font_prop = fm.FontProperties(fname=font)
         plt.rcParams['font.family'] = font_prop.get_name()
@@ -303,12 +251,7 @@ class Contour(FigureCanvas):
 
         self.ax = self.fig.add_subplot(111)
 
-        self.fig.subplots_adjust(
-            left=0.1,
-            right=0.975,
-            top=0.975,
-            bottom=0.1,
-        )
+        self.fig.subplots_adjust(left=0.1, right=0.975, top=0.975, bottom=0.1)
 
     def plot(self, dict_data: dict):
         # 消去
@@ -317,16 +260,8 @@ class Contour(FigureCanvas):
         x = dict_data['x']
         y = dict_data['y']
         z = dict_data['z']
-        cont = self.ax.contour(
-            x, y, z,
-            colors=['blue'],
-            linestyles='solid',
-            linewidths=0.5,
-        )
-        cont.clabel(
-            fmt='%.f',
-            fontsize=12,
-        )
+        cont = self.ax.contour(x, y, z, colors=['blue'], linestyles='solid', linewidths=0.5)
+        cont.clabel(fmt='%.f', fontsize=12)
 
         self.ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
         self.ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
