@@ -55,34 +55,47 @@ class Executor(QMainWindow):
 
     def closeEvent(self, event):
         print('アプリケーションを終了します。')
+        if self.broker is not None:
+            self.broker.deleteLater()
         event.accept()  # let the window close
 
     def exel_dir_selected(self, dir: str):
         self.dock.setExcelDir(dir)
 
-    def on_start_simulation(self):
+    def get_params4broker(self) -> dict:
+        """
+        BrokerThreadLoop インスタンスへ渡すパラメータ
+        """
         params = dict()
         params['res'] = self.res
         params['threadpool'] = self.threadpool
         params['dock'] = self.dock
         params['panel'] = self.win_main
         params['pbar'] = self.pbar
-        self.broker = broker = BrokerThreadLoop(params)
-        broker.errorMessage.connect(self.show_error_message)
-        broker.threadFinished.connect(self.thread_complete)
 
-        # シミュレーション開始
+        return params
+
+    def on_start_simulation(self):
+        """
+        シミュレーション起動
+        """
+        params = self.get_params4broker()
+        self.broker = broker = BrokerThreadLoop(params)
+        broker.errorMessage.connect(self.on_show_error_message)
+        broker.simulationFinished.connect(self.on_simulation_finished)
+
+        # BrokerThreadLoop インスタンスでシミュレーション開始
         print('start simulation!')
         broker.start()
 
-    def show_error_message(self, msg):
+    def on_show_error_message(self, msg):
         print(msg)
 
-    def thread_complete(self, result: bool):
+    def on_simulation_finished(self, result: bool):
         if result:
-            print('スレッド処理を正常終了しました。')
+            print('シミュレーションを正常終了しました。')
         else:
-            print('スレッド処理を異常終了しました。')
+            print('シミュレーションを異常終了しました。')
 
 
 def main():
