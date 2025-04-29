@@ -46,6 +46,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # 呼び値
         price_nominal = dict_param['price_nominal']
 
+        # 最小収益単位
+        self.price_min = price_nominal * unit
+
         # 損切（ロスカット）機能が有効か否か
         self.flag_losscut = dict_param['flag_losscut']
 
@@ -158,17 +161,33 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # -------------
                     # 未エントリの場合
                     # -------------
-                    if self.psar.getEPupd() > 5:
+                    if 5 <= self.psar.getEPupd():
                         # +++++++++++++++++++++++++++++++++++++++++++++
                         # 暫定エントリ条件
-                        # PSAR の EP が 1 回でも更新されていれば建玉を取得する
+                        # PSAR の EP が 5 回更新されていれば建玉を取得する
                         # +++++++++++++++++++++++++++++++++++++++++++++
                         self.position_open(t_current, p_current)
                         # エントリ・フラグを立てる
                         self.flag_entry = True
                 else:
-                    # エントリしている ＝ 建玉を持っている
-                    # 利確・損切
+                    # エントリしている ＝ 建玉を持っているはず？
+                    # 利確
+                    if self.posman.hasPosition():
+                        profit_max = self.posman.getProfitMax()
+                        if self.price_min * 50 < profit_max:
+                            r = 0.5
+                            if self.posman.getProfit(p_current) < profit_max * r:
+                                self.position_close(t_current, p_current)
+                        elif self.price_min * 25 < profit_max:
+                            r = 0.3
+                            if self.posman.getProfit(p_current) < profit_max * r:
+                                self.position_close(t_current, p_current)
+                        elif self.price_min * 10 < profit_max:
+                            r = 0.1
+                            if self.posman.getProfit(p_current) < profit_max * r:
+                                self.position_close(t_current, p_current)
+
+                    # 損切
                     pass
 
                 #  トレンド反転の判定処理（おわり）
@@ -191,7 +210,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             self.eval_profit(t_current, p_current)
 
         dict_result = dict()
-        dict_result['date']= self.date_str
+        dict_result['date'] = self.date_str
         dict_result['tick'] = self.psar.getPSAR()
         dict_result['profit'] = self.posman.getProfitHistory()
         dict_result['order'] = self.posman.getOrderHistory()
