@@ -78,7 +78,7 @@ class PositionManager:
         else:
             return False
 
-    def get_profit(self, price: float):
+    def get_profit(self, price: float) -> float:
         """
         保持しているトレンドから含み益を算出
         :param price: 株価
@@ -92,7 +92,7 @@ class PositionManager:
         elif self.trend < 0:
             return (self.price - price) * self.unit
         else:
-            return 0,
+            return 0.
 
     def getColFormatOrder(self) -> list:
         """
