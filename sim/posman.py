@@ -51,7 +51,7 @@ class PositionManager:
         :param price:
         :return:
         """
-        profit = self.get_profit(price)
+        profit = self.getProfit(price)
         if self.profit_max < profit:
             self.profit_max = profit
 
@@ -68,6 +68,12 @@ class PositionManager:
 
         return dict_profit
 
+    def getProfitMax(self) -> float:
+        """
+        最大含み益を取得
+        """
+        return self.profit_max
+
     def hasPosition(self):
         """
         建玉を持っているか？
@@ -78,7 +84,7 @@ class PositionManager:
         else:
             return False
 
-    def get_profit(self, price: float) -> float:
+    def getProfit(self, price: float) -> float:
         """
         保持しているトレンドから含み益を算出
         :param price: 株価
