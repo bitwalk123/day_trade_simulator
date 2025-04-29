@@ -14,18 +14,33 @@ class RealTimePSAR:
         self.af_step = af_step
         self.af_max = af_max
 
+        # ---------------------------------------------------------------------
+        # 【注意】
+        #  VBAの数値型変数はNullにならない。
+        #  https://www.relief.jp/docs/vba-check-if-isnull-numeric-variable.html
+        #  VBA への移植するためには、最終的に np.nan を使用しないコーディングにした方が良い
+        # ---------------------------------------------------------------------
+
+        # 一つ前の値 (6)
+        self.dt0 = 0
+        self.price0 = 0
+        self.trend0 = 0
+        self.ep0 = 0
+        self.af0 = -1 # AF は 0 以上の実数
+        self.psar0 = 0
+
         # トレンド反転したときの株価
-        self.baseline = np.nan
+        self.baseline = 0
 
         # トレンド ＆ EP 更新モニター
         self.n_trend = 1
         self.n_ep_update = 0
 
         # 双曲線の補助線（ロスカット用）
-        self.r = np.nan
-        self.p = np.nan
+        self.r = 0
+        self.p = 0
         self.q = q
-        self.x = np.nan
+        self.x = 0
 
         # クラス内で使用するデータフレーム
         df = pd.DataFrame()
@@ -37,32 +52,41 @@ class RealTimePSAR:
         r = len(self.df)
 
         if r == 0:
-            # --------------------------
-            #  最初は時刻と中立トレンドを記録
-            # --------------------------
+            # -----------------------------------------------------------------
+            # 【PSAR 最初の処理】
+            #  比較対象がないので、時刻と中立トレンドを記録
+            # -----------------------------------------------------------------
             trend1 = 0
-            ep1 = np.nan
-            af1 = np.nan
-            psar1 = np.nan
+            # ---------------------------------------------------------
+            # 【パラメータ更新】
+            #  中立の場合は nan
+            # ---------------------------------------------------------
+            ep1 = 0
+            af1 = -1
+            psar1 = 0
         else:
-            # 一つ前のデータをデータフレームから取得
-            dt0 = self.df.index[r - 1]
-            price0 = self.df.loc[dt0, 'Price']
-            trend0 = self.df.loc[dt0, 'TREND']
-            ep0 = self.df.loc[dt0, 'EP']
-            af0 = self.df.loc[dt0, 'AF']
-            psar0 = self.df.loc[dt0, 'PSAR']
-
             if r == 1:
-                trend1 = self.trend_from_prices(price0, price1)
+                # -------------------------------------------------------------
+                # 【PSAR 2番目の処理】
+                #  前の株価と差を確認して、差があればトレンド開始
+                # -------------------------------------------------------------
+                trend1 = self.trend_from_prices(self.price0, price1)
                 if trend1 == 0:
-                    ep1 = ep0
-                    af1 = af0
-                    psar1 = psar0
+                    # ---------------------------------------------------------
+                    # 【パラメータ初期値】
+                    #  中立の場合は nan
+                    # ---------------------------------------------------------
+                    ep1 = 0
+                    af1 = -1
+                    psar1 = 0
 
                     # トレンド反転したときの株価
                     self.baseline = np.nan
                 else:
+                    # ---------------------------------------------------------
+                    # 【パラメータ初期値】
+                    #  中立から最初のトレンド
+                    # ---------------------------------------------------------
                     ep1 = price1
                     af1 = self.af_init
                     psar1 = price1
@@ -73,17 +97,28 @@ class RealTimePSAR:
                     # トレンド ＆ EP 更新モニター
                     self.n_trend = 1
                     self.n_ep_update = 0
-            elif trend0 == 0:
-                # トレンドが中立の時（ほとんどありえないが念のため）
-                trend1 = self.trend_from_prices(price0, price1)
+            elif self.trend0 == 0:
+                # -------------------------------------------------------------
+                # 【トレンドが中立の時】
+                #  ストップ安・高になってしまった場合などを想定
+                # -------------------------------------------------------------
+                trend1 = self.trend_from_prices(self.price0, price1)
                 if trend1 == 0:
-                    ep1 = ep0
-                    af1 = af0
-                    psar1 = psar0
+                    # ---------------------------------------------------------
+                    # 【パラメータ初期値】
+                    #  中立の場合は nan
+                    # ---------------------------------------------------------
+                    ep1 = 0
+                    af1 = -1
+                    psar1 = 0
 
                     # トレンド反転したときの株価
-                    self.baseline = np.nan
+                    self.baseline = 0
                 else:
+                    # ---------------------------------------------------------
+                    # 【パラメータ初期値】
+                    #  中立から最初のトレンド
+                    # ---------------------------------------------------------
                     ep1 = price1
                     af1 = self.af_init
                     psar1 = price1
@@ -94,15 +129,19 @@ class RealTimePSAR:
                     # トレンド ＆ EP 更新モニター
                     self.n_trend = 1
                     self.n_ep_update = 0
-            elif self.cmp_psar(trend0, price1, psar0):
+            elif self.cmp_psar(self.trend0, price1, self.psar0):
                 # _/_/_/_/_/_/
                 # トレンド反転
                 # _/_/_/_/_/_/
-                trend1 = trend0 * -1
+                trend1 = self.trend0 * -1
 
+                # -------------------------------------------------------------
+                # 【パラメータ初期値】
+                # トレンド反転後の最初のトレンド
+                # -------------------------------------------------------------
                 ep1 = price1
                 af1 = self.af_init
-                psar1 = ep0
+                psar1 = self.ep0
 
                 # トレンド反転したときの株価
                 self.baseline = price1
@@ -113,63 +152,32 @@ class RealTimePSAR:
 
                 # 双曲線の補助線
                 self.p = price1
-                self.r = (price1 - ep0) * self.q
+                self.r = (price1 - self.ep0) * self.q
                 self.x = 0
             else:
                 # 同一トレンド
-                trend1 = trend0
+                trend1 = self.trend0
 
                 # トレンドモニター
                 self.n_trend += 1
 
                 # EP 更新するか？
-                if self.cmp_ep(trend0, price1, ep0):
+                if self.cmp_ep(self.trend0, price1, self.ep0):
                     # EP と AF の更新
-                    ep1, af1 = self.update_ep_af(price1, af0)
+                    ep1, af1 = self.update_ep_af(price1, self.af0)
 
                     # EP 更新モニター
                     self.n_ep_update += 1
                 else:
-                    ep1 = ep0
-                    af1 = af0
+                    ep1 = self.ep0
+                    af1 = self.af0
 
-                psar1 = self.update_psar(ep1, af1, psar0)
+                psar1 = self.update_psar(ep1, af1, self.psar0)
 
-        # データフレームに新たな行を追加
-        self.df.loc[dt1, 'Price'] = price1
-        self.df.loc[dt1, 'TREND'] = trend1
-        self.df.loc[dt1, 'EP'] = ep1
-        self.df.loc[dt1, 'AF'] = af1
-        self.df.loc[dt1, 'PSAR'] = psar1
-        self.df.loc[dt1, 'Baseline'] = self.baseline
-
-        # 双曲線の補助線
-        try:
-            self.df.loc[dt1, 'Losscut'] = self.p - self.r / (self.x + self.q)
-            self.x += 1
-        except ZeroDivisionError:
-            self.df.loc[dt1, 'Losscut'] = np.nan
-            print('ZeroDivisionError')
-
-        # トレンド＆EP更新モニター
-        self.df.loc[dt1, 'TrendN'] = self.n_trend
-        self.df.loc[dt1, 'EPupd'] = self.n_ep_update
+        self.update_info(dt1, price1, trend1, ep1, af1, psar1)
 
         # 現在のトレンドを返す
         return trend1
-
-    @staticmethod
-    def cmp_psar(trend: int, price: float, psar: float) -> bool:
-        if 0 < trend:
-            if price < psar:
-                return True
-            else:
-                return False
-        else:
-            if psar < price:
-                return True
-            else:
-                return False
 
     @staticmethod
     def cmp_ep(trend: int, price: float, ep: float) -> bool:
@@ -184,6 +192,19 @@ class RealTimePSAR:
             else:
                 return False
 
+    @staticmethod
+    def cmp_psar(trend: int, price: float, psar: float) -> bool:
+        if 0 < trend:
+            if price < psar:
+                return True
+            else:
+                return False
+        else:
+            if psar < price:
+                return True
+            else:
+                return False
+
     def getPSAR(self) -> pd.DataFrame:
         """
         PSAR のデータフレームを返す
@@ -194,10 +215,7 @@ class RealTimePSAR:
     @staticmethod
     def trend_from_prices(price0: float, price1: float) -> int:
         """
-        p0 と p1 を比較してトレンドを返す。
-        :param price0:
-        :param price1:
-        :return:
+        price0 と price1 を比較してトレンドを返す。
         """
         if price0 < price1:
             return 1
@@ -209,9 +227,6 @@ class RealTimePSAR:
     def update_ep_af(self, price: float, af: float) -> tuple[float, float]:
         """
         EP（極値）と AF（加速因数）の更新
-        :param price:
-        :param af:
-        :return:
         """
         # EP の更新
         ep_new = price
@@ -223,6 +238,39 @@ class RealTimePSAR:
             af_new = self.af_max
 
         return ep_new, af_new
+
+    def update_info(self, dt, price, trend, ep, af, psar):
+        self.dt0 = dt
+        self.price0 = price
+        self.trend0 = trend
+        self.ep0 = ep
+        self.af0 = af
+        self.psar0 = psar
+
+        # データフレームに新たな行を追加
+        self.df.loc[dt, 'Price'] = price
+        self.df.loc[dt, 'TREND'] = trend
+        if ep > 0:
+            self.df.loc[dt, 'EP'] = ep
+        if af >= 0:
+            self.df.loc[dt, 'AF'] = af
+        if psar > 0:
+            self.df.loc[dt, 'PSAR'] = psar
+        if self.baseline > 0:
+            self.df.loc[dt, 'Baseline'] = self.baseline
+
+        # 双曲線の補助線
+        if self.p > 0:
+            try:
+                self.df.loc[dt, 'Losscut'] = self.p - self.r / (self.x + self.q)
+                self.x += 1
+            except ZeroDivisionError:
+                self.df.loc[dt, 'Losscut'] = np.nan
+                print('ZeroDivisionError')
+
+        # トレンド＆EP更新モニター
+        self.df.loc[dt, 'TrendN'] = self.n_trend
+        self.df.loc[dt, 'EPupd'] = self.n_ep_update
 
     @staticmethod
     def update_psar(ep: float, af: float, psar: float) -> float:
