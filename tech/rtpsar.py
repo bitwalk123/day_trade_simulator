@@ -224,7 +224,8 @@ class RealTimePSAR:
 
         return ep_new, af_new
 
-    def update_psar(self, ep: float, af: float, psar: float) -> float:
+    @staticmethod
+    def update_psar(ep: float, af: float, psar: float) -> float:
         """
         PSAR を AF で更新
         :param ep:
