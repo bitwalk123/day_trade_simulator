@@ -2,7 +2,7 @@
 Parabolic SAR シミュレータ
 
 【特徴】
- 素直にドテン売買をするシンプルな Parabolic SAR
+ トレンド反転の後、エントリのタイミングを評価
 """
 import datetime
 
