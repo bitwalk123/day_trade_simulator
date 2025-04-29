@@ -26,7 +26,7 @@ class RealTimePSAR:
         self.price0 = 0
         self.trend0 = 0
         self.ep0 = 0
-        self.af0 = -1 # AF は 0 以上の実数
+        self.af0 = -1  # AF は 0 以上の実数
         self.psar0 = 0
 
         # トレンド反転したときの株価
@@ -204,6 +204,9 @@ class RealTimePSAR:
                 return True
             else:
                 return False
+
+    def getEPupd(self) -> int:
+        return self.n_ep_update
 
     def getPSAR(self) -> pd.DataFrame:
         """
