@@ -158,7 +158,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # -------------
                     # 未エントリの場合
                     # -------------
-                    if self.psar.getEPupd() > 0:
+                    if self.psar.getEPupd() > 5:
                         # +++++++++++++++++++++++++++++++++++++++++++++
                         # 暫定エントリ条件
                         # PSAR の EP が 1 回でも更新されていれば建玉を取得する
