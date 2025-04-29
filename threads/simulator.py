@@ -1,3 +1,9 @@
+"""
+Parabolic SAR シミュレータ
+
+【特徴】
+ 素直にドテン売買をするシンプルな Parabolic SAR
+"""
 import datetime
 
 import pandas as pd
@@ -47,7 +53,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             # 損切（ロスカット）因数
             factor_losscut = dict_param['factor_losscut']
             self.losscut = factor_losscut / price_nominal
-            #print('losscut', self.losscut)
+            # print('losscut', self.losscut)
         else:
             self.losscut = -100000.0  # バカヨケ
 
@@ -73,19 +79,21 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # 🧬 RealTimePSAR クラスのインスタンス
+        #
         self.psar = RealTimePSAR(af_init, af_step, af_max)
+        #
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
         # 🧬 建玉管理クラスのインスタンス
+        #
         self.posman = PositionManager(unit)
+        #
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
     def get_progress(self, t) -> int:
         """
         現在時刻から進捗度(%)を算出
-        :param t:
-        :return:
         """
         # 分子
         numerator = (t.timestamp() - self.t_start.timestamp()) * 100.0
@@ -97,7 +105,6 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
     def run(self):
         """
         シミュレータ本体
-        :return:
         """
         # 時刻、株価の初期化
         t_current = self.t_start
@@ -107,7 +114,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # 時刻ループ（はじめ）
         while t_current < self.t_end:
             # -----------------------------------------------------------------
-            # 🧿 システム時刻と進捗の通知
+            # 🧿 システム時刻と進捗を通知
             self.updateSystemTime.emit(
                 t_current.strftime(self.time_format),
                 self.get_progress(t_current)
@@ -172,6 +179,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # ---------------------------------------------------------------------
         # 🧿 スレッド処理の終了を通知
         self.threadFinished.emit(dict_result)
+        #
         # 🧿 シミュレーション処理の終了を通知（auto-simulation 用シグナル）
         self.simulationCompleted.emit(dict_result)
         # ---------------------------------------------------------------------
