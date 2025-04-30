@@ -67,6 +67,12 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         af_step = dict_param['af_step']
         af_max = dict_param['af_max']
 
+        # エントリ判定に使用する EP 更新回数
+        if 'epupd' in dict_param.keys():
+            self.epupd = dict_param['epupd']
+        else:
+            self.epupd = 0
+
         # シミュレーション用データ＆パラメータ（おわり）
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
@@ -158,36 +164,26 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     self.flag_entry = False
 
                 elif self.flag_entry is False:
-                    # -------------
-                    # 未エントリの場合
-                    # -------------
-                    if 5 <= self.psar.getEPupd():
-                        # +++++++++++++++++++++++++++++++++++++++++++++
-                        # 暫定エントリ条件
-                        # PSAR の EP が 5 回更新されていれば建玉を取得する
-                        # +++++++++++++++++++++++++++++++++++++++++++++
+                    # -----------------------------------------------
+                    # 【未エントリの場合】
+                    # エントリ条件
+                    # PSAR の EP が規定回数だけ更新されていれば建玉を取得する
+                    # -----------------------------------------------
+                    if self.epupd <= self.psar.getEPupd():
                         self.position_open(t_current, p_current)
                         # エントリ・フラグを立てる
                         self.flag_entry = True
-                else:
-                    # エントリしている ＝ 建玉を持っているはず？
+                elif self.posman.hasPosition():
+                    # 建玉あり
+                    profit = self.posman.getProfit(p_current)
+                    profit_max = self.posman.getProfitMax()
+
                     # 利確
-                    if self.posman.hasPosition():
-                        profit_max = self.posman.getProfitMax()
-                        if self.price_min * 50 < profit_max:
-                            r = 0.5
-                            if self.posman.getProfit(p_current) < profit_max * r:
-                                self.position_close(t_current, p_current)
-                        elif self.price_min * 25 < profit_max:
-                            r = 0.3
-                            if self.posman.getProfit(p_current) < profit_max * r:
-                                self.position_close(t_current, p_current)
-                        elif self.price_min * 10 < profit_max:
-                            r = 0.1
-                            if self.posman.getProfit(p_current) < profit_max * r:
-                                self.position_close(t_current, p_current)
 
                     # 損切
+                    pass
+                else:
+                    # トレンドの向きに急騰して、かつ、既に建玉を手放してしまった場合
                     pass
 
                 #  トレンド反転の判定処理（おわり）
