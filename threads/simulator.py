@@ -46,6 +46,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         # 呼び値
         price_nominal = dict_param['price_nominal']
 
+        # 最小収益単位
+        self.price_min = price_nominal * unit
+
         # 損切（ロスカット）機能が有効か否か
         self.flag_losscut = dict_param['flag_losscut']
 
@@ -63,6 +66,12 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         af_init = dict_param['af_init']
         af_step = dict_param['af_step']
         af_max = dict_param['af_max']
+
+        # エントリ判定に使用する EP 更新回数
+        if 'epupd' in dict_param.keys():
+            self.epupd = dict_param['epupd']
+        else:
+            self.epupd = 0
 
         # シミュレーション用データ＆パラメータ（おわり）
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
@@ -155,20 +164,26 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     self.flag_entry = False
 
                 elif self.flag_entry is False:
-                    # -------------
-                    # 未エントリの場合
-                    # -------------
-                    if self.psar.getEPupd() > 5:
-                        # +++++++++++++++++++++++++++++++++++++++++++++
-                        # 暫定エントリ条件
-                        # PSAR の EP が 1 回でも更新されていれば建玉を取得する
-                        # +++++++++++++++++++++++++++++++++++++++++++++
+                    # -----------------------------------------------
+                    # 【未エントリの場合】
+                    # エントリ条件
+                    # PSAR の EP が規定回数だけ更新されていれば建玉を取得する
+                    # -----------------------------------------------
+                    if self.epupd <= self.psar.getEPupd():
                         self.position_open(t_current, p_current)
                         # エントリ・フラグを立てる
                         self.flag_entry = True
+                elif self.posman.hasPosition():
+                    # 建玉あり
+                    profit = self.posman.getProfit(p_current)
+                    profit_max = self.posman.getProfitMax()
+
+                    # 利確
+
+                    # 損切
+                    pass
                 else:
-                    # エントリしている ＝ 建玉を持っている
-                    # 利確・損切
+                    # トレンドの向きに急騰して、かつ、既に建玉を手放してしまった場合
                     pass
 
                 #  トレンド反転の判定処理（おわり）
@@ -191,7 +206,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             self.eval_profit(t_current, p_current)
 
         dict_result = dict()
-        dict_result['date']= self.date_str
+        dict_result['date'] = self.date_str
         dict_result['tick'] = self.psar.getPSAR()
         dict_result['profit'] = self.posman.getProfitHistory()
         dict_result['order'] = self.posman.getOrderHistory()
