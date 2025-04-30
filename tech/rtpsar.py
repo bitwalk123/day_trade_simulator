@@ -205,6 +205,9 @@ class RealTimePSAR:
             else:
                 return False
 
+    def get_hyperbolic(self):
+        return self.p - self.r / (self.x + self.q)
+
     def getEPupd(self) -> int:
         return self.n_ep_update
 
@@ -265,7 +268,7 @@ class RealTimePSAR:
         # 双曲線の補助線
         if self.p > 0:
             try:
-                self.df.loc[dt, 'Losscut'] = self.p - self.r / (self.x + self.q)
+                self.df.loc[dt, 'Losscut'] = self.get_hyperbolic()
                 self.x += 1
             except ZeroDivisionError:
                 self.df.loc[dt, 'Losscut'] = np.nan

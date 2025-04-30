@@ -67,6 +67,12 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         af_step = dict_param['af_step']
         af_max = dict_param['af_max']
 
+        # エントリ判定に使用する EP 更新回数
+        if 'epupd' in dict_param.keys():
+            self.epupd = dict_param['epupd']
+        else:
+            self.epupd = 0
+
         # シミュレーション用データ＆パラメータ（おわり）
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
@@ -158,12 +164,12 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     self.flag_entry = False
 
                 elif self.flag_entry is False:
-                    # ------------------------------------------
+                    # -----------------------------------------------
                     # 【未エントリの場合】
                     # エントリ条件
-                    # PSAR の EP が 5 回更新されていれば建玉を取得する
-                    # ------------------------------------------
-                    if 5 <= self.psar.getEPupd():
+                    # PSAR の EP が規定回数だけ更新されていれば建玉を取得する
+                    # -----------------------------------------------
+                    if self.epupd <= self.psar.getEPupd():
                         self.position_open(t_current, p_current)
                         # エントリ・フラグを立てる
                         self.flag_entry = True
@@ -173,17 +179,6 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     profit_max = self.posman.getProfitMax()
 
                     # 利確
-                    if 1000.0 < profit_max and profit < profit_max * 0.5:
-                        self.position_close(t_current, p_current)
-                        continue
-
-                    if 500.0 < profit_max and profit < profit_max * 0.3:
-                        self.position_close(t_current, p_current)
-                        continue
-
-                    if 250.0 < profit_max and profit < profit_max * 0.1:
-                        self.position_close(t_current, p_current)
-                        continue
 
                     # 損切
                     pass
