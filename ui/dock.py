@@ -323,6 +323,12 @@ class DockMain(QDockWidget):
         dict_param['af_step'] = self.objAFstep.getValue()
         dict_param['af_max'] = self.objAFmax.getValue()
 
+    def getCode(self) -> str:
+        return self.objCode.text()
+
+    def getDate(self) -> str:
+        return self.objDate.text()
+
     def getNominalPrice(self) -> float:
         return self.objNominalPrice.getValue()
 

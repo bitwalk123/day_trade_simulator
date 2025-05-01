@@ -89,6 +89,12 @@ class WinMain(QMainWindow):
         # プロット
         canvas.plot(dict_plot)
 
+    def getCode(self) -> str:
+        return self.dock.getCode()
+
+    def getDate(self) -> str:
+        return self.dock.getDate()
+
     # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
     #  注文履歴
     # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_

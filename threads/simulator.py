@@ -71,7 +71,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         if 'epupd' in dict_param.keys():
             self.epupd = dict_param['epupd']
         else:
-            self.epupd = 3
+            self.epupd = 5
 
         # シミュレーション用データ＆パラメータ（おわり）
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
@@ -179,6 +179,13 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     profit_max = self.posman.getProfitMax()
 
                     # 利確
+                    if 150 <= profit_max and profit <= 50:
+                        # +++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        # 利確効果確認条件（最低限の利確条件）
+                        # 最大含み益が150円以上の場合で、現含み益が50以下になったら利確
+                        # +++++++++++++++++++++++++++++++++++++++++++++++++++++
+                        self.position_close(t_current, p_current)
+                        continue
 
                     # 損切
                     pass
