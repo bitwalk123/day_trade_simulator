@@ -71,7 +71,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         if 'epupd' in dict_param.keys():
             self.epupd = dict_param['epupd']
         else:
-            self.epupd = 0
+            self.epupd = 3
 
         # シミュレーション用データ＆パラメータ（おわり）
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
