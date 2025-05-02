@@ -103,6 +103,19 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         #
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
 
+    def eval_profit(self, t_current, p_current):
+        """
+        建玉管理インスタンスが保持しているトレンドに従って含み益を評価
+        :param t_current:
+        :param p_current:
+        :return:
+        """
+        dict_profit = self.posman.evalProfit(t_current, p_current)
+        # ---------------------------------------------------------------------
+        # 🧿 更新された含み益を通知
+        self.updateProfit.emit(dict_profit)
+        # ---------------------------------------------------------------------
+
     def get_progress(self, t) -> int:
         """
         現在時刻から進捗度(%)を算出
@@ -113,6 +126,34 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         denominator = self.t_end.timestamp() - self.t_start.timestamp()
 
         return int(numerator / denominator)
+
+    def position_close(self, t_current, p_current, note: str = ''):
+        """
+        建玉管理インスタンスが保持しているトレンドに従って建玉を返済
+        :param t_current:
+        :param p_current:
+        :param note:
+        :return:
+        """
+        total = self.posman.posClose(t_current, p_current, note)
+        # ---------------------------------------------------------------------
+        # 🧿 建玉を返却したことを通知
+        self.positionClose.emit(total)
+        # ---------------------------------------------------------------------
+
+    def position_open(self, t_current, p_current, note: str = ''):
+        """
+        建玉管理インスタンスが保持しているトレンドに従って建玉を持つ
+        :param t_current:
+        :param p_current:
+        :param note:
+        :return:
+        """
+        dict_position = self.posman.posOpen(t_current, p_current, note)
+        # ---------------------------------------------------------------------
+        # 🧿 建玉を持ったことを通知
+        self.positionOpen.emit(dict_position)
+        # ---------------------------------------------------------------------
 
     def run(self):
         """
@@ -178,18 +219,24 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     profit = self.posman.getProfit(p_current)
                     profit_max = self.posman.getProfitMax()
 
+                    # -----------------------------------------------
                     # 最低限の利確
+                    # -----------------------------------------------
                     if 500 <= profit_max and profit <= 50:
                         self.position_close(t_current, p_current)
                         continue
 
+                    # -----------------------------------------------
                     # 損切
-                    pass
+                    # -----------------------------------------------
+                    if self.should_losscut(p_current):
+                        self.position_close(t_current, p_current)
+                        continue
+
                 else:
                     # トレンドの向きに急騰して、
                     # かつ、既に建玉を返済している場合の二度買い処理
                     pass
-
                 #  トレンド反転の判定処理（おわり）
                 # =============================================================
 
@@ -225,51 +272,15 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         self.simulationCompleted.emit(dict_result)
         # ---------------------------------------------------------------------
 
-    def position_close(self, t_current, p_current, note: str = ''):
-        """
-        建玉管理インスタンスが保持しているトレンドに従って建玉を返済
-        :param t_current:
-        :param p_current:
-        :param note:
-        :return:
-        """
-        total = self.posman.posClose(t_current, p_current, note)
-        # ---------------------------------------------------------------------
-        # 🧿 建玉を返却したことを通知
-        self.positionClose.emit(total)
-        # ---------------------------------------------------------------------
-
-    def position_open(self, t_current, p_current, note: str = ''):
-        """
-        建玉管理インスタンスが保持しているトレンドに従って建玉を持つ
-        :param t_current:
-        :param p_current:
-        :param note:
-        :return:
-        """
-        dict_position = self.posman.posOpen(t_current, p_current, note)
-        # ---------------------------------------------------------------------
-        # 🧿 建玉を持ったことを通知
-        self.positionOpen.emit(dict_position)
-        # ---------------------------------------------------------------------
-
-    def eval_profit(self, t_current, p_current):
-        """
-        建玉管理インスタンスが保持しているトレンドに従って含み益を評価
-        :param t_current:
-        :param p_current:
-        :return:
-        """
-        dict_profit = self.posman.evalProfit(t_current, p_current)
-        # ---------------------------------------------------------------------
-        # 🧿 更新された含み益を通知
-        self.updateProfit.emit(dict_profit)
-        # ---------------------------------------------------------------------
-
-        # 損切（ロスカット）
-        if self.flag_losscut:
-            self.test_losscut(t_current, p_current, dict_profit)
-
-    def test_losscut(self, t_current, p_current, dict_profit):
-        if dict_profit['profit'] < 0 and self.losscut < self.psar.getPricePSARDelta(p_current):
-            self.position_close(t_current, p_current, '損切')
+    def should_losscut(self, price: float) -> bool:
+        losscut = self.psar.get_hyperbolic()
+        if 0 < self.posman.getTrend():
+            if price < losscut:
+                return True
+            else:
+                return False
+        else:
+            if losscut < price:
+                return True
+            else:
+                return False
