@@ -3,6 +3,7 @@ import os
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import numpy as np
 import pandas as pd
 from matplotlib import dates as mdates
 from matplotlib.backends.backend_qtagg import (
@@ -140,6 +141,9 @@ class Canvas(FigureCanvas):
     def plot_epupd(self, idx, df_tick, colname):
         self.ax[idx].set_ylabel('EP updated')
         self.ax[idx].plot(df_tick[colname])
+        _, end = self.ax[idx].get_ylim()
+        self.ax[idx].yaxis.set_ticks(np.arange(0, end, 5))
+        self.ax[idx].tick_params(axis='y', labelsize=9)
         # y = 0 の横線
         self.ax[idx].axhline(0, linewidth=0.75, color='#444')
 

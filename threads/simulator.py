@@ -178,19 +178,16 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     profit = self.posman.getProfit(p_current)
                     profit_max = self.posman.getProfitMax()
 
-                    # 利確
-                    if 300 <= profit_max and profit <= 50:
-                        # +++++++++++++++++++++++++++++++++++++++++++++++++++++
-                        # 利確効果確認条件（最低限の利確条件）
-                        # 最大含み益が500円以上の場合で、現含み益が50以下になったら利確
-                        # +++++++++++++++++++++++++++++++++++++++++++++++++++++
+                    # 最低限の利確
+                    if 500 <= profit_max and profit <= 50:
                         self.position_close(t_current, p_current)
                         continue
 
                     # 損切
                     pass
                 else:
-                    # トレンドの向きに急騰して、かつ、既に建玉を手放してしまった場合
+                    # トレンドの向きに急騰して、
+                    # かつ、既に建玉を返済している場合の二度買い処理
                     pass
 
                 #  トレンド反転の判定処理（おわり）
