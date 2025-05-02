@@ -179,7 +179,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     profit_max = self.posman.getProfitMax()
 
                     # 利確
-                    if 500 <= profit_max and profit <= 50:
+                    if 300 <= profit_max and profit <= 50:
                         # +++++++++++++++++++++++++++++++++++++++++++++++++++++
                         # 利確効果確認条件（最低限の利確条件）
                         # 最大含み益が500円以上の場合で、現含み益が50以下になったら利確
