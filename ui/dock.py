@@ -210,37 +210,64 @@ class DockMain(QDockWidget):
         labParameter = LabelFlat('【パラメータ】')
         layout.addWidget(labParameter, r, 0)
 
-        r += 1
-        labPSAR = LabelFlatRight('Parabolic SAR')
-        layout.addWidget(labPSAR, r, 0)
+        # r += 1
+        # labPSAR = LabelFlatRight('Parabolic SAR')
+        # layout.addWidget(labPSAR, r, 0)
 
+        # ---------------------------------------------------------------------
+        #  Parabilic SAR AF（初期値）
+        # ---------------------------------------------------------------------
         r += 1
         labAFinit = LabelTitle('AF（初期値）')
         layout.addWidget(labAFinit, r, 0)
 
         self.objAFinit = objAFinit = LabelFloat()
         objAFinit.setValue(dict_target['af_init'])
-        layout.addWidget(objAFinit, r, 1, 1, 2)
+        layout.addWidget(objAFinit, r, 1)
 
         self.objAFedit = objAFedit = EditButton(res)
         objAFedit.clicked.connect(self.on_modify_af)
         layout.addWidget(objAFedit, r, 3, 3, 1)
 
+        # ---------------------------------------------------------------------
+        #  Parabilic SAR AF（ステップ）
+        # ---------------------------------------------------------------------
         r += 1
         labAFstep = LabelTitle('AF（ステップ）')
         layout.addWidget(labAFstep, r, 0)
 
         self.objAFstep = objAFstep = LabelFloat()
         objAFstep.setValue(dict_target['af_step'])
-        layout.addWidget(objAFstep, r, 1, 1, 2)
+        layout.addWidget(objAFstep, r, 1)
 
+        # ---------------------------------------------------------------------
+        #  Parabilic SAR AF（最大値）
+        # ---------------------------------------------------------------------
         r += 1
         labAFmax = LabelTitle('AF（最大値）')
         layout.addWidget(labAFmax, r, 0)
 
         self.objAFmax = objAFmax = LabelFloat()
         objAFmax.setValue(dict_target['af_max'])
-        layout.addWidget(objAFmax, r, 1, 1, 2)
+        layout.addWidget(objAFmax, r, 1)
+
+        # ---------------------------------------------------------------------
+        #  EP 更新回数によるエントリ・ポイント
+        # ---------------------------------------------------------------------
+        r += 1
+        labEPupd = LabelTitle('エントリ')
+        layout.addWidget(labEPupd, r, 0)
+
+        self.objEPupd = objEPupd = LabelInt()
+        if 'epupd' in dict_target:
+            objEPupd.setValue(dict_target['epupd'])
+        else:
+            objEPupd.setValue(5)
+        layout.addWidget(objEPupd, r, 1)
+
+        self.objEPupdEdit = objEPupdEdit = EditButton(res)
+        objEPupdEdit.clicked.connect(self.on_modify_epupd)
+        layout.addWidget(objEPupdEdit, r, 3)
 
         r += 1
         labLossCut = LabelFlatRight('損切')
@@ -359,6 +386,9 @@ class DockMain(QDockWidget):
             self.objAFinit.setValue(dict_af['af_init'])
             self.objAFstep.setValue(dict_af['af_step'])
             self.objAFmax.setValue(dict_af['af_max'])
+
+    def on_modify_epupd(self):
+        pass
 
     def on_modify_factor_losscut(self):
         pass
