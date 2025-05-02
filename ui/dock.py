@@ -344,11 +344,13 @@ class DockMain(QDockWidget):
         """
         Parabolic SAR の AF（加速因数）パラメータの取得
         :param dict_param: パラメータを保持する辞書
-        :return:
         """
         dict_param['af_init'] = self.objAFinit.getValue()
         dict_param['af_step'] = self.objAFstep.getValue()
         dict_param['af_max'] = self.objAFmax.getValue()
+
+    def getEPupd(self, dict_param: dict):
+        dict_param['epupd'] = self.objEPupd.getValue()
 
     def getCode(self) -> str:
         return self.objCode.text()
