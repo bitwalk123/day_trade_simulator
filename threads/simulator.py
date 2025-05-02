@@ -178,18 +178,30 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     profit = self.posman.getProfit(p_current)
                     profit_max = self.posman.getProfitMax()
 
+                    # -----------------------------------------------
                     # 最低限の利確
+                    # -----------------------------------------------
                     if 500 <= profit_max and profit <= 50:
                         self.position_close(t_current, p_current)
                         continue
 
+                    # -----------------------------------------------
                     # 損切
-                    pass
+                    # -----------------------------------------------
+                    losscut = self.psar.get_hyperbolic()
+                    if 0 < self.posman.getTrend():
+                        if p_current < losscut:
+                            self.position_close(t_current, p_current)
+                            continue
+                    else:
+                        if losscut < p_current:
+                            self.position_close(t_current, p_current)
+                            continue
+
                 else:
                     # トレンドの向きに急騰して、
                     # かつ、既に建玉を返済している場合の二度買い処理
                     pass
-
                 #  トレンド反転の判定処理（おわり）
                 # =============================================================
 
