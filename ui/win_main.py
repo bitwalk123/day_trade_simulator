@@ -65,9 +65,9 @@ class WinMain(QMainWindow):
         )
 
         # チャートのサブタイトル書式 (1)
-        self.af_param_format = 'AF: init = %.5f, step = %.5f, max = %.5f'
+        self.af_param_format = 'AF: init = %.5f, step = %.5f, max = %.5f, epupd = %d'
         # チャートのサブタイトル書式 (2)
-        self.af_param_locccut_format = 'AF: init = %.5f, step = %.5f, max = %.5f, losscut factor = %d'
+        self.af_param_locccut_format = 'AF: init = %.5f, step = %.5f, max = %.5f, epupd = %d, losscut factor = %d'
 
         # _____________________________________________________________________
         # チャートに渡す情報を dict_target にせずに、
@@ -75,10 +75,13 @@ class WinMain(QMainWindow):
         # これは、パラメータを変更して再描画するために自由度を確保するため。
         dict_plot = dict()
         dict_plot['title'] = dict_target['title']
+        if 'epupd' not in dict_target:
+            dict_target['epupd'] = -1
         dict_plot['subtitle'] = self.af_param_format % (
             dict_target['af_init'],
             dict_target['af_step'],
-            dict_target['af_max']
+            dict_target['af_max'],
+            dict_target['epupd']
         )
         dict_plot['price_nominal'] = dict_target['price_nominal']
         dict_plot['tick'] = dict_target['tick']
@@ -152,20 +155,25 @@ class WinMain(QMainWindow):
         dict_plot['title'] = self.dict_target['title']
 
         dict_param = dict()
+        # AF パラメータ
         self.dock.getAFparams(dict_param)
+        # エントリ・ポイント EP update
+        self.dock.getEPupd(dict_param)
         if self.dock.isLossCutEnabled():
             losscut_factor = self.dock.objFactorLosscut.getValue()
             dict_plot['subtitle'] = self.af_param_locccut_format % (
                 dict_param['af_init'],
                 dict_param['af_step'],
                 dict_param['af_max'],
+                dict_param['epupd'],
                 losscut_factor
             )
         else:
             dict_plot['subtitle'] = self.af_param_format % (
                 dict_param['af_init'],
                 dict_param['af_step'],
-                dict_param['af_max']
+                dict_param['af_max'],
+                dict_param['epupd']
             )
 
         dict_plot['price_nominal'] = self.dock.getNominalPrice()
