@@ -16,7 +16,7 @@ from widgets.statusbar import StatusBar
 
 class Executor(QMainWindow):
     __app_name__ = 'Executor'
-    __version__ = '2.0.0'
+    __version__ = '2.1.0'
 
     def __init__(self):
         super().__init__()
