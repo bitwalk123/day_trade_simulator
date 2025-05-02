@@ -63,6 +63,10 @@ class BrokerThreadLoop(QObject):
         シミュレーションのメイン処理
         シミュレータに条件を書き込んでシミュレーターを起動する処理
         """
+        # 銘柄と日付を更新
+        self.panel.setCode(self.winmain.getCode())
+        self.panel.setDate(self.winmain.getDate())
+
         n_condition = self.counter.getCountCondition()
         af_init = self.panel.getAFinit(n_condition)
         af_step = self.panel.getAFstep(n_condition)
@@ -204,10 +208,7 @@ class BrokerThreadLoop(QObject):
 
     def on_excel_read_completed(self, list_target):
         """
-        Excel ファイルを読み込んだ後、
-        データセットに基づき、銘柄毎のタブ画面を作成
-        :param list_target:
-        :return:
+        Excel ファイルを読み込んだ後の処理
         """
         print(self.files[self.counter.getCountFile()])
 
