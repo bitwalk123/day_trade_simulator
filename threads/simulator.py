@@ -222,6 +222,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # -----------------------------------------------
                     # 最低限の利確
                     # -----------------------------------------------
+                    # 最大含み益が 500 円より大きい場合の利確水準
                     factor_profit = 0.1
                     if 500 <= profit_max and profit <= profit_max * factor_profit:
                         self.position_close(t_current, p_current)
@@ -230,10 +231,12 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # -----------------------------------------------
                     # 損切
                     # -----------------------------------------------
-                    if profit_max == 0 and profit <= -500:
+                    # 最大含み益が 0 より大きかった場合に許容できる最大損失額
+                    if 0 <= profit_max and profit <= -500:
                         self.position_close(t_current, p_current)
                         continue
 
+                    # 許容できる最大損失額
                     if profit <= -1000:
                         self.position_close(t_current, p_current)
                         continue
