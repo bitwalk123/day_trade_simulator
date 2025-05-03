@@ -222,16 +222,27 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # -----------------------------------------------
                     # 最低限の利確
                     # -----------------------------------------------
-                    if 500 <= profit_max and profit <= 50:
+                    factor_profit = 0.1
+                    if 500 <= profit_max and profit <= profit_max * factor_profit:
                         self.position_close(t_current, p_current)
                         continue
 
                     # -----------------------------------------------
                     # 損切
                     # -----------------------------------------------
+                    if profit_max == 0 and profit <= -500:
+                        self.position_close(t_current, p_current)
+                        continue
+
+                    if profit <= -1000:
+                        self.position_close(t_current, p_current)
+                        continue
+
+                    """
                     if self.should_losscut(p_current):
                         self.position_close(t_current, p_current)
                         continue
+                    """
 
                 else:
                     # トレンドの向きに急騰して、
@@ -272,15 +283,17 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         self.simulationCompleted.emit(dict_result)
         # ---------------------------------------------------------------------
 
-    def should_losscut(self, price: float) -> bool:
-        losscut = self.psar.get_hyperbolic()
+    def should_losscut(self, price_current: float) -> bool:
+        price_hyper = self.psar.get_hyperbolic()
+        # 許容する損失額
+        ls_margin = +50  # 価格差を捉えたいので符号はプラスで考える
         if 0 < self.posman.getTrend():
-            if price < losscut:
+            if ls_margin < price_hyper - price_current:
                 return True
             else:
                 return False
         else:
-            if losscut < price:
+            if ls_margin < price_current - price_hyper:
                 return True
             else:
                 return False
