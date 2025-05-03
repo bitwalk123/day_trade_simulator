@@ -218,6 +218,9 @@ class RealTimePSAR:
         """
         return self.df
 
+    def getTrendN(self) -> int:
+        return self.n_trend
+
     @staticmethod
     def trend_from_prices(price0: float, price1: float) -> int:
         """
