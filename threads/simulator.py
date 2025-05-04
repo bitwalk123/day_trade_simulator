@@ -74,7 +74,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         else:
             self.epupd = 5
         """
-        self.epupd = 2
+        self.epupd = 3
 
         # シミュレーション用データ＆パラメータ（おわり）
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
