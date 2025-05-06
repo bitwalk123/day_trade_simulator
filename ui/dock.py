@@ -262,7 +262,7 @@ class DockMain(QDockWidget):
         if 'epupd' in dict_target:
             objEPupd.setValue(dict_target['epupd'])
         else:
-            objEPupd.setValue(5)
+            objEPupd.setValue(1)
         layout.addWidget(objEPupd, r, 1)
 
         self.objEPupdEdit = objEPupdEdit = EditButton(res)

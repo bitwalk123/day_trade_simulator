@@ -196,7 +196,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                 if self.posman.getTrend() != trend:
                     # 建玉を持って入れば返済
                     if self.posman.hasPosition():
-                        self.position_close(t_current, p_current)
+                        self.position_close(t_current, p_current, 'トレンド反転')
 
                     # トレンドを更新
                     self.posman.setTrend(trend)
@@ -244,10 +244,11 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                         self.position_close(t_current, p_current)
                         continue
 
-                    if self.should_losscut(p_current):
-                        self.position_close(t_current, p_current)
-                        continue
                     """
+                    # 双曲線を抜けた場合の損切
+                    if self.should_losscut(p_current):
+                        self.position_close(t_current, p_current, '損切（双曲線）')
+                        continue
 
                 else:
                     # トレンドの向きに急騰して、
@@ -290,15 +291,13 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
     def should_losscut(self, price_current: float) -> bool:
         price_hyper = self.psar.get_hyperbolic()
-        # 許容する損失額
-        ls_margin = +50  # 価格差を捉えたいので符号はプラスで考える
         if 0 < self.posman.getTrend():
-            if ls_margin < price_hyper - price_current:
+            if price_current < price_hyper:
                 return True
             else:
                 return False
         else:
-            if ls_margin < price_current - price_hyper:
+            if price_hyper < price_current:
                 return True
             else:
                 return False
