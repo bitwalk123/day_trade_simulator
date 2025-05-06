@@ -16,7 +16,7 @@ from widgets.labels import (
     LabelFlat,
     LabelTitleLeft,
 )
-from widgets.spinbox import DoubleSpinBox
+from widgets.spinbox import DoubleSpinBox, SpinBox
 
 
 def DialogWarning(message: str):
@@ -115,6 +115,59 @@ class DlgAFSetting(QDialog):
         self.dict_af['af_init'] = self.objAFinit.value()
         self.dict_af['af_step'] = self.objAFstep.value()
         self.dict_af['af_max'] = self.objAFmax.value()
+        self.accept()
+
+    def clickedRejectButton(self):
+        """
+        Cancel ボタンをクリックしたときの処理
+        :return:
+        """
+        self.reject()
+
+class DlgEntrySetting(QDialog):
+    """
+    Parabolic SAR の AF（加速因数）用の設定ダイアログ
+    """
+
+    def __init__(self, res: AppRes, dict_entry: dict):
+        super().__init__()
+        self.dict_entry = dict_entry
+
+        icon = QIcon(os.path.join(res.dir_image, 'pencil.png'))
+        self.setWindowIcon(icon)
+        self.setWindowTitle('エントリ条件の設定')
+
+        layout_base = QVBoxLayout()
+        self.setLayout(layout_base)
+
+        base = Frame()
+        layout_base.addWidget(base)
+
+        layout = QGridLayout()
+        layout.setSpacing(0)
+        base.setLayout(layout)
+
+        r = 0
+        labAFinit = LabelTitleLeft('EP 更新回数')
+        layout.addWidget(labAFinit, r, 0)
+
+        self.objEPupd = objEPupd = SpinBox()
+        objEPupd.setValue(self.dict_entry['epupd'])
+        layout.addWidget(objEPupd, r, 1)
+
+        # ダイアログ用ボタンボックス
+        dlgbtn = QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        bbox = QDialogButtonBox(dlgbtn)
+        bbox.accepted.connect(self.clickedAcceptButton)
+        bbox.rejected.connect(self.clickedRejectButton)
+        layout_base.addWidget(bbox)
+
+    def clickedAcceptButton(self):
+        """
+        Ok ボタンをクリックしたときの処理
+        :return:
+        """
+        self.dict_entry['epupd'] = self.objEPupd.value()
         self.accept()
 
     def clickedRejectButton(self):

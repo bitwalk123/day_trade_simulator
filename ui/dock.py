@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
 
 from structs.res import AppRes
 from widgets.checks import CheckBoxLossCut
-from widgets.dialog import DlgAFSetting
+from widgets.dialog import DlgAFSetting, DlgEntrySetting
 from widgets.buttons import EditButton, StartButton
 from widgets.container import Frame, PadH
 from widgets.labels import (
@@ -377,7 +377,6 @@ class DockMain(QDockWidget):
     def on_modify_af(self):
         """
         Parabolic SAR の AF パラメータの編集ダイアログ
-        :return:
         """
         dict_af = dict()
         self.getAFparams(dict_af)
@@ -390,7 +389,13 @@ class DockMain(QDockWidget):
             self.objAFmax.setValue(dict_af['af_max'])
 
     def on_modify_epupd(self):
-        pass
+        dict_entry = dict()
+        dict_entry['epupd'] = self.objEPupd.getValue()
+
+        # 設定ダイアログを表示
+        dlg = DlgEntrySetting(self.res, dict_entry)
+        if dlg.exec():
+            self.objEPupd.setValue(dict_entry['epupd'])
 
     def on_modify_factor_losscut(self):
         pass
