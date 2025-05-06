@@ -68,13 +68,10 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
         af_max = dict_param['af_max']
 
         # エントリ判定に使用する EP 更新回数
-        """
         if 'epupd' in dict_param.keys():
             self.epupd = dict_param['epupd']
         else:
             self.epupd = 5
-        """
-        self.epupd = 5
 
         # シミュレーション用データ＆パラメータ（おわり）
         # _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_
