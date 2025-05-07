@@ -35,7 +35,7 @@ class Canvas(FigureCanvas):
         plt.rcParams['font.size'] = 14
 
         self.ax = dict()
-        n = 3
+        n = 4
 
         if n > 1:
             gs = self.fig.add_gridspec(
@@ -126,6 +126,12 @@ class Canvas(FigureCanvas):
             self.ax[idx].set_ylabel(dict_plot['ylabel_profit'])
             self.plot_profit(idx, df_profit)
 
+        # Trend 継続回数
+        colname = 'TrendN'
+        if colname in df_tick.columns:
+            idx += 1
+            self.plot_trendn(idx, df_tick, colname)
+
         # EP 更新回数
         colname = 'EPupd'
         if colname in df_tick.columns:
@@ -141,8 +147,8 @@ class Canvas(FigureCanvas):
     def plot_epupd(self, idx, df_tick, colname):
         self.ax[idx].set_ylabel('EP updated')
         self.ax[idx].plot(df_tick[colname])
-        _, end = self.ax[idx].get_ylim()
-        self.ax[idx].yaxis.set_ticks(np.arange(0, end, 5))
+        _, y_max = self.ax[idx].get_ylim()
+        self.ax[idx].yaxis.set_ticks(np.arange(0, y_max, 5))
         self.ax[idx].tick_params(axis='y', labelsize=9)
         # y = 0 の横線
         self.ax[idx].axhline(0, linewidth=0.75, color='#444')
@@ -150,6 +156,25 @@ class Canvas(FigureCanvas):
     def plot_profit(self, idx: int, df_profit: pd.DataFrame):
         self.ax[idx].plot(df_profit['Profit'], color='black', linewidth=0.5, alpha=0.75)
         self.ax[idx].plot(df_profit['ProfitMax'], color='red', linewidth=0.5, alpha=0.75)
+        """
+        y_min, y_max = self.ax[idx].get_ylim()
+        if y_max < 1000:
+            self.ax[idx].yaxis.set_ticks(np.arange(y_min, y_max, 100))
+        elif y_max < 2000:
+            self.ax[idx].yaxis.set_ticks(np.arange(y_min, y_max, 200))
+        else:
+            self.ax[idx].yaxis.set_ticks(np.arange(y_min, y_max, 500))
+        """
+        self.ax[idx].tick_params(axis='y', labelsize=9)
+        # y = 0 の横線
+        self.ax[idx].axhline(0, linewidth=0.75, color='#444')
+
+    def plot_trendn(self, idx, df_tick, colname):
+        self.ax[idx].set_ylabel('TrendN')
+        self.ax[idx].plot(df_tick[colname])
+        _, y_max = self.ax[idx].get_ylim()
+        self.ax[idx].yaxis.set_ticks(np.arange(0, y_max, 200))
+        self.ax[idx].tick_params(axis='y', labelsize=9)
         # y = 0 の横線
         self.ax[idx].axhline(0, linewidth=0.75, color='#444')
 

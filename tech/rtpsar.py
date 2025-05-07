@@ -9,7 +9,7 @@ class RealTimePSAR:
     """
     __version__ = '1.4.0'
 
-    def __init__(self, af_init=0.000, af_step=0.001, af_max=0.01, q=50):
+    def __init__(self, af_init=0.000, af_step=0.001, af_max=0.01, q=200):
         self.af_init = af_init
         self.af_step = af_step
         self.af_max = af_max
@@ -217,6 +217,9 @@ class RealTimePSAR:
         :return: PSAR のデータフレーム
         """
         return self.df
+
+    def getTrendN(self) -> int:
+        return self.n_trend
 
     @staticmethod
     def trend_from_prices(price0: float, price1: float) -> int:
