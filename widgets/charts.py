@@ -148,7 +148,11 @@ class Canvas(FigureCanvas):
         self.ax[idx].set_ylabel('EP updated')
         self.ax[idx].plot(df_tick[colname])
         _, y_max = self.ax[idx].get_ylim()
-        self.ax[idx].yaxis.set_ticks(np.arange(0, y_max, 5))
+        if y_max > 50:
+            self.ax[idx].yaxis.set_ticks(np.arange(0, y_max, 10))
+        else:
+            self.ax[idx].yaxis.set_ticks(np.arange(0, y_max, 5))
+
         self.ax[idx].tick_params(axis='y', labelsize=9)
         # y = 0 の横線
         self.ax[idx].axhline(0, linewidth=0.75, color='#444')
@@ -156,15 +160,6 @@ class Canvas(FigureCanvas):
     def plot_profit(self, idx: int, df_profit: pd.DataFrame):
         self.ax[idx].plot(df_profit['Profit'], color='black', linewidth=0.5, alpha=0.75)
         self.ax[idx].plot(df_profit['ProfitMax'], color='red', linewidth=0.5, alpha=0.75)
-        """
-        y_min, y_max = self.ax[idx].get_ylim()
-        if y_max < 1000:
-            self.ax[idx].yaxis.set_ticks(np.arange(y_min, y_max, 100))
-        elif y_max < 2000:
-            self.ax[idx].yaxis.set_ticks(np.arange(y_min, y_max, 200))
-        else:
-            self.ax[idx].yaxis.set_ticks(np.arange(y_min, y_max, 500))
-        """
         self.ax[idx].tick_params(axis='y', labelsize=9)
         # y = 0 の横線
         self.ax[idx].axhline(0, linewidth=0.75, color='#444')
@@ -173,7 +168,19 @@ class Canvas(FigureCanvas):
         self.ax[idx].set_ylabel('TrendN')
         self.ax[idx].plot(df_tick[colname])
         _, y_max = self.ax[idx].get_ylim()
-        self.ax[idx].yaxis.set_ticks(np.arange(0, y_max, 200))
+        if y_max > 10000:
+            self.ax[idx].yaxis.set_ticks(np.arange(0, y_max, 2000))
+        elif y_max > 5000:
+            self.ax[idx].yaxis.set_ticks(np.arange(0, y_max, 1000))
+        elif y_max > 1000:
+            self.ax[idx].yaxis.set_ticks(np.arange(0, y_max, 500))
+        elif y_max > 500:
+            self.ax[idx].yaxis.set_ticks(np.arange(0, y_max, 100))
+        elif y_max > 100:
+            self.ax[idx].yaxis.set_ticks(np.arange(0, y_max, 20))
+        else:
+            self.ax[idx].yaxis.set_ticks(np.arange(0, y_max, 10))
+
         self.ax[idx].tick_params(axis='y', labelsize=9)
         # y = 0 の横線
         self.ax[idx].axhline(0, linewidth=0.75, color='#444')

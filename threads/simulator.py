@@ -218,25 +218,23 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # 建玉あり
                     profit = self.posman.getProfit(p_current)
                     profit_max = self.posman.getProfitMax()
+                    n_trend = self.psar.getTrendN()
 
                     # -----------------------------------------------
                     # 最低限の利確・損切
                     # -----------------------------------------------
-                    """
-                    # 最大含み益が 500 円より大きい場合の利確水準
-                    factor_profit = 0
-                    # if 500 <= profit_max and profit <= profit_max * factor_profit:
-                    if 500 <= profit_max and profit <= 0:
+                    # 最大含み益が 1000 円より大きい場合の利確水準
+                    factor_profit = 0.3
+                    if 1000 <= profit_max and profit <= profit_max * factor_profit:
                         self.position_close(t_current, p_current)
                         continue
-                    """
 
                     # -----------------------------------------------
                     # 損切
                     # -----------------------------------------------
                     """
-                    # 最大含み益が 0 より大きかった場合に許容できる最大損失額
-                    if 0 <= profit_max and profit <= -500:
+                    # 最大含み益が 0 の場合
+                    if profit_max == 0 and 100 < n_trend:
                         self.position_close(t_current, p_current)
                         continue
 
@@ -245,11 +243,11 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                         self.position_close(t_current, p_current)
                         continue
 
-                    """
                     # 双曲線を抜けた場合の損切
                     if self.should_losscut(p_current):
                         self.position_close(t_current, p_current, '損切（双曲線）')
                         continue
+                    """
 
                 else:
                     # トレンドの向きに急騰して、

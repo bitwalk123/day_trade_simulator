@@ -9,7 +9,7 @@ class RealTimePSAR:
     """
     __version__ = '1.4.0'
 
-    def __init__(self, af_init=0.000, af_step=0.001, af_max=0.01, q=200):
+    def __init__(self, af_init=0.000, af_step=0.001, af_max=0.01, q=10):
         self.af_init = af_init
         self.af_step = af_step
         self.af_max = af_max
