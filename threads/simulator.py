@@ -211,9 +211,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # -----------------------------------------------
                     # 【未エントリの場合】
                     # エントリ条件
-                    # PSAR の EP が規定回数だけ更新されていれば建玉を取得する
+                    # PSAR の EP が規定回数より多く更新されていれば建玉を取得
                     # -----------------------------------------------
-                    if self.epupd <= self.psar.getEPupd():
+                    if self.epupd < self.psar.getEPupd():
                         self.position_open(t_current, p_current)
                         # エントリ・フラグを立てる
                         self.flag_entry = True
