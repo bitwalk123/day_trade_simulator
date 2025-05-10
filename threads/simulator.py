@@ -226,6 +226,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # -----------------------------------------------
                     # 最低限の利確・損切
                     # -----------------------------------------------
+                    """
                     # 最大含み益が 1000 円より大きい場合の利確水準
                     factor_profit = 0.3
                     if 1000 <= profit_max and profit <= profit_max * factor_profit:
@@ -235,7 +236,6 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # -----------------------------------------------
                     # 損切
                     # -----------------------------------------------
-                    """
                     # 最大含み益が 0 の場合
                     if profit_max == 0 and 100 < n_trend:
                         self.position_close(t_current, p_current)
@@ -245,12 +245,12 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     if profit <= -1000:
                         self.position_close(t_current, p_current)
                         continue
-                    """
 
                     # 双曲線を抜けた場合の損切
                     if self.should_losscut(p_current):
                         self.position_close(t_current, p_current, '損切（双曲線）')
                         continue
+                    """
 
                 else:
                     # トレンドの向きに急騰して、
