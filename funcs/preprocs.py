@@ -77,6 +77,7 @@ def prep_dataset(file_excel: str) -> list:
             sheet_name=name_sheet_tick,
             header=0,
         )
+
         # 時刻データを日付を含んだ Matplotlib で扱える形式に変換、インデックスへ
         df_tick.index = [pd.to_datetime('%s %s' % (date, t)) for t in df_tick['Time']]
         df_tick.index.name = 'Datetime'
@@ -322,7 +323,8 @@ def read_sheet_tick(
         file_excel: str,
         code: str,
         date: str,
-        dict_target: dict):
+        dict_target: dict
+):
     """
     シート tick_**** の読み込み
     :param file_excel:
@@ -337,8 +339,17 @@ def read_sheet_tick(
         sheet_name=name_sheet_tick,
         header=0,
     )
+
+    # Moving Median Proce (MMPrice) の列がなければ追加
+    colname = 'MMPrice'
+    period = 50
+    if colname not in df.columns:
+        df.insert(2, colname, df['Price'].rolling(period, min_periods=1).median())
+
     # 時刻データを日付を含んだ Matplotlib で扱える形式に変換、インデックスへ
     df.index = [pd.to_datetime('%s %s' % (date, t)) for t in df['Time']]
     df.index.name = 'Datetime'
-    df = df[['Price', 'TREND', 'EP', 'AF', 'PSAR']]
+
+    # 必要な列のみ残す
+    df = df[['Price', colname, 'TREND', 'EP', 'AF', 'PSAR']]
     dict_target['tick'] = df
