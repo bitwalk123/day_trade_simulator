@@ -70,7 +70,8 @@ class Canvas(FigureCanvas):
         #  ティックデータ
         # =============
         idx = 0
-        self.ax[idx].plot(df_tick['Price'], color='black', linewidth=0.5, alpha=0.5)
+        self.ax[idx].plot(df_tick['Price'], color='black', linewidth=0.5, alpha=0.25)
+        self.ax[idx].plot(df_tick['MMPrice'], color='black', linewidth=0.5, alpha=1)
 
         # PSAR トレンド
         df_bear = df_tick[df_tick['TREND'] < 0]

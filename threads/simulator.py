@@ -36,6 +36,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
         # ログデータ
         self.ser_tick: pd.Series = dict_param['tick']
+        self.ser_mmtick: pd.Series = dict_param['mmtick'] # Moving Median
 
         # 日付文字列
         self.date_str = date_str = dict_param['date']
@@ -178,9 +179,11 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             if t_current in self.ser_tick.index:
                 # 現在価格の取得
                 p_current = self.ser_tick.at[t_current]
+                mmp_current = self.ser_mmtick.at[t_current]
 
                 # Parabolic SAR の算出
-                trend = self.psar.add(t_current, p_current)
+                #trend = self.psar.add(t_current, p_current)
+                trend = self.psar.add(t_current, mmp_current)
 
                 # -------------------------------------------------------------
                 # 🧿 現在時刻＆現在価格の更新を通知
@@ -242,12 +245,12 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     if profit <= -1000:
                         self.position_close(t_current, p_current)
                         continue
+                    """
 
                     # 双曲線を抜けた場合の損切
                     if self.should_losscut(p_current):
                         self.position_close(t_current, p_current, '損切（双曲線）')
                         continue
-                    """
 
                 else:
                     # トレンドの向きに急騰して、
