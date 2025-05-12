@@ -144,7 +144,12 @@ class WinMain(QMainWindow):
         :return:
         """
 
-        df_tick = dict_result['tick']
+        df_tick0 = dict_result['tick']
+        df_tick = self.dict_target['tick']
+        for colname in df_tick0.columns:
+            if colname != 'Price' and colname != 'MMPrice':
+                df_tick[colname] = df_tick0[colname].copy()
+
         df_profit = dict_result['profit']
         self.df_order = df_order = dict_result['order']
         self.column_format = dict_result['column_format']

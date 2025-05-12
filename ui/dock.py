@@ -370,6 +370,7 @@ class DockMain(QDockWidget):
         """
         dict_param['date'] = self.dict_target['date']
         dict_param['tick'] = self.dict_target['tick']['Price']
+        dict_param['mmtick'] = self.dict_target['tick']['MMPrice']
 
     def isLossCutEnabled(self) -> bool:
         return self.objLossCut.isChecked()

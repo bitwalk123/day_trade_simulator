@@ -36,6 +36,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
 
         # ログデータ
         self.ser_tick: pd.Series = dict_param['tick']
+        self.ser_mmtick: pd.Series = dict_param['mmtick'] # Moving Median
 
         # 日付文字列
         self.date_str = date_str = dict_param['date']
@@ -178,9 +179,11 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
             if t_current in self.ser_tick.index:
                 # 現在価格の取得
                 p_current = self.ser_tick.at[t_current]
+                mmp_current = self.ser_mmtick.at[t_current]
 
                 # Parabolic SAR の算出
-                trend = self.psar.add(t_current, p_current)
+                #trend = self.psar.add(t_current, p_current)
+                trend = self.psar.add(t_current, mmp_current)
 
                 # -------------------------------------------------------------
                 # 🧿 現在時刻＆現在価格の更新を通知
@@ -208,9 +211,9 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # -----------------------------------------------
                     # 【未エントリの場合】
                     # エントリ条件
-                    # PSAR の EP が規定回数だけ更新されていれば建玉を取得する
+                    # PSAR の EP が規定回数より多く更新されていれば建玉を取得
                     # -----------------------------------------------
-                    if self.epupd <= self.psar.getEPupd():
+                    if self.epupd < self.psar.getEPupd():
                         self.position_open(t_current, p_current)
                         # エントリ・フラグを立てる
                         self.flag_entry = True
@@ -223,6 +226,7 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # -----------------------------------------------
                     # 最低限の利確・損切
                     # -----------------------------------------------
+                    """
                     # 最大含み益が 1000 円より大きい場合の利確水準
                     factor_profit = 0.3
                     if 1000 <= profit_max and profit <= profit_max * factor_profit:
@@ -232,7 +236,6 @@ class WorkerSimulator(QRunnable, SimulatorSignal):
                     # -----------------------------------------------
                     # 損切
                     # -----------------------------------------------
-                    """
                     # 最大含み益が 0 の場合
                     if profit_max == 0 and 100 < n_trend:
                         self.position_close(t_current, p_current)
